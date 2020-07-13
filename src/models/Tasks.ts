@@ -43,8 +43,17 @@ export function getTasksModel(sequelize, models): ModelType {
         forgets: {
             type: DataTypes.INTEGER,
             defaultValue: 0
-        }
-
+        },
+        notificationsNeed: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1,
+            allowNull: false
+        },
+        notificationsDone: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+            allowNull: false
+        },
     }, {
         sequelize,
         tableName: 'tasks',

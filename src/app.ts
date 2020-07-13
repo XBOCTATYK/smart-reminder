@@ -67,7 +67,12 @@ setTimeout(() => {
                 switch (state) {
                     case 'taskName':
                         options.name = ctx1.message.text;
-                        state = 'taskTime';
+                        state = 'taskDate';
+                        ctx1.reply('На какую дату планируете?');
+                        break;
+                    case 'taskDate':
+                        options.date = ctx1.message.text;
+
                         ctx1.reply('На какое время планируете?');
                         break;
                     case 'taskTime':

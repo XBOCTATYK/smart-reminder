@@ -7,6 +7,7 @@ import { getNotifiesModel } from 'Models/Notifies';
 import { getUserModel } from 'Models/User';
 import { getUsualModel } from 'Models/Usual';
 import { remindControls } from 'Src/messages/remind';
+import { createNewTask } from 'Src/utils/createNewTask';
 
 const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
 
@@ -105,8 +106,11 @@ setTimeout(() => {
                         options.startTime = format(new Date(), 'HH:mm');
                         options.startDate = getDateNow();
 
-                        DB.model('Tasks').create(options).then(() => {
+                        createNewTask(DB, options).then(() => {
                             ctx1.reply('Напоминание создано!')
+                        }).catch(err => {
+                            state = 'end';
+                            ctx1.reply('Произошла ошибка при создании задачи!')
                         })
                         break;
                     default:
@@ -124,11 +128,26 @@ setTimeout(() => {
         DB.model('Tasks').findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
             result.forEach( item => {
                 const { dataValues } = item;
-                bot.telegram.sendMessage(dataValues.user_id, dataValues.name, remindControls());
+                bot.telegram.sendMessage(dataValues.user_id, `Крайний срок задачи: ${dataValues.name} - ${dataValues.time} ${dataValues.date}`);
             })
         })
 
         DB.model('Tasks').update(( { done: true } ), { where: { time: thisTime, date: thisDate } } );
+
+        DB.model('Notifies').findAll({ where: { time: thisTime, date: thisDate }, include: [ DB.model('Tasks') ] }).then((result) => {
+            result.forEach( item => {
+                const { dataValues: notify } = item;
+                const { Task: { dataValues: task }} = notify;
+
+                delete notify.Task;
+
+                const value = { ...task, ...notify };
+                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${value.time} ${value.date}`, remindControls());
+
+                
+                DB.model('Notifies').destroy({ where: { id: value.id } })
+            })
+        })
     }, 60000)
 
     bot.on('callback_query', (ctx) => {

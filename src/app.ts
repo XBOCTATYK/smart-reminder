@@ -10,6 +10,10 @@ import { remindControls } from 'Src/messages/remind';
 
 const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
 
+function getDateNow() {
+    return format(new Date(), 'dd.MM.yyyy');
+}
+
 setTimeout(() => {
 
     const DB = new ORMConnection(process.env.DATABASE_URL, [
@@ -55,8 +59,11 @@ setTimeout(() => {
         const options = {
             user_id: userId,
             name: 'Новая задача',
+            priority: 5,
             time: null,
-            date: format(new Date(), 'dd.MM.yyyy')
+            startTime: null,
+            startDate: null,
+            date: getDateNow(),
         };
         let state = 'taskName';
 
@@ -67,16 +74,36 @@ setTimeout(() => {
                 switch (state) {
                     case 'taskName':
                         options.name = ctx1.message.text;
+                        state = 'taskPriority';
+                        ctx1.reply('Какой приоритет задачи?');
+                        break;
+                    case 'taskPriority':
+                        const priority = parseInt(ctx1.message.text);
+                        if (isNaN(priority)) {
+                            ctx1.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
+                            break;
+                        }
+                        options.priority = priority;
                         state = 'taskDate';
                         ctx1.reply('На какую дату планируете?');
                         break;
                     case 'taskDate':
-                        options.date = ctx1.message.text;
+                        let date = ctx1.message.text;
 
+                        if (date === 'Сегодня') {
+                            date = getDateNow();
+                        }
+
+                        options.date = date;
+
+                        state = 'taskTime';
                         ctx1.reply('На какое время планируете?');
                         break;
                     case 'taskTime':
                         options.time = ctx1.message.text;
+
+                        options.startTime = format(new Date(), 'HH:mm');
+                        options.startDate = getDateNow();
 
                         DB.model('Tasks').create(options).then(() => {
                             ctx1.reply('Напоминание создано!')
@@ -90,14 +117,18 @@ setTimeout(() => {
     })
 
     setInterval(() => {
-        const thisTime = format(new Date, 'HH:mm');
+        const date = new Date();
+        const thisTime = format(date, 'HH:mm');
+        const thisDate = format(date, 'dd.MM.yyyy');
 
-        DB.model('Tasks').findAll({ where: { time: thisTime } }).then((result) => {
+        DB.model('Tasks').findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
             result.forEach( item => {
                 const { dataValues } = item;
                 bot.telegram.sendMessage(dataValues.user_id, dataValues.name, remindControls());
             })
         })
+
+        DB.model('Tasks').update(( { done: true } ), { where: { time: thisTime, date: thisDate } } );
     }, 60000)
 
     bot.on('callback_query', (ctx) => {

@@ -15,6 +15,8 @@ const tasksDefaults = {
     name: 'Что-то за задача',
     time: '23:50',
     date: '12.07.2020',
+    startTime: '12:00',
+    startDate: '11.07.2020',
     priority: 5,
 }
 

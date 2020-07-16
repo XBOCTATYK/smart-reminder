@@ -44,7 +44,6 @@ function notifiesInDay(date1, date2, notifyCount) {
     const diffInMinutes = differenceInMinutes(date2, date1);
 
     let resultArr = [];
-    let altArr = [];
     const notifyOffset = diffInMinutes/notifyCount;
     let offset = diffInMinutes;
 
@@ -59,22 +58,33 @@ function notifiesInDay(date1, date2, notifyCount) {
 }
 
 
-const notifies = notifiesInDay(new Date(2020, 10, 20, 8), new Date(2020, 10, 28, 22), 20);
-
+const notifies = notifiesInDay(new Date(2020, 10, 15, 14, 27), new Date(2020, 10, 28, 22), 60);
+console.log(notifies)
 function notifyTimesInNearDayWithWorkingHours(notifyTimes, from, to) {
     const nearestDay = format(notifyTimes[0], 'dd.MM.yyyy', new Date());
-    console.log(nearestDay)
     let notifiesInNearestDay = notifyTimes.filter( date => format(date, 'dd.MM.yyyy', new Date()) === nearestDay );
 
-    const allNotifiesInRange = notifiesInNearestDay.reduce( (value, date) => { value = checkInWorkRange(from, to, date) }, false)
+    const allNotifiesInRange = notifiesInNearestDay.reduce( (value, date) => { value = checkInWorkRange(from, to, date); return value }, false)
 
-    const offsets = allNotifiesInRange
+    const offsets = !allNotifiesInRange
         ? notifiesInNearestDay.map( date => getAvailableTime(from, to, date))
         : notifiesInNearestDay;
 
-    console.log(notifyTimes)
-    console.log(notifiesInNearestDay)
-    console.log(offsets)
+    return offsets[0];
 }
 
 notifyTimesInNearDayWithWorkingHours(notifies, '10:00', '22:00')
+
+let currentNotifyDate = new Date(2020, 10, 15, 14, 27);
+const startDate = currentNotifyDate;
+
+for (let index = 0; index < 6; index++) {
+    const not = notifiesInDay(startDate, new Date(2020, 10, 28, 18), 6).slice(index);
+    currentNotifyDate = notifyTimesInNearDayWithWorkingHours(not, '10:00', '22:00');
+    if (!checkInWorkRange('10:00', '22:00', currentNotifyDate)) {
+        index++;
+        const not2 = notifiesInDay(startDate, new Date(2020, 10, 28, 18), 6).slice(index);
+        currentNotifyDate = notifyTimesInNearDayWithWorkingHours(not2, '10:00', '22:00');
+    }
+    console.log(currentNotifyDate);
+}

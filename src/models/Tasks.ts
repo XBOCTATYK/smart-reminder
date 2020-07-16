@@ -31,6 +31,14 @@ export function getTasksModel(sequelize, models): ModelType {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        startTime: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        startDate: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         priority: {
             type: DataTypes.INTEGER,
             defaultValue: 5,
@@ -54,6 +62,10 @@ export function getTasksModel(sequelize, models): ModelType {
             defaultValue: 0,
             allowNull: false
         },
+        done: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        }
     }, {
         sequelize,
         tableName: 'tasks',

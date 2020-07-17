@@ -144,10 +144,10 @@ setTimeout(() => {
                 delete notify.Task;
 
                 const value = { ...task, ...notify };
-                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${value.time} ${value.date}`, remindControls());
+                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} ${task.date}`, remindControls({ ...task }, { ...notify }));
 
                 createNextNotification(DB, task).then(() => {
-                    DB.model('Notifies').destroy({ where: { id: value.id } })
+
                 })
                     .catch(() => {
                         bot.telegram.sendMessage(value.user_id, 'Ошибка при создании следующего напоминания');
@@ -155,17 +155,44 @@ setTimeout(() => {
 
             })
         })
-    }, 60000)
+    }, 10000)
 
-    bot.on('callback_query', (ctx) => {
+    bot.on('callback_query', async (ctx) => {
         const callback_id = ctx.update?.callback_query?.id;
+        console.log(ctx.update?.callback_query?.data)
+        const { task, notify, answerId } = JSON.parse(ctx.update?.callback_query?.data);
+        const callback_query = ctx.update?.callback_query;
 
         const messageAnswers = {
             Y: 'Отлично!',
             N: 'ОК! Повторим напоминание чуть позже',
             D: 'Отлично! Больше не напоминаю.'
         }
-        ctx.reply(messageAnswers[callback_id])
+
+        try {
+            const notifyExists = DB.model('Notifies').findOne({ where: { id: notify.id }})
+
+            console.log(callback_query)
+            console.log(notifyExists)
+
+            switch (answerId) {
+                case 'N':
+                    await DB.model('Tasks').update(({ notificationsNeed: task.notificationsNeed + 1 }), { where: { id: task.id } });
+                    await DB.model('Notifies').destroy({ where: { id: notify.id } })
+                    break;
+                case 'D':
+                    await DB.model('Tasks').update(({ done: true }), { where: { id: task.id } });
+                    await DB.model('Notifies').destroy({ where: { id: notify.id } })
+                    break;
+                default:
+                    console.log('Unrecognized answer')
+            }
+
+            ctx.reply(messageAnswers[answerId])
+        } catch (e) {
+            ctx.reply('Что-то пошло не так')
+            console.log(e)
+        }
     })
 
     bot.command('stop', (ctx) => {

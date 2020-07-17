@@ -1,20 +1,15 @@
 import parse from 'date-fns/parse';
 import differenceInMinutes from 'date-fns/differenceInMinutes';
 import addMinutes from 'date-fns/addMinutes';
-import addHours from 'date-fns/addHours';
-import subHours from 'date-fns/subHours';
 import startOfDay from 'date-fns/startOfDay';
 import format from 'date-fns/format';
-import { DATE_FORMAT, TIME_FORMAT } from 'Src/constants/formats';
-
-
-const dateFnsConfig = { weekStartsOn: 1 };
+import { DATE_FNS_OPTIONS, DATE_FORMAT, TIME_FORMAT } from 'Src/constants/formats';
 
 const MINS_IN_DAY = 1440;
 
 function getRange(from, to) {
-    const fromTime = parse(from, TIME_FORMAT, new Date(1970, 1, 2));
-    const toTime = parse(to, TIME_FORMAT, new Date(1970, 1, 2));
+    const fromTime = parse(from, TIME_FORMAT, new Date(1970, 1, 2), DATE_FNS_OPTIONS);
+    const toTime = parse(to, TIME_FORMAT, new Date(1970, 1, 2), DATE_FNS_OPTIONS);
 
     const fromInMinutes = differenceInMinutes(fromTime, startOfDay(fromTime));
     const toInMinutes = differenceInMinutes(toTime, startOfDay(fromTime));
@@ -23,7 +18,7 @@ function getRange(from, to) {
 }
 
 function getAvailableTime(from, to, dateTime) {
-    const dayStart = addHours(startOfDay(dateTime), 3);
+    const dayStart = startOfDay(dateTime);
     const currentPoint = differenceInMinutes(dateTime, dayStart);
     const { fromInMinutes, toInMinutes } = getRange(from, to);
 
@@ -53,7 +48,7 @@ function notifyTimes(date1: Date, date2: Date, notifyCount: number): Date[] {
 }
 
 function checkInWorkRange(from, to, dateTime) {
-    const dayStart = addHours(startOfDay(dateTime), 3);
+    const dayStart = startOfDay(dateTime);
     const currentPoint = differenceInMinutes(dateTime, dayStart);
     const { fromInMinutes, toInMinutes } = getRange(from, to);
 
@@ -63,9 +58,9 @@ function checkInWorkRange(from, to, dateTime) {
 function notifyTimesInNearDayWithWorkingHours(notifyTimes, from, to) {
     console.log(notifyTimes)
     // @ts-ignore
-    const nearestDay = format(notifyTimes[0], DATE_FORMAT, dateFnsConfig);
+    const nearestDay = format(notifyTimes[0], DATE_FORMAT, DATE_FNS_OPTIONS);
     // @ts-ignore
-    let notifiesInNearestDay = notifyTimes.filter( date => format(date, DATE_FORMAT, dateFnsConfig) === nearestDay );
+    let notifiesInNearestDay = notifyTimes.filter( date => format(date, DATE_FORMAT, DATE_FNS_OPTIONS) === nearestDay );
 
     const allNotifiesInRange = notifiesInNearestDay.reduce( (value, date) => { value = checkInWorkRange(from, to, date); return value }, false)
 
@@ -77,14 +72,14 @@ function notifyTimesInNearDayWithWorkingHours(notifyTimes, from, to) {
 }
 
 export function getNextNotifyTime(user, task): { date: string, time: string } {
-    const taskTime = parse(`${task.date} ${task.time}`, `${DATE_FORMAT} ${TIME_FORMAT}`, new Date());
+    const taskTime = parse(`${task.date} ${task.time}`, `${DATE_FORMAT} ${TIME_FORMAT}`, new Date(), DATE_FNS_OPTIONS);
 
     const dateNow = new Date();
     const nextNotificationsTimes = notifyTimes(dateNow, taskTime, task.notificationsNeed).slice(task.notificationsDone);
     console.log(nextNotificationsTimes)
     const nextNotifyTime = notifyTimesInNearDayWithWorkingHours(nextNotificationsTimes, user.time_from, user.time_to)[0];
-    const nextNotifyDateFormatted = format(subHours(nextNotifyTime, 3), DATE_FORMAT);
-    const nextNotifyTimeFormatted = format(subHours(nextNotifyTime, 3), TIME_FORMAT);
+    const nextNotifyDateFormatted = format(nextNotifyTime,  DATE_FORMAT, DATE_FNS_OPTIONS);
+    const nextNotifyTimeFormatted = format(nextNotifyTime, TIME_FORMAT, DATE_FNS_OPTIONS);
 
     return { date: nextNotifyDateFormatted, time: nextNotifyTimeFormatted };
 }

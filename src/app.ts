@@ -8,11 +8,13 @@ import { getUserModel } from 'Models/User';
 import { getUsualModel } from 'Models/Usual';
 import { remindControls } from 'Src/messages/remind';
 import { createNewTask } from 'Src/utils/createNewTask';
+import { createNextNotification } from 'Src/utils/createNextNotification';
+import { DATE_FNS_OPTIONS } from 'Src/constants/formats';
 
 const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
 
 function getDateNow() {
-    return format(new Date(), 'dd.MM.yyyy');
+    return format(new Date(), 'dd.MM.yyyy', DATE_FNS_OPTIONS);
 }
 
 setTimeout(() => {
@@ -103,7 +105,7 @@ setTimeout(() => {
                     case 'taskTime':
                         options.time = ctx1.message.text;
 
-                        options.startTime = format(new Date(), 'HH:mm');
+                        options.startTime = format(new Date(), 'HH:mm', DATE_FNS_OPTIONS);
                         options.startDate = getDateNow();
 
                         createNewTask(DB, options).then(() => {
@@ -122,8 +124,8 @@ setTimeout(() => {
 
     setInterval(() => {
         const date = new Date();
-        const thisTime = format(date, 'HH:mm');
-        const thisDate = format(date, 'dd.MM.yyyy');
+        const thisTime = format(date, 'HH:mm', DATE_FNS_OPTIONS);
+        const thisDate = format(date, 'dd.MM.yyyy', DATE_FNS_OPTIONS);
 
         DB.model('Tasks').findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
             result.forEach( item => {
@@ -144,8 +146,13 @@ setTimeout(() => {
                 const value = { ...task, ...notify };
                 bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${value.time} ${value.date}`, remindControls());
 
-                
-                DB.model('Notifies').destroy({ where: { id: value.id } })
+                createNextNotification(DB, task).then(() => {
+                    DB.model('Notifies').destroy({ where: { id: value.id } })
+                })
+                    .catch(() => {
+                        bot.telegram.sendMessage(value.user_id, 'Ошибка при создании следующего напоминания');
+                    })
+
             })
         })
     }, 60000)

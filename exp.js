@@ -9,18 +9,18 @@ const startOfDay = require('date-fns/startOfDay')
 const MINS_IN_DAY = 1440;
 
 function getRange(from, to) {
-    const fromTime = parse(from, 'HH:mm', new Date(1970, 1, 2));
-    const toTime = parse(to, 'HH:mm', new Date(1970, 1, 2));
+    const fromTime = parse(from, 'HH:mm', new Date(1970, 1, 2), { locale: 'ru-Ru' });
+    const toTime = parse(to, 'HH:mm', new Date(1970, 1, 2), { locale: 'ru-Ru' });
 
-    const fromInMinutes = differenceInMinutes(fromTime, startOfDay(fromTime));
-    const toInMinutes = differenceInMinutes(toTime, startOfDay(fromTime));
+    const fromInMinutes = differenceInMinutes(fromTime, startOfDay(fromTime, { locale: 'ru-Ru' }));
+    const toInMinutes = differenceInMinutes(toTime, startOfDay(fromTime, { locale: 'ru-Ru' }));
 
     return { fromInMinutes, toInMinutes}
 }
 
 function getAvailableTime(from, to, dateTime) {
-    const dayStart = addHours(startOfDay(dateTime), 3);
-    const currentPoint = differenceInMinutes(dateTime, dayStart);
+    const dayStart = startOfDay(dateTime, { locale: 'ru-Ru' });
+    const currentPoint = differenceInMinutes(dateTime, dayStart, { locale: 'ru-Ru' });
     const { fromInMinutes, toInMinutes } = getRange(from, to);
 
     const sizeWorkingDayInMinutes = MINS_IN_DAY - (MINS_IN_DAY - toInMinutes) - fromInMinutes;
@@ -28,20 +28,20 @@ function getAvailableTime(from, to, dateTime) {
     const newPoint = Math.round((currentPoint)*ratio);
     const resultOffset = fromInMinutes + newPoint;
 
-    return addMinutes(dayStart, resultOffset)
+    return addMinutes(dayStart, resultOffset, { locale: 'ru-Ru' })
 
 }
 
 function checkInWorkRange(from, to, dateTime) {
-    const dayStart = addHours(startOfDay(dateTime), 3);
-    const currentPoint = differenceInMinutes(dateTime, dayStart);
+    const dayStart = startOfDay(dateTime, { locale: 'ru-Ru' });
+    const currentPoint = differenceInMinutes(dateTime, dayStart, { locale: 'ru-Ru' });
     const { fromInMinutes, toInMinutes } = getRange(from, to);
 
     return currentPoint >= fromInMinutes && currentPoint <= toInMinutes;
 }
 
 function notifiesInDay(date1, date2, notifyCount) {
-    const diffInMinutes = differenceInMinutes(date2, date1);
+    const diffInMinutes = differenceInMinutes(date2, date1, { locale: 'ru-Ru' });
 
     let resultArr = [];
     const notifyOffset = diffInMinutes/notifyCount;
@@ -51,7 +51,7 @@ function notifiesInDay(date1, date2, notifyCount) {
         const notifyLeft = notifyCount - index;
         offset -= notifyOffset*((notifyCount/2)/(notifyLeft*2));
 
-        resultArr.push(addMinutes(date1, Math.round(offset)));
+        resultArr.push(addMinutes(date1, Math.round(offset), { locale: 'ru-Ru' }));
     }
 
     return resultArr.reverse();
@@ -61,8 +61,8 @@ function notifiesInDay(date1, date2, notifyCount) {
 const notifies = notifiesInDay(new Date(2020, 10, 15, 14, 27), new Date(2020, 10, 28, 22), 60);
 console.log(notifies)
 function notifyTimesInNearDayWithWorkingHours(notifyTimes, from, to) {
-    const nearestDay = format(notifyTimes[0], 'dd.MM.yyyy', new Date());
-    let notifiesInNearestDay = notifyTimes.filter( date => format(date, 'dd.MM.yyyy', new Date()) === nearestDay );
+    const nearestDay = format(notifyTimes[0], 'dd.MM.yyyy', new Date(), { locale: 'ru-Ru' });
+    let notifiesInNearestDay = notifyTimes.filter( date => format(date, 'dd.MM.yyyy', new Date(), { locale: 'ru-Ru' }) === nearestDay );
 
     const allNotifiesInRange = notifiesInNearestDay.reduce( (value, date) => { value = checkInWorkRange(from, to, date); return value }, false)
 

@@ -81,19 +81,22 @@ setTimeout(() => {
                         ctx1.reply('Какой приоритет задачи?');
                         break;
                     case 'taskPriority':
-                        const priority = parseInt(ctx1.message.text);
-                        if (isNaN(priority)) {
+                        const priority = ctx1.message.text;
+
+                        const priorityAsNumber = priority === 'f' ? 5 : parseInt(priority);
+
+                        if (isNaN(priorityAsNumber)) {
                             ctx1.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
                             break;
                         }
-                        options.priority = priority;
+                        options.priority = priorityAsNumber;
                         state = 'taskDate';
                         ctx1.reply('На какую дату планируете?');
                         break;
                     case 'taskDate':
                         let date = ctx1.message.text;
 
-                        if (date === 'Сегодня') {
+                        if (date === 'Сегодня' || date === 'f') {
                             date = getDateNow();
                         }
 
@@ -144,7 +147,7 @@ setTimeout(() => {
                 delete notify.Task;
 
                 const value = { ...task, ...notify };
-                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} ${task.date}`, remindControls({ ...task }, { ...notify }));
+                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} ${task.date}`, remindControls(task, notify));
 
                 createNextNotification(DB, task).then(() => {
 
@@ -155,13 +158,12 @@ setTimeout(() => {
 
             })
         })
-    }, 10000)
+    }, 60000)
 
     bot.on('callback_query', async (ctx) => {
         const callback_id = ctx.update?.callback_query?.id;
         console.log(ctx.update?.callback_query?.data)
-        const { task, notify, answerId } = JSON.parse(ctx.update?.callback_query?.data);
-        const callback_query = ctx.update?.callback_query;
+        const { taskId, notifNed, notifyId, answerId } = JSON.parse(ctx.update?.callback_query?.data);
 
         const messageAnswers = {
             Y: 'Отлично!',
@@ -170,25 +172,33 @@ setTimeout(() => {
         }
 
         try {
-            const notifyExists = DB.model('Notifies').findOne({ where: { id: notify.id }})
+            // @ts-ignore
+            const notifyExists = await DB.model('Notifies').findOne({ where: { id: notifyId }})
 
-            console.log(callback_query)
             console.log(notifyExists)
 
-            switch (answerId) {
-                case 'N':
-                    await DB.model('Tasks').update(({ notificationsNeed: task.notificationsNeed + 1 }), { where: { id: task.id } });
-                    await DB.model('Notifies').destroy({ where: { id: notify.id } })
-                    break;
-                case 'D':
-                    await DB.model('Tasks').update(({ done: true }), { where: { id: task.id } });
-                    await DB.model('Notifies').destroy({ where: { id: notify.id } })
-                    break;
-                default:
-                    console.log('Unrecognized answer')
+            if (notifyExists) {
+                switch (answerId) {
+                    case 'Y':
+                        await DB.model('Notifies').destroy({ where: { id: notifyId } });
+                        break;
+                    case 'N':
+                        await DB.model('Tasks').update(({ notificationsNeed: notifNed + 1 }), { where: { id: taskId } });
+                        await DB.model('Notifies').destroy({ where: { id: notifyId } })
+                        break;
+                    case 'D':
+                        await DB.model('Tasks').update(({ done: true }), { where: { id: taskId } });
+                        await DB.model('Notifies').destroy({ where: { id: notifyId } })
+                        break;
+                    default:
+                        console.log('Unrecognized answer')
+                }
+
+                ctx.reply(messageAnswers[answerId])
+            } else {
+                ctx.reply('Вы уже давали ответ на это напоминание!')
             }
 
-            ctx.reply(messageAnswers[answerId])
         } catch (e) {
             ctx.reply('Что-то пошло не так')
             console.log(e)

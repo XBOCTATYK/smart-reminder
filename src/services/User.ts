@@ -6,6 +6,7 @@ class UserState {
     private id: number;
     private stateProp: string;
     private dataProp: any = {};
+    private created: boolean;
 
     constructor(id: number | string, state?: UserStateType, data?) {
         if (!id) {
@@ -22,17 +23,24 @@ class UserState {
             Store.set(id, { state: defaultState, ...data });
             this.stateProp = defaultState;
             this.dataProp = data;
+            this.created = true;
         } else {
             this.stateProp = userData.state;
             this.dataProp = { ...userData };
+            this.created = false;
         }
 
         this.id = Number(id);
     }
 
+    isCreated() {
+        return this.created;
+    }
+
     setState(state) {
         Store.set(this.id, { ...this.dataProp, state });
         this.stateProp = state;
+        this.created = false;
         return this;
     }
 
@@ -44,6 +52,7 @@ class UserState {
         const newData = { ...this.dataProp, ...data };
         Store.set(this.id, { ...newData, state: this.stateProp, });
         this.dataProp = newData;
+        this.created = false;
         return this;
     }
 

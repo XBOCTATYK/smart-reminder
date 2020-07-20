@@ -9,16 +9,16 @@ import { getUsualModel } from 'Models/Usual';
 import { remindControls } from 'Src/messages/remind';
 import { createNewTask } from 'Utils/createNewTask';
 import { createNextNotification } from 'Src/utils/createNextNotification';
-import { DATE_FNS_OPTIONS } from 'Constants/formats';
-import { dateControls } from 'Src/messages/taskCreating';
+import { DATE_FNS_OPTIONS, DATE_FORMAT, TIME_FORMAT } from 'Constants/formats';
+import { dateControls, priorityControls } from 'Src/messages/taskCreating';
 import { UserService } from 'Services/User';
 import { STATES } from 'Constants/states';
 
-const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
+import { notificationCallback } from 'Src/callbacks/notificationCallback';
+import { getDateNow } from 'Utils/dates';
+import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
 
-function getDateNow() {
-    return format(new Date(), 'dd.MM.yyyy', DATE_FNS_OPTIONS);
-}
+const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
 
 setTimeout(() => {
 
@@ -84,7 +84,7 @@ setTimeout(() => {
         switch (currentState) {
                 case STATES.ENTER_TASK_NAME:
                     User.addData({ name: ctx.message.text }).setState(STATES.ENTER_TASK_PRIORITY);
-                    ctx.reply('Какой приоритет задачи?');
+                    ctx.reply('Какой приоритет задачи?', priorityControls());
                     break;
                 case STATES.ENTER_TASK_PRIORITY:
                     const priority = ctx.message.text;
@@ -112,7 +112,7 @@ setTimeout(() => {
                     const options = {} as any;
                     options.time = ctx.message.text;
 
-                    options.startTime = format(new Date(), 'HH:mm', DATE_FNS_OPTIONS);
+                    options.startTime = format(new Date(), TIME_FORMAT, DATE_FNS_OPTIONS);
                     options.startDate = getDateNow();
                     User.addData(options);
 
@@ -133,8 +133,8 @@ setTimeout(() => {
 
     setInterval(() => {
         const date = new Date();
-        const thisTime = format(date, 'HH:mm', DATE_FNS_OPTIONS);
-        const thisDate = format(date, 'dd.MM.yyyy', DATE_FNS_OPTIONS);
+        const thisTime = format(date, TIME_FORMAT, DATE_FNS_OPTIONS);
+        const thisDate = format(date, DATE_FORMAT, DATE_FNS_OPTIONS);
 
         DB.model('Tasks').findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
             result.forEach( item => {
@@ -164,49 +164,9 @@ setTimeout(() => {
         })
     }, 60000);
 
-    bot.on('callback_query', async (ctx) => {
-        const callback_id = ctx.update?.callback_query?.id;
-        console.log(ctx.update?.callback_query?.data);
-        const { taskId, notifNed, notifyId, answerId } = JSON.parse(ctx.update?.callback_query?.data);
-
-        const messageAnswers = {
-            Y: 'Отлично!',
-            N: 'ОК! Повторим напоминание чуть позже',
-            D: 'Отлично! Больше не напоминаю.'
-        };
-
-        try {
-            // @ts-ignore
-            const notifyExists = await DB.model('Notifies').findOne({ where: { id: notifyId }});
-
-            console.log(notifyExists)
-
-            if (notifyExists) {
-                switch (answerId) {
-                    case 'Y':
-                        await DB.model('Notifies').destroy({ where: { id: notifyId } });
-                        break;
-                    case 'N':
-                        await DB.model('Tasks').update(({ notificationsNeed: notifNed + 1 }), { where: { id: taskId } });
-                        await DB.model('Notifies').destroy({ where: { id: notifyId } });
-                        break;
-                    case 'D':
-                        await DB.model('Tasks').update(({ done: true }), { where: { id: taskId } });
-                        await DB.model('Notifies').destroy({ where: { id: notifyId } });
-                        break;
-                    default:
-                        console.log('Unrecognized answer')
-                }
-
-                ctx.reply(messageAnswers[answerId])
-            } else {
-                ctx.reply('Вы уже давали ответ на это напоминание!')
-            }
-
-        } catch (e) {
-            ctx.reply('Что-то пошло не так');
-            console.log(e)
-        }
+    bot.on('callback_query', (ctx) => {
+        creatingTaskCallback(ctx);
+        notificationCallback(ctx, DB).then();
     });
 
     bot.command('stop', (ctx) => {

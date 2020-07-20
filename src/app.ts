@@ -7,10 +7,12 @@ import { getNotifiesModel } from 'Models/Notifies';
 import { getUserModel } from 'Models/User';
 import { getUsualModel } from 'Models/Usual';
 import { remindControls } from 'Src/messages/remind';
-import { createNewTask } from 'Src/utils/createNewTask';
+import { createNewTask } from 'Utils/createNewTask';
 import { createNextNotification } from 'Src/utils/createNextNotification';
-import { DATE_FNS_OPTIONS } from 'Src/constants/formats';
+import { DATE_FNS_OPTIONS } from 'Constants/formats';
 import { dateControls } from 'Src/messages/taskCreating';
+import { UserService } from 'Services/User';
+import { STATES } from 'Constants/states';
 
 const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
 
@@ -61,7 +63,6 @@ setTimeout(() => {
     bot.command('task', (ctx) => {
         const userId = ctx.message.from.id;
         const options = {
-            user_id: userId,
             name: 'Новая задача',
             priority: 5,
             time: null,
@@ -69,61 +70,65 @@ setTimeout(() => {
             startDate: null,
             date: getDateNow(),
         };
-        let state = 'taskName';
 
         ctx.reply('Что планируете сделать?');
 
-        bot.on('text', ctx1 => {
-            if (userId === ctx1.message.from.id) {
-                switch (state) {
-                    case 'taskName':
-                        options.name = ctx1.message.text;
-                        state = 'taskPriority';
-                        ctx1.reply('Какой приоритет задачи?');
+        UserService(userId, STATES.ENTER_TASK_NAME, options);
+    });
+
+    bot.on('text', ctx => {
+        const userId = ctx?.message?.from?.id;
+        const User = UserService(userId);
+        const currentState = User.state();
+
+        switch (currentState) {
+                case STATES.ENTER_TASK_NAME:
+                    User.addData({ name: ctx.message.text }).setState(STATES.ENTER_TASK_PRIORITY);
+                    ctx.reply('Какой приоритет задачи?');
+                    break;
+                case STATES.ENTER_TASK_PRIORITY:
+                    const priority = ctx.message.text;
+                    const priorityAsNumber = priority === 'f' ? 5 : parseInt(priority);
+
+                    if (isNaN(priorityAsNumber)) {
+                        ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
                         break;
-                    case 'taskPriority':
-                        const priority = ctx1.message.text;
+                    }
 
-                        const priorityAsNumber = priority === 'f' ? 5 : parseInt(priority);
+                    User.addData({ priority: priorityAsNumber }).setState(STATES.ENTER_TASK_DATE);
+                    ctx.reply('На какую дату планируете?', dateControls());
+                    break;
+                case STATES.ENTER_TASK_DATE:
+                    let date = ctx.message.text.toLowerCase();
 
-                        if (isNaN(priorityAsNumber)) {
-                            ctx1.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
-                            break;
-                        }
-                        options.priority = priorityAsNumber;
-                        state = 'taskDate';
-                        ctx1.reply('На какую дату планируете?', dateControls());
-                        break;
-                    case 'taskDate':
-                        let date = ctx1.message.text.toLowerCase();
+                    if (date === 'сегодня' || date === 'f') {
+                        date = getDateNow();
+                    }
 
-                        if (date === 'cегодня' || date === 'f') {
-                            date = getDateNow();
-                        }
+                    User.addData({ date }).setState(STATES.ENTER_TASK_TIME);
+                    ctx.reply('На какое время планируете?');
+                    break;
+                case STATES.ENTER_TASK_TIME:
+                    const options = {} as any;
+                    options.time = ctx.message.text;
 
-                        options.date = date;
+                    options.startTime = format(new Date(), 'HH:mm', DATE_FNS_OPTIONS);
+                    options.startDate = getDateNow();
+                    User.addData(options);
 
-                        state = 'taskTime';
-                        ctx1.reply('На какое время планируете?');
-                        break;
-                    case 'taskTime':
-                        options.time = ctx1.message.text;
+                    console.log(userId);
 
-                        options.startTime = format(new Date(), 'HH:mm', DATE_FNS_OPTIONS);
-                        options.startDate = getDateNow();
-
-                        createNewTask(DB, options).then(() => {
-                            ctx1.reply('Напоминание создано!')
-                        }).catch(err => {
-                            state = 'end';
-                            ctx1.reply('Произошла ошибка при создании задачи!')
-                        });
-                        break;
-                    default:
-                        break;
-                }
+                    createNewTask(DB, { user_id: userId, ...User.data() }).then(() => {
+                        ctx.reply('Напоминание создано!');
+                        User.done();
+                    }).catch(err => {
+                        User.setState(STATES.CREATING_TASK_ERROR);
+                        ctx.reply('Произошла ошибка при создании задачи!')
+                    });
+                    break;
+                default:
+                    break;
             }
-        })
     });
 
     setInterval(() => {

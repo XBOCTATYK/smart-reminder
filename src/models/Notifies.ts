@@ -11,7 +11,8 @@ export function getNotifiesModel(sequelize, models): ModelType {
             type: DataTypes.INTEGER,
             allowNull: false,
             autoIncrement: true,
-            primaryKey: true
+            primaryKey: true,
+            unique: true,
         },
         task_id: {
             type: DataTypes.INTEGER,
@@ -33,12 +34,12 @@ export function getNotifiesModel(sequelize, models): ModelType {
         sequelize,
         tableName: 'notifies',
         modelName: 'Notifies'
-    })
+    });
 
     // @ts-ignore
     Notifies.belongsTo(TaskModel, {
         foreignKey: 'task_id'
-    })
+    });
 
     return Notifies;
 }

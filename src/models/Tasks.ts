@@ -10,7 +10,8 @@ export function getTasksModel(sequelize, models): ModelType {
             type: DataTypes.INTEGER,
             allowNull: false,
             autoIncrement: true,
-            primaryKey: true
+            primaryKey: true,
+            unique: true,
         },
         user_id: {
             type: DataTypes.INTEGER,

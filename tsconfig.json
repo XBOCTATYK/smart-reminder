@@ -25,6 +25,10 @@
         "paths": {
             "Src/*": ["src/*"],
             "Models/*": ["src/models/*"],
+            "Services/*": ["src/services/*"],
+            "Types/*": ["src/types/*"],
+            "Constants/*": ["src/constants/*"],
+            "Utils/*": ["src/utils/*"]
         }
-    },
+    }
 }

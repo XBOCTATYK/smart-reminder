@@ -10,6 +10,7 @@ import { remindControls } from 'Src/messages/remind';
 import { createNewTask } from 'Src/utils/createNewTask';
 import { createNextNotification } from 'Src/utils/createNextNotification';
 import { DATE_FNS_OPTIONS } from 'Src/constants/formats';
+import { dateControls } from 'Src/messages/taskCreating';
 
 const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
 
@@ -24,25 +25,25 @@ setTimeout(() => {
         getTasksModel,
         getNotifiesModel,
         getUsualModel,
-    ])
+    ]);
 
     const bot = new Telegraf(TOKEN);
     bot.command('start', (ctx) => {
         let state = 'from';
-        let from = '09:00';
-        let to = '22:00';
+        let fromTime = '09:00';
+        let toTime = '22:00';
 
         ctx.reply('С какого времени вам нужно начинать напоминать?').then(() => {
-            bot.hears(/[0-9]{2}:[0-9]{2}/, ctx => {
+            bot.hears(/[0-9]{1,2}:[0-9]{2}/, ctx => {
                 switch (state) {
                     case 'from':
-                        from = ctx.message.text;
-                        ctx.reply('В какое время прекращать присылать напоминания?')
+                        fromTime = ctx.message.text;
+                        ctx.reply('В какое время прекращать присылать напоминания?');
                         state = 'to';
                         break;
                     case 'to':
-                        to = ctx.message.text;
-                        DB.model('User').create({ id: ctx.message.from.id, time_from: from, time_to: to }).then(() => {
+                        toTime = ctx.message.text;
+                        DB.model('User').create({ id: ctx.message.from.id, time_from: fromTime, time_to: toTime }).then(() => {
                             ctx.reply('Спасибо! Ваши настройки сохранены!');
                         }).catch(() => {
                             ctx.reply('Произошла ошибка! Попробуйте ввести данные еще раз.');
@@ -91,12 +92,12 @@ setTimeout(() => {
                         }
                         options.priority = priorityAsNumber;
                         state = 'taskDate';
-                        ctx1.reply('На какую дату планируете?');
+                        ctx1.reply('На какую дату планируете?', dateControls());
                         break;
                     case 'taskDate':
-                        let date = ctx1.message.text;
+                        let date = ctx1.message.text.toLowerCase();
 
-                        if (date === 'Сегодня' || date === 'f') {
+                        if (date === 'cегодня' || date === 'f') {
                             date = getDateNow();
                         }
 
@@ -116,14 +117,14 @@ setTimeout(() => {
                         }).catch(err => {
                             state = 'end';
                             ctx1.reply('Произошла ошибка при создании задачи!')
-                        })
+                        });
                         break;
                     default:
                         break;
                 }
             }
         })
-    })
+    });
 
     setInterval(() => {
         const date = new Date();
@@ -135,7 +136,7 @@ setTimeout(() => {
                 const { dataValues } = item;
                 bot.telegram.sendMessage(dataValues.user_id, `Крайний срок задачи: ${dataValues.name} - ${dataValues.time} ${dataValues.date}`);
             })
-        })
+        });
 
         DB.model('Tasks').update(( { done: true } ), { where: { time: thisTime, date: thisDate } } );
 
@@ -149,31 +150,29 @@ setTimeout(() => {
                 const value = { ...task, ...notify };
                 bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} ${task.date}`, remindControls(task, notify));
 
-                createNextNotification(DB, task).then(() => {
-
-                })
+                createNextNotification(DB, task).then(() => {})
                     .catch(() => {
                         bot.telegram.sendMessage(value.user_id, 'Ошибка при создании следующего напоминания');
                     })
 
             })
         })
-    }, 60000)
+    }, 60000);
 
     bot.on('callback_query', async (ctx) => {
         const callback_id = ctx.update?.callback_query?.id;
-        console.log(ctx.update?.callback_query?.data)
+        console.log(ctx.update?.callback_query?.data);
         const { taskId, notifNed, notifyId, answerId } = JSON.parse(ctx.update?.callback_query?.data);
 
         const messageAnswers = {
             Y: 'Отлично!',
             N: 'ОК! Повторим напоминание чуть позже',
             D: 'Отлично! Больше не напоминаю.'
-        }
+        };
 
         try {
             // @ts-ignore
-            const notifyExists = await DB.model('Notifies').findOne({ where: { id: notifyId }})
+            const notifyExists = await DB.model('Notifies').findOne({ where: { id: notifyId }});
 
             console.log(notifyExists)
 
@@ -184,11 +183,11 @@ setTimeout(() => {
                         break;
                     case 'N':
                         await DB.model('Tasks').update(({ notificationsNeed: notifNed + 1 }), { where: { id: taskId } });
-                        await DB.model('Notifies').destroy({ where: { id: notifyId } })
+                        await DB.model('Notifies').destroy({ where: { id: notifyId } });
                         break;
                     case 'D':
                         await DB.model('Tasks').update(({ done: true }), { where: { id: taskId } });
-                        await DB.model('Notifies').destroy({ where: { id: notifyId } })
+                        await DB.model('Notifies').destroy({ where: { id: notifyId } });
                         break;
                     default:
                         console.log('Unrecognized answer')
@@ -200,10 +199,10 @@ setTimeout(() => {
             }
 
         } catch (e) {
-            ctx.reply('Что-то пошло не так')
+            ctx.reply('Что-то пошло не так');
             console.log(e)
         }
-    })
+    });
 
     bot.command('stop', (ctx) => {
 
@@ -212,4 +211,4 @@ setTimeout(() => {
     bot.launch();
 
 
-}, 0)
+}, 0);

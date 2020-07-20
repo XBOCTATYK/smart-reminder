@@ -2,63 +2,78 @@ import { Telegraf } from 'telegraf';
 import format from 'date-fns/format';
 
 import { ORMConnection } from 'Src/db/orm-connection';
+import { STATES } from 'Constants/states';
 import { getTasksModel } from 'Models/Tasks';
 import { getNotifiesModel } from 'Models/Notifies';
 import { getUserModel } from 'Models/User';
 import { getUsualModel } from 'Models/Usual';
+import { getParamsModel } from 'Models/Params';
 import { remindControls } from 'Src/messages/remind';
 import { createNewTask } from 'Utils/createNewTask';
-import { createNextNotification } from 'Src/utils/createNextNotification';
+import { createNextNotification } from 'Utils/createNextNotification';
 import { DATE_FNS_OPTIONS, DATE_FORMAT, TIME_FORMAT } from 'Constants/formats';
 import { dateControls, priorityControls } from 'Src/messages/taskCreating';
 import { UserService } from 'Services/User';
-import { STATES } from 'Constants/states';
 
 import { notificationCallback } from 'Src/callbacks/notificationCallback';
-import { getDateNow } from 'Utils/dates';
 import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
+import { getDateNow } from 'Utils/dates';
 
-const TOKEN = '1265591775:AAEClLeEmSAsMQR6d_V0FkzL6O7C8HupQn8';
-
-setTimeout(() => {
-
+setTimeout(async () => {
     const DB = new ORMConnection(process.env.DATABASE_URL, [
         getUserModel,
         getTasksModel,
         getNotifiesModel,
         getUsualModel,
+        getParamsModel,
     ]);
 
-    const bot = new Telegraf(TOKEN);
+    const Params = await DB.model('Params').findAll();
+    const SETTINGS = {
+        TOKEN: ''
+    };
+    Params.forEach(item => {
+        const { key, value } = item;
+        SETTINGS[key] = value;
+    });
+
+    const bot = new Telegraf(SETTINGS.TOKEN);
     bot.command('start', (ctx) => {
-        let state = 'from';
+        const userId = ctx.message.from.id;
+        let state = STATES.FROM_TIME;
         let fromTime = '09:00';
         let toTime = '22:00';
 
         ctx.reply('С какого времени вам нужно начинать напоминать?').then(() => {
-            bot.hears(/[0-9]{1,2}:[0-9]{2}/, ctx => {
-                switch (state) {
-                    case 'from':
-                        fromTime = ctx.message.text;
-                        ctx.reply('В какое время прекращать присылать напоминания?');
-                        state = 'to';
-                        break;
-                    case 'to':
-                        toTime = ctx.message.text;
-                        DB.model('User').create({ id: ctx.message.from.id, time_from: fromTime, time_to: toTime }).then(() => {
-                            ctx.reply('Спасибо! Ваши настройки сохранены!');
-                        }).catch(() => {
-                            ctx.reply('Произошла ошибка! Попробуйте ввести данные еще раз.');
-                            ctx.reply('В какое время прекращать присылать напоминания?');
-                            state = 'from';
-                        });
-                        break;
-                    default:
-                        break;
-                }
-            })
+            UserService(userId, state, { fromTime, toTime });
         });
     });
+
+    bot.hears(/[0-9]{1,2}:[0-9]{2}/, ctx => {
+        const userId = ctx.message.from.id;
+        const User = UserService(userId);
+        const currentState = User.state();
+
+        switch (currentState) {
+            case STATES.FROM_TIME:
+                User.addData({ fromTime: ctx.message.text }).setState(STATES.TO_TIME);
+                ctx.reply('В какое время прекращать присылать напоминания?');
+                break;
+            case STATES.TO_TIME:
+                User.addData({ toTime: ctx.message.text });
+                DB.model('User').create({ id: ctx.message.from.id, time_from: User.data().fromTime, time_to: User.data().toTime }).then(() => {
+                    User.setState(STATES.PENDING_TASK);
+                    ctx.reply('Спасибо! Ваши настройки сохранены!');
+                }).catch(() => {
+                    ctx.reply('Произошла ошибка! Попробуйте ввести данные еще раз.');
+                    ctx.reply('В какое время прекращать присылать напоминания?');
+                    User.setState(STATES.TO_TIME);
+                });
+                break;
+            default:
+                break;
+        }
+    })
 
     bot.command('task', (ctx) => {
         const userId = ctx.message.from.id;

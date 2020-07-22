@@ -1,6 +1,6 @@
-import { DataTypes, ModelType, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 
-export function getTasksModel(sequelize, models): ModelType {
+export function getTasksModel(sequelize, models) {
     class Tasks extends Model {}
 
     const UserModel = models?.User;

@@ -1,13 +1,7 @@
 import { Telegraf } from 'telegraf';
 import format from 'date-fns/format';
 
-import { ORMConnection } from 'Src/db/orm-connection';
 import { STATES } from 'Constants/states';
-import { getTasksModel } from 'Models/Tasks';
-import { getNotifiesModel } from 'Models/Notifies';
-import { getUserModel } from 'Models/User';
-import { getUsualModel } from 'Models/Usual';
-import { getParamsModel } from 'Models/Params';
 import { remindControls } from 'Src/messages/remind';
 import { createNewTask } from 'Utils/createNewTask';
 import { createNextNotification } from 'Utils/createNextNotification';
@@ -18,15 +12,24 @@ import { UserService } from 'Services/User';
 import { notificationCallback } from 'Src/callbacks/notificationCallback';
 import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
 import { getDateNow } from 'Utils/dates';
+import { getModels } from 'Utils/db/getModels';
+import { model } from 'Utils/decorators/model';
+import { ModelType } from 'sequelize';
+
+class APP {
+    t = 2;
+
+    @model('User')
+    User: ModelType;
+
+    @model('Tasks')
+    Tasks: ModelType;
+}
 
 setTimeout(async () => {
-    const DB = new ORMConnection(process.env.DATABASE_URL, [
-        getUserModel,
-        getTasksModel,
-        getNotifiesModel,
-        getUsualModel,
-        getParamsModel,
-    ]);
+    const DB = getModels();
+    const app = new APP();
+    console.dir(app.User)
 
     const Params = await DB.model('Params').findAll();
     const SETTINGS = {

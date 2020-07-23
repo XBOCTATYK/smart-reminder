@@ -14,7 +14,7 @@ import { getDateNow } from 'Utils/dates';
 import { getModels } from 'Utils/db/getModels';
 import { model } from 'Utils/decorators/model';
 import { ModelType } from 'sequelize';
-import { TaskListService } from 'Services/Task';
+import { TaskListService, TaskService } from 'Services/Task';
 import { NextNotification } from 'Services/Notification';
 
 class APP {
@@ -80,7 +80,7 @@ setTimeout(async () => {
         await ctx.reply(formattedString);
     });
 
-    bot.on('text', ctx => {
+    bot.on('text', async (ctx) => {
         const userId = ctx?.message?.from?.id;
         const UserState = UserStateService(userId);
         const currentState = UserState.state();

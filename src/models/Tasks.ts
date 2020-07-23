@@ -1,7 +1,9 @@
 import { DataTypes, Model } from 'sequelize';
 
 export function getTasksModel(sequelize, models) {
-    class Tasks extends Model {}
+    class Tasks extends Model {
+        dataValues: any;
+    }
 
     const UserModel = models?.User;
 

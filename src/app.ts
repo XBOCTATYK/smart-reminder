@@ -15,6 +15,7 @@ import { getDateNow } from 'Utils/dates';
 import { getModels } from 'Utils/db/getModels';
 import { model } from 'Utils/decorators/model';
 import { ModelType } from 'sequelize';
+import { TaskList } from 'Services/Task';
 
 class APP {
     t = 2;
@@ -29,7 +30,6 @@ class APP {
 setTimeout(async () => {
     const DB = getModels();
     const app = new APP();
-    console.dir(app.User)
 
     const Params = await DB.model('Params').findAll();
     const SETTINGS = {
@@ -52,32 +52,6 @@ setTimeout(async () => {
         });
     });
 
-    bot.hears(/[0-9]{1,2}:[0-9]{2}/, ctx => {
-        const userId = ctx.message.from.id;
-        const User = UserService(userId);
-        const currentState = User.state();
-
-        switch (currentState) {
-            case STATES.FROM_TIME:
-                User.addData({ fromTime: ctx.message.text }).setState(STATES.TO_TIME);
-                ctx.reply('В какое время прекращать присылать напоминания?');
-                break;
-            case STATES.TO_TIME:
-                User.addData({ toTime: ctx.message.text });
-                DB.model('User').create({ id: ctx.message.from.id, time_from: User.data().fromTime, time_to: User.data().toTime }).then(() => {
-                    User.setState(STATES.PENDING_TASK);
-                    ctx.reply('Спасибо! Ваши настройки сохранены!');
-                }).catch(() => {
-                    ctx.reply('Произошла ошибка! Попробуйте ввести данные еще раз.');
-                    ctx.reply('В какое время прекращать присылать напоминания?');
-                    User.setState(STATES.TO_TIME);
-                });
-                break;
-            default:
-                break;
-        }
-    })
-
     bot.command('task', (ctx) => {
         const userId = ctx.message.from.id;
         const options = {
@@ -94,54 +68,86 @@ setTimeout(async () => {
         UserService(userId, STATES.ENTER_TASK_NAME, options);
     });
 
+    bot.command('list', async (ctx) => {
+        const userId = ctx?.message?.from?.id;
+        const UserTaskList = await TaskList(userId);
+
+        console.dir(UserTaskList);
+
+        const formattedString = UserTaskList.value().reduce((string, item) => {
+            string += `${item.date} | ${item.time} | ${item.name} \n`;
+            return string;
+        }, '');
+
+        ctx.reply(formattedString);
+    });
+
     bot.on('text', ctx => {
         const userId = ctx?.message?.from?.id;
-        const User = UserService(userId);
-        const currentState = User.state();
+        const UserState = UserService(userId);
+        const currentState = UserState.state();
+        const incomingMessage = ctx.message.text;
 
         switch (currentState) {
                 case STATES.ENTER_TASK_NAME:
-                    User.addData({ name: ctx.message.text }).setState(STATES.ENTER_TASK_PRIORITY);
+                    UserState.addData({ name: incomingMessage }).setState(STATES.ENTER_TASK_PRIORITY);
                     ctx.reply('Какой приоритет задачи?', priorityControls());
                     break;
                 case STATES.ENTER_TASK_PRIORITY:
                     const priority = ctx.message.text;
-                    const priorityAsNumber = priority === 'f' ? 5 : parseInt(priority);
+                    const priorityAsNumber = parseInt(priority);
 
                     if (isNaN(priorityAsNumber)) {
                         ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
                         break;
                     }
 
-                    User.addData({ priority: priorityAsNumber }).setState(STATES.ENTER_TASK_DATE);
+                    UserState.addData({ priority: priorityAsNumber }).setState(STATES.ENTER_TASK_DATE);
                     ctx.reply('На какую дату планируете?', dateControls());
                     break;
                 case STATES.ENTER_TASK_DATE:
-                    let date = ctx.message.text.toLowerCase();
+                    let date = incomingMessage.toLowerCase();
 
-                    if (date === 'сегодня' || date === 'f') {
+                    if (date === 'сегодня') {
                         date = getDateNow();
                     }
 
-                    User.addData({ date }).setState(STATES.ENTER_TASK_TIME);
+                    UserState.addData({ date }).setState(STATES.ENTER_TASK_TIME);
                     ctx.reply('На какое время планируете?');
                     break;
                 case STATES.ENTER_TASK_TIME:
                     const options = {} as any;
-                    options.time = ctx.message.text;
+                    options.time = incomingMessage;
 
                     options.startTime = format(new Date(), TIME_FORMAT, DATE_FNS_OPTIONS);
                     options.startDate = getDateNow();
-                    User.addData(options);
+                    UserState.addData(options);
 
-                    console.log(userId);
-
-                    createNewTask(DB, { user_id: userId, ...User.data() }).then(() => {
+                    createNewTask(DB, { user_id: userId, ...UserState.data() }).then(() => {
                         ctx.reply('Напоминание создано!');
-                        User.done();
+                        UserState.done();
                     }).catch(err => {
-                        User.setState(STATES.CREATING_TASK_ERROR);
+                        UserState.setState(STATES.CREATING_TASK_ERROR);
                         ctx.reply('Произошла ошибка при создании задачи!')
+                    });
+                    break;
+                case STATES.FROM_TIME:
+                    UserState.addData({ fromTime: incomingMessage }).setState(STATES.TO_TIME);
+                    ctx.reply('В какое время прекращать присылать напоминания?');
+                    break;
+                case STATES.TO_TIME:
+                    UserState.addData({ toTime: incomingMessage });
+                    DB.model('User').create({
+                        id: userId,
+                        time_from: UserState.data().fromTime,
+                        time_to: UserState.data().toTime
+                    }).then(() => {
+                        UserState.setState(STATES.PENDING_TASK);
+                        ctx.reply('Спасибо! Ваши настройки сохранены!');
+                    }).catch(() => {
+                        ctx.reply('Произошла ошибка! Попробуйте ввести данные еще раз.');
+                        ctx.reply('В какое время прекращать присылать напоминания?');
+                        UserState.setState(STATES.TO_TIME);
                     });
                     break;
                 default:

@@ -1,42 +1,53 @@
-import { ModelStatic, Model } from 'sequelize';
 import { getTasksModel } from 'Models/Tasks';
 import { model } from 'Utils/decorators/model';
 
 export class TaskListService {
+    static count = 0;
 
     private id: number;
+    private userId: number;
+    private cached = null;
+    private listProp = [];
 
     @model('Tasks')
     public TaskModel: ReturnType<typeof getTasksModel>;
     public UserService: any;
 
 
-    constructor(userId, cached) {
-        let taskData = null;
+    constructor(userId: number, cached = null) {
+        this.userId = userId;
+        this.cached = cached;
+        this.id = TaskListService.count++;
+    }
 
-        this.id = userId;
-
-        if (!cached) {
-            const dataResult = this.getData(userId)
+    public async get() {
+        if (!this.cached) {
+            this.listProp = this.cached;
         }
+        const StoreResult = await this.TaskModel.findAll({ where: { user_id: this.userId } });
+        this.listProp = StoreResult ? StoreResult.map(item => item.dataValues) : [];
+
+        return this;
     }
 
-    private async getData(userId) {
-        await this.TaskModel.findAll({ where: { user_id: userId } })
+    value() {
+        return this.listProp;
     }
-}
 
+    first() {
+        return this.listProp[0];
+    }
 
-
-
-export function TaskListCreator(TaskModel, UserService) {
-    return function TaskList(userId, cached) {
-        const TaskListNew = new TaskListService(userId, cached);
-
-        TaskListNew.TaskModel = TaskModel;
-        TaskListNew.UserService = UserService;
-
-        return TaskListNew;
+    last() {
+        return this.listProp[this.listProp.length - 1];
     }
 }
+
+export async function TaskList(userId: number, cached?): Promise<TaskListService> {
+    const TaskListNew = new TaskListService(userId, cached);
+    await TaskListNew.get();
+
+    return TaskListNew;
+}
+
 

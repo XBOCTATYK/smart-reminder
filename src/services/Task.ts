@@ -1,33 +1,42 @@
 import { getTasksModel } from 'Models/Tasks';
 import { model } from 'Utils/decorators/model';
+import { Store } from 'Services/store';
 
 export class TaskListService {
-    static count = 0;
-
-    private id: number;
     private userId: number;
-    private cached = null;
     private listProp = [];
+    private isChanged = false;
+
+    private diffNew = [];
+    private diffUpdate = [];
+
+    protected cacheNamePrefix = 'Model_Tasks_';
 
     @model('Tasks')
-    public TaskModel: ReturnType<typeof getTasksModel>;
-    public UserService: any;
+    static TaskModel: ReturnType<typeof getTasksModel>;
+    static filter = {};
 
-
-    constructor(userId: number, cached = null) {
+    constructor(userId: number) {
         this.userId = userId;
-        this.cached = cached;
-        this.id = TaskListService.count++;
     }
 
-    public async get() {
-        if (!this.cached) {
-            this.listProp = this.cached;
+    static async create(userId) {
+        if (!userId) {
+            throw new Error('User id is not defined!');
         }
-        const StoreResult = await this.TaskModel.findAll({ where: { user_id: this.userId } });
-        this.listProp = StoreResult ? StoreResult.map(item => item.dataValues) : [];
 
-        return this;
+        const newTaskList = new TaskListService(userId);
+        const taskData = Store.get(`${newTaskList.cacheNamePrefix}${userId}`) as any;
+
+        if (!taskData) {
+            const StoreResult = await TaskListService.TaskModel.findAll({ where: { user_id: userId } });
+            newTaskList.listProp = StoreResult ? StoreResult.map(item => item.dataValues) : [];
+            Store.set(`${newTaskList.cacheNamePrefix}${userId}`, newTaskList.listProp);
+        } else {
+            newTaskList.listProp = taskData;
+        }
+
+        return newTaskList;
     }
 
     value() {
@@ -41,13 +50,20 @@ export class TaskListService {
     last() {
         return this.listProp[this.listProp.length - 1];
     }
-}
 
-export async function TaskList(userId: number, cached?): Promise<TaskListService> {
-    const TaskListNew = new TaskListService(userId, cached);
-    await TaskListNew.get();
+    addData(data) {
 
-    return TaskListNew;
+    }
+
+    async done() {
+        if (this.isChanged) {
+            for (let item of this.diffUpdate) {
+                await TaskListService.TaskModel.update(item, { where: { id: item.id } });
+            }
+
+            await TaskListService.TaskModel.bulkCreate(this.diffNew);
+        }
+    }
 }
 
 

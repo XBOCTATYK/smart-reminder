@@ -1,11 +1,13 @@
 import { Store } from './store';
 import { STATES } from 'Constants/states';
 import { UserStateType } from 'Types/state';
+import { model } from 'Utils/decorators/model';
+import { getUserModel } from 'Models/User';
 
 class UserState {
     private id: number;
     private stateProp: string;
-    private dataProp: any = {};
+    private valueProp: any = {};
     private created: boolean;
 
     constructor(id: number | string, state?: UserStateType, data?) {
@@ -13,20 +15,18 @@ class UserState {
             throw new Error('User id is not defined!');
         }
 
-        const userData = Store.get(id) as any;
-
-        console.log(userData)
+        const userData = Store.get(`State_${id}`) as any;
 
         if (!userData) {
             const defaultState = state || STATES.PENDING_TASK;
 
-            Store.set(id, { state: defaultState, ...data });
+            Store.set(`State_${id}`, { state: defaultState, ...data });
             this.stateProp = defaultState;
-            this.dataProp = data;
+            this.valueProp = data;
             this.created = true;
         } else {
             this.stateProp = userData.state;
-            this.dataProp = { ...userData };
+            this.valueProp = { ...userData };
             this.created = false;
         }
 
@@ -38,7 +38,7 @@ class UserState {
     }
 
     setState(state) {
-        Store.set(this.id, { ...this.dataProp, state });
+        Store.set(`State_${this.id}`, { ...this.valueProp, state });
         this.stateProp = state;
         this.created = false;
         return this;
@@ -49,23 +49,76 @@ class UserState {
     }
 
     addData(data) {
-        const newData = { ...this.dataProp, ...data };
-        Store.set(this.id, { ...newData, state: this.stateProp, });
-        this.dataProp = newData;
+        const newData = { ...this.valueProp, ...data };
+        Store.set(`State_${this.id}`, { ...newData, state: this.stateProp, });
+        this.valueProp = newData;
         this.created = false;
         return this;
     }
 
-    data() {
-        return { ...this.dataProp };
+    value() {
+        return { ...this.valueProp };
     }
 
     done() {
         this.stateProp = STATES.DONE;
-        Store.del(this.id);
+        Store.del(`State_${this.id}`);
     }
 }
 
-export function UserService(id: number | string, state?: UserStateType, data?) {
+export function UserStateService(id: number | string, state?: UserStateType, data?) {
     return new UserState(id, state, data);
+}
+
+export class UserService {
+    private id: number;
+    private valueProp = {};
+    private isChanged = false;
+
+    @model('User')
+    private static UserModel: ReturnType<typeof getUserModel>;
+
+    static async create(userId) {
+        if (!userId) {
+            throw new Error('User id is not defined!');
+        }
+
+        const userData = Store.get(`Model_${userId}`) as any;
+
+        const newUser = new UserService(userId);
+
+        if (!userData) {
+            const StoreResult = await UserService.UserModel.findOne({ where: { id: userId } });
+            newUser.valueProp = StoreResult ? StoreResult.dataValues : {};
+        } else {
+            newUser.valueProp = userData;
+        }
+
+        return newUser;
+    }
+
+    constructor(userId) {
+        this.id = Number(userId);
+    }
+
+    addData(data) {
+        const newData = { ...this.valueProp, ...data };
+        this.valueProp = { ...newData };
+        Store.set(`Model_${this.id}`, { ...newData });
+
+        this.isChanged = true;
+
+        return this;
+    }
+
+    value() {
+        return this.valueProp;
+    }
+
+    async done() {
+        if (this.isChanged) {
+            await UserService.UserModel.update(this.valueProp, { where: { id: this.id } });
+            Store.del(`Model_${this.id}`);
+        }
+    }
 }

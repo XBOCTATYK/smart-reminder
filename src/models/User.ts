@@ -1,7 +1,9 @@
-import { DataTypes, ModelType, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 
-export function getUserModel(sequelize): ModelType {
-    class User extends Model {}
+export function getUserModel(sequelize) {
+    class User extends Model {
+        dataValues: any;
+    }
 
     User.init({
         id: {

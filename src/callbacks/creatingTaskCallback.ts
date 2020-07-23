@@ -1,4 +1,4 @@
-import { UserService } from 'Src/services/User';
+import { UserStateService } from 'Src/services/User';
 import { STATES } from 'Constants/states';
 import { getDateNow, getDateTomorrow } from 'Utils/dates';
 import { dateControls } from 'Src/messages/taskCreating';
@@ -7,7 +7,7 @@ export function creatingTaskCallback(ctx) {
     const userId = ctx.update?.callback_query?.from?.id;
     const { answerId } = JSON.parse(ctx.update?.callback_query?.data);
 
-    const User = UserService(userId);
+    const User = UserStateService(userId);
     const currentState = User.state();
 
     switch (currentState) {
@@ -35,5 +35,5 @@ export function creatingTaskCallback(ctx) {
             return;
     }
 
-    console.log(User.data())
+    console.log(User.value())
 }

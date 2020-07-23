@@ -88,3 +88,20 @@ for (let index = 0; index < 6; index++) {
     }
     console.log(currentNotifyDate);
 }
+
+
+class Notification {
+    id;
+    create() {}
+    map() {}
+    chain() {}
+}
+
+class NotificationsList {
+    id;
+    create() {}
+    map() {}
+    chain() {}
+    add() {}
+    remove() {}
+}

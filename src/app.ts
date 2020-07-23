@@ -4,10 +4,9 @@ import format from 'date-fns/format';
 import { STATES } from 'Constants/states';
 import { remindControls } from 'Src/messages/remind';
 import { createNewTask } from 'Utils/createNewTask';
-import { createNextNotification } from 'Utils/createNextNotification';
 import { DATE_FNS_OPTIONS, DATE_FORMAT, TIME_FORMAT } from 'Constants/formats';
 import { dateControls, priorityControls } from 'Src/messages/taskCreating';
-import { UserService } from 'Services/User';
+import { UserStateService } from 'Services/User';
 
 import { notificationCallback } from 'Src/callbacks/notificationCallback';
 import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
@@ -15,7 +14,8 @@ import { getDateNow } from 'Utils/dates';
 import { getModels } from 'Utils/db/getModels';
 import { model } from 'Utils/decorators/model';
 import { ModelType } from 'sequelize';
-import { TaskList } from 'Services/Task';
+import { TaskListService } from 'Services/Task';
+import { NextNotification } from 'Services/Notification';
 
 class APP {
     t = 2;
@@ -48,7 +48,7 @@ setTimeout(async () => {
         let toTime = '22:00';
 
         ctx.reply('С какого времени вам нужно начинать напоминать?').then(() => {
-            UserService(userId, state, { fromTime, toTime });
+            UserStateService(userId, state, { fromTime, toTime });
         });
     });
 
@@ -65,26 +65,24 @@ setTimeout(async () => {
 
         ctx.reply('Что планируете сделать?');
 
-        UserService(userId, STATES.ENTER_TASK_NAME, options);
+        UserStateService(userId, STATES.ENTER_TASK_NAME, options);
     });
 
     bot.command('list', async (ctx) => {
         const userId = ctx?.message?.from?.id;
-        const UserTaskList = await TaskList(userId);
-
-        console.dir(UserTaskList);
+        const UserTaskList = await TaskListService.create(userId);
 
         const formattedString = UserTaskList.value().reduce((string, item) => {
             string += `${item.date} | ${item.time} | ${item.name} \n`;
             return string;
         }, '');
 
-        ctx.reply(formattedString);
+        await ctx.reply(formattedString);
     });
 
     bot.on('text', ctx => {
         const userId = ctx?.message?.from?.id;
-        const UserState = UserService(userId);
+        const UserState = UserStateService(userId);
         const currentState = UserState.state();
         const incomingMessage = ctx.message.text;
 
@@ -94,7 +92,7 @@ setTimeout(async () => {
                     ctx.reply('Какой приоритет задачи?', priorityControls());
                     break;
                 case STATES.ENTER_TASK_PRIORITY:
-                    const priority = ctx.message.text;
+                    const priority = incomingMessage;
                     const priorityAsNumber = parseInt(priority);
 
                     if (isNaN(priorityAsNumber)) {
@@ -123,7 +121,7 @@ setTimeout(async () => {
                     options.startDate = getDateNow();
                     UserState.addData(options);
 
-                    createNewTask(DB, { user_id: userId, ...UserState.data() }).then(() => {
+                    createNewTask(DB, { user_id: userId, ...UserState.value() }).then(() => {
                         ctx.reply('Напоминание создано!');
                         UserState.done();
                     }).catch(err => {
@@ -139,8 +137,8 @@ setTimeout(async () => {
                     UserState.addData({ toTime: incomingMessage });
                     DB.model('User').create({
                         id: userId,
-                        time_from: UserState.data().fromTime,
-                        time_to: UserState.data().toTime
+                        time_from: UserState.value().fromTime,
+                        time_to: UserState.value().toTime
                     }).then(() => {
                         UserState.setState(STATES.PENDING_TASK);
                         ctx.reply('Спасибо! Ваши настройки сохранены!');
@@ -177,12 +175,23 @@ setTimeout(async () => {
                 delete notify.Task;
 
                 const value = { ...task, ...notify };
-                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} ${task.date}`, remindControls(task, notify));
+                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} | ${task.date}`, remindControls(task, notify));
 
-                createNextNotification(DB, task).then(() => {})
-                    .catch(() => {
-                        bot.telegram.sendMessage(value.user_id, 'Ошибка при создании следующего напоминания');
-                    })
+                const notificationsDone = task.notificationsDone + 1;
+                DB.model('Tasks').update({ ...task, notificationsDone }, { where: { id: task.id } });
+
+                try {
+                    if (notificationsDone <= task.notificationsNeed) {
+                        NextNotification.create(task)
+                            .then(() => {})
+                            .catch(() => {
+                                bot.telegram.sendMessage(value.user_id, 'Ошибка при создании следующего напоминания');
+                            })
+                    }
+                } catch (e) {
+                    console.log(e);
+                    throw new Error(`Cannot create notify! ${e.message}`);
+                }
 
             })
         })

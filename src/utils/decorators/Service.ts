@@ -1,3 +1,8 @@
+/**
+ * Декоратор добавляющий типовые методы для класса сущности
+ * @param TargetClass
+ * @constructor
+ */
 export function Service(TargetClass: any) {
     return class ServiceClass extends TargetClass {
         valueProp = {};
@@ -15,15 +20,16 @@ export function Service(TargetClass: any) {
     }
 }
 
+/**
+ * Декоратор добавляющий типовые методы для класса списка сущностей
+ * @param TargetClass
+ * @constructor
+ */
 export function ServiceList(TargetClass: any) {
-    return class ServiceClass extends TargetClass {
+    return class ServiceListClass extends TargetClass {
         protected listProp = [];
         private diffNew = [];
         private diffUpdate = [];
-
-        value() {
-            return this.listProp;
-        }
 
         addData(data) {
             if (!data.id) return this;
@@ -54,6 +60,30 @@ export function ServiceList(TargetClass: any) {
             this.Store.set(`${this.cacheNamePrefix}${this.id}`, this.listProp);
 
             return this;
+        }
+
+        value() {
+            return this.listProp;
+        }
+
+        first() {
+            return this.listProp[0];
+        }
+
+        last() {
+            return this.listProp[this.listProp.length - 1];
+        }
+
+        async done() {
+            if (this.isChanged) {
+                for (let item of this.diffUpdate) {
+                    await this.Model.update(item, { where: { id: item.id } });
+                }
+
+                await this.Model.bulkCreate(this.diffNew);
+            }
+
+            this.Store.del(`${this.cacheNamePrefix}${this.id}`)
         }
     }
 }

@@ -13,9 +13,11 @@ import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
 import { getDateNow } from 'Utils/dates';
 import { getModels } from 'Utils/db/getModels';
 import { model } from 'Utils/decorators/model';
-import { ModelType } from 'sequelize';
+import { DATE, ModelType } from 'sequelize';
 import { TaskListService, TaskService } from 'Services/Task';
 import { NextNotification } from 'Services/Notification';
+import Op from 'sequelize/types/lib/operators';
+import { addDays, addHours, addMinutes } from 'date-fns';
 
 class APP {
     t = 2;
@@ -65,7 +67,7 @@ setTimeout(async () => {
 
         ctx.reply('Что планируете сделать?');
 
-        UserStateService(userId, STATES.ENTER_TASK_NAME, options);
+        UserStateService(userId, STATES.ENTER_TASK_NAME, options).setState(STATES.ENTER_TASK_NAME);
     });
 
     bot.command('list', async (ctx) => {
@@ -154,16 +156,33 @@ setTimeout(async () => {
     });
 
     setInterval(() => {
-        const date = new Date();
-        const thisTime = format(date, TIME_FORMAT, DATE_FNS_OPTIONS);
-        const thisDate = format(date, DATE_FORMAT, DATE_FNS_OPTIONS);
+        const dateNow = new Date();
+        const thisTime = format(dateNow, TIME_FORMAT, DATE_FNS_OPTIONS);
+        const thisDate = format(dateNow, DATE_FORMAT, DATE_FNS_OPTIONS);
 
         DB.model('Tasks').findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
+            const replanTask = [];
+
             result.forEach( item => {
                 const { dataValues } = item;
                 bot.telegram.sendMessage(dataValues.user_id, `Крайний срок задачи: ${dataValues.name} - ${dataValues.time} ${dataValues.date}`);
             })
         });
+
+        // пересоздание задач, которые повторяются
+        const replanTask = [];
+        DB.model('Usual').findAll({ where: { lastTaskDate: thisDate, lastTaskTime: thisTime }, include: [ DB.model('Tasks') ] }).then(records => {
+            records.forEach( record => {
+                const { dataValues: usual } = record;
+                const { Task: { dataValues: task }} = usual;
+
+                const nextDate = format(addMinutes(addHours(addDays(dateNow, usual.days), usual.hours), usual.minutes), DATE_FORMAT, DATE_FNS_OPTIONS);
+
+                replanTask.push({ ...task, date: nextDate})
+            })
+
+            DB.model('Tasks').bulkCreate(replanTask);
+        })
 
         DB.model('Tasks').update(( { done: true } ), { where: { time: thisTime, date: thisDate } } );
 

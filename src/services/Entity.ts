@@ -6,6 +6,7 @@ export class Entity {
     protected cacheNamePrefix = 'Service_Model_';
     protected Store = Store;
     protected Model;
+    protected isChanged = false;
 
     constructor(id) {
         this.id = id;
@@ -38,6 +39,13 @@ export class Entity {
         this.valueProp = { ...this.valueProp, ...data };
         this.Store.set(`${this.cacheNamePrefix}${this.id}`, this.valueProp);
 
+        return this;
+    }
+
+    async done() {
+        if (this.isChanged) {
+            await this.Model.update(this.valueProp, { where: { id: this.id } });
+        }
         return this;
     }
 
@@ -135,6 +143,6 @@ export class ListEntity {
             await this.Model.bulkCreate(this.diffNew);
         }
 
-        this.Store.del(`${this.cacheNamePrefix}${this.id}`)
+        this.Store.del(`${this.cacheNamePrefix}${this.id}`);
     }
 }

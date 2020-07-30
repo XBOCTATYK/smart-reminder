@@ -10,7 +10,7 @@ export class TaskListService extends ListEntity {
     protected listProp = [];
 
     @model('Tasks')
-    static Model: ReturnType<typeof getTasksModel>;
+    protected Model: ReturnType<typeof getTasksModel>;
     protected Store = Store;
 
     constructor(userId: number) {
@@ -18,7 +18,7 @@ export class TaskListService extends ListEntity {
     }
 
     static async storeResult(newTaskList) {
-        return await TaskListService.Model.findAll({ where: { user_id: newTaskList.id } });
+        return await newTaskList.Model.findAll({ where: { user_id: newTaskList.id } });
     }
 
 }
@@ -27,7 +27,7 @@ export class TaskService extends Entity {
     protected cacheNamePrefix = 'Model_Task_';
 
     @model('Tasks')
-    static Model: ReturnType<typeof getTasksModel>;
+    protected Model: ReturnType<typeof getTasksModel>;
     protected Store = Store;
 
     constructor(taskId) {
@@ -35,7 +35,7 @@ export class TaskService extends Entity {
     }
 
     static async storeResult(newTask) {
-        return await TaskService.Model.findOne({ where: { id: newTask.id } });
+        return await newTask.Model.findOne({ where: { id: newTask.id } });
     }
 
     static async create(taskId: number) {

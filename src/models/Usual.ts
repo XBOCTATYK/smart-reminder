@@ -1,9 +1,10 @@
 import { DataTypes, ModelType, Model } from 'sequelize';
+import { getTasksModel } from 'Models/Tasks';
 
 export function getUsualModel(sequelize, models): ModelType {
     class Usual extends Model {}
 
-    const TaskModel = models?.Tasks;
+    const TaskModel = getTasksModel(sequelize, models);
 
     Usual.init({
         id: {
@@ -21,14 +22,17 @@ export function getUsualModel(sequelize, models): ModelType {
         },
         days: {
             type: DataTypes.INTEGER,
+            defaultValue: 0,
             allowNull: false
         },
         hours: {
             type: DataTypes.INTEGER,
+            defaultValue: 0,
             allowNull: false
         },
         minutes: {
             type: DataTypes.INTEGER,
+            defaultValue: 0,
             allowNull: false
         }
 
@@ -37,6 +41,10 @@ export function getUsualModel(sequelize, models): ModelType {
         tableName: 'usual',
         modelName: 'Usual'
     })
+
+    Usual.belongsTo(TaskModel, {
+        foreignKey: 'task_id'
+    });
 
     return Usual;
 }

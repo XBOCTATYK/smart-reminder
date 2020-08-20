@@ -76,7 +76,7 @@ export class UserService {
     private isChanged = false;
 
     @model('User')
-    private static UserModel: ReturnType<typeof getUserModel>;
+    private Model: ReturnType<typeof getUserModel>;
 
     static async create(userId) {
         if (!userId) {
@@ -88,7 +88,7 @@ export class UserService {
         const newUser = new UserService(userId);
 
         if (!userData) {
-            const StoreResult = await UserService.UserModel.findOne({ where: { id: userId } });
+            const StoreResult = await newUser.Model.findOne({ where: { id: userId } });
             newUser.valueProp = StoreResult ? StoreResult.dataValues : {};
         } else {
             newUser.valueProp = userData;
@@ -117,7 +117,7 @@ export class UserService {
 
     async done() {
         if (this.isChanged) {
-            await UserService.UserModel.update(this.valueProp, { where: { id: this.id } });
+            await this.Model.update(this.valueProp, { where: { id: this.id } });
             Store.del(`Model_${this.id}`);
         }
     }

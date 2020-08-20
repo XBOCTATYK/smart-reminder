@@ -1,37 +1,23 @@
 import { Telegraf } from 'telegraf';
 import format from 'date-fns/format';
+import { addDays, addHours, addMinutes } from 'date-fns';
 
 import { STATES } from 'Constants/states';
 import { remindControls } from 'Src/messages/remind';
 import { createNewTask } from 'Utils/createNewTask';
 import { DATE_FNS_OPTIONS, DATE_FORMAT, TIME_FORMAT } from 'Constants/formats';
 import { dateControls, priorityControls } from 'Src/messages/taskCreating';
-import { UserStateService } from 'Services/User';
 
+import { UserStateService } from 'Services/User';
 import { notificationCallback } from 'Src/callbacks/notificationCallback';
 import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
 import { getDateNow } from 'Utils/dates';
 import { getModels } from 'Utils/db/getModels';
-import { model } from 'Utils/decorators/model';
-import { DATE, ModelType } from 'sequelize';
-import { TaskListService, TaskService } from 'Services/Task';
+import { TaskListService } from 'Services/Task';
 import { NextNotification } from 'Services/Notification';
-import Op from 'sequelize/types/lib/operators';
-import { addDays, addHours, addMinutes } from 'date-fns';
-
-class APP {
-    t = 2;
-
-    @model('User')
-    User: ModelType;
-
-    @model('Tasks')
-    Tasks: ModelType;
-}
 
 setTimeout(async () => {
     const DB = getModels();
-    const app = new APP();
 
     const Params = await DB.model('Params').findAll();
     const SETTINGS = {

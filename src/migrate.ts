@@ -4,6 +4,7 @@ import { getTasksModel } from './models/Tasks';
 import { getNotifiesModel } from './models/Notifies';
 import { getUsualModel } from './models/Usual';
 import { getParamsModel } from './models/Params';
+import { USER_ENTITY_KEY } from './constants/enitityNames';
 
 const userDefaults = {
     id: 0,
@@ -29,11 +30,11 @@ const paramsDefault = [
 ];
 
 const DB = new ORMConnection(process.env.DATABASE_URL, [
-    getUserModel,
+    { init: getUserModel, key: USER_ENTITY_KEY },
     getTasksModel,
     getNotifiesModel,
-   getParamsModel,
-   // getUsualModel,
+    getParamsModel,
+    getUsualModel,
 ]);
 
 setTimeout(async () => {

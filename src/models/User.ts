@@ -1,6 +1,7 @@
-import { DataTypes, Model } from 'sequelize';
+import { Sequelize, DataTypes, Model } from 'sequelize';
+import { OrmModelCollection } from 'Src/db/orm-connection';
 
-export function getUserModel(sequelize) {
+export function getUserModel(sequelize: Sequelize, models?: OrmModelCollection, key?: Symbol) {
     class User extends Model {
         dataValues: any;
     }
@@ -28,7 +29,7 @@ export function getUserModel(sequelize) {
     }, {
         sequelize,
         tableName: 'users',
-        modelName: 'User'
+        modelName: key.toString()
     })
 
     return User;

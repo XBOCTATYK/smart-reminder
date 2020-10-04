@@ -1,12 +1,12 @@
-import { DataTypes, ModelType, Model } from 'sequelize';
+import { DataTypes, Model, ModelType } from 'sequelize';
 import { getTasksModel } from 'Models/Tasks';
-import { ModelKey } from 'Constants/enitityNames';
+import { ModelKey, TASK_ENTITY_KEY } from 'Constants/enitityNames';
 import { OrmModelCollection } from 'Src/db/orm-connection';
 
 export function getUsualModel(sequelize, models?: OrmModelCollection, key?: ModelKey): ModelType {
     class Usual extends Model {}
 
-    const TaskModel = getTasksModel(sequelize, models);
+    const TaskModel = getTasksModel(sequelize, models, TASK_ENTITY_KEY);
 
     Usual.init({
         id: {
@@ -36,7 +36,15 @@ export function getUsualModel(sequelize, models?: OrmModelCollection, key?: Mode
             type: DataTypes.INTEGER,
             defaultValue: 0,
             allowNull: false
-        }
+        },
+        lastTaskDate: {
+            type: DataTypes.STRING(12),
+            defaultValue: null,
+        },
+        lastTaskTime: {
+            type: DataTypes.STRING(5),
+            defaultValue: null,
+        },
 
     }, {
         sequelize,

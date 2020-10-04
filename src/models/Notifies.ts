@@ -1,12 +1,12 @@
-import { DataTypes, ModelType, Model } from 'sequelize';
+import { DataTypes, Model, ModelType } from 'sequelize';
 import { getTasksModel } from 'Models/Tasks';
-import { ModelKey } from 'Constants/enitityNames';
+import { ModelKey, TASK_ENTITY_KEY } from 'Constants/enitityNames';
 import { OrmModelCollection } from 'Src/db/orm-connection';
 
 export function getNotifiesModel(sequelize, models?: OrmModelCollection, key?: ModelKey): ModelType {
     class Notifies extends Model {}
 
-    const TaskModel = getTasksModel(sequelize, models);
+    const TaskModel = getTasksModel(sequelize, models, TASK_ENTITY_KEY);
 
     Notifies.init({
         id: {

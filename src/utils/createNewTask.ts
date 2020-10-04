@@ -7,7 +7,7 @@ export async function createNewTask(DB, options) {
     currentOptions.notificationsNeed = options.priority;
 
     try {
-        const DBTaskResponse = await DB.model('Tasks').create(currentOptions);
+        const DBTaskResponse = await DB.model('Task').create(currentOptions);
         const task = DBTaskResponse.dataValues;
 
         await NextNotification.create(task);

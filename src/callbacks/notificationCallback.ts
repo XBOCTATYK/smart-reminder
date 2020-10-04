@@ -1,3 +1,5 @@
+import { NOTIFICATION_ENTITY_KEY, TASK_ENTITY_KEY } from 'Constants/enitityNames';
+
 export async function notificationCallback(ctx, DB) {
     const userId = ctx.update?.callback_query?.from?.id;
     const { taskId, notifNed, notifyId, answerId } = JSON.parse(ctx.update?.callback_query?.data);
@@ -12,22 +14,22 @@ export async function notificationCallback(ctx, DB) {
 
     try {
         // @ts-ignore
-        const notifyExists = await DB.model('Notifies').findOne({ where: { id: notifyId }});
+        const notifyExists = await DB.model(NOTIFICATION_ENTITY_KEY).findOne({ where: { id: notifyId }});
 
         console.log(notifyExists);
 
         if (notifyExists) {
             switch (answerId) {
                 case 'Y':
-                    await DB.model('Notifies').destroy({ where: { id: notifyId } });
+                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: notifyId } });
                     break;
                 case 'N':
-                    await DB.model('Tasks').update({ notificationsNeed: notifNed + 1 }, { where: { id: taskId } });
-                    await DB.model('Notifies').destroy({ where: { id: notifyId } });
+                    await DB.model(TASK_ENTITY_KEY).update({ notificationsNeed: notifNed + 1 }, { where: { id: taskId } });
+                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: notifyId } });
                     break;
                 case 'D':
-                    await DB.model('Tasks').update({ done: true }, { where: { id: taskId } });
-                    await DB.model('Notifies').destroy({ where: { id: notifyId } });
+                    await DB.model(TASK_ENTITY_KEY).update({ done: true }, { where: { id: taskId } });
+                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: notifyId } });
                     break;
                 default:
                     console.log('Unrecognized answer');

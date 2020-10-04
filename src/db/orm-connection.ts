@@ -1,12 +1,13 @@
-import Model, { Sequelize } from 'sequelize';
+import { Sequelize, Model } from 'sequelize';
+import { ModelKey } from 'Constants/enitityNames';
 
 export type OrmModelCollection = {
-    [x: string]: Model.Sequelize;
+    [key in ModelKey]?: typeof Model;
 }
 
 type OrmModelList = Array<{
-    key: Symbol | string;
-    init: (ormInstance: Sequelize, models: OrmModelCollection, key: Symbol | string) => Model.Sequelize;
+    key: ModelKey;
+    init: (ormInstance: Sequelize, models?: OrmModelCollection, key?: ModelKey) => typeof Model;
 }>
 
 export class ORMConnection {
@@ -25,7 +26,7 @@ export class ORMConnection {
         })
     }
 
-    model(name) {
+    model(name: ModelKey) {
         return this.models[name];
     }
 

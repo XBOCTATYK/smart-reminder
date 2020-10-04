@@ -4,6 +4,15 @@ export function dateControls() {
     return Markup.inlineKeyboard([
         Markup.callbackButton('Сегодня', JSON.stringify({ answerId: 'TODAY' })),
         Markup.callbackButton('Завтра', JSON.stringify({ answerId: 'TOMORROW' })),
+        Markup.callbackButton('Повторяющееся событие', JSON.stringify({ answerId: 'REPEAT' })),
+    ])
+        .extra()
+}
+
+export function repeatControls() {
+    return Markup.inlineKeyboard([
+        Markup.callbackButton('Ежедневно', JSON.stringify({ answerId: 'DAILY' })),
+        Markup.callbackButton('Еженедельно', JSON.stringify({ answerId: 'WEEKLY' })),
     ])
         .extra()
 }

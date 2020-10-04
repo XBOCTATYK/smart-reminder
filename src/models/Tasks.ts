@@ -1,6 +1,8 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import { OrmModelCollection } from 'Src/db/orm-connection';
+import { ModelKey } from 'Constants/enitityNames';
 
-export function getTasksModel(sequelize, models) {
+export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, key?: ModelKey) {
     class Tasks extends Model {
         dataValues: any;
     }
@@ -72,7 +74,7 @@ export function getTasksModel(sequelize, models) {
     }, {
         sequelize,
         tableName: 'tasks',
-        modelName: 'Tasks'
+        modelName: key
     })
 
     return Tasks;

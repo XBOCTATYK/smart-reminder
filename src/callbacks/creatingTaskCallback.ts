@@ -21,6 +21,10 @@ export function creatingTaskCallback(ctx) {
                     User.addData( { date: getDateTomorrow() }).setState(STATES.ENTER_TASK_TIME);
                     ctx.reply('На какое время планируете?');
                     break;
+                case 'REPEAT':
+                    User.setState(STATES.REPEATING_TASK);
+                    ctx.reply('Как часто выполняется задача?');
+                    break;
                 default:
                     return ;
             }
@@ -29,6 +33,18 @@ export function creatingTaskCallback(ctx) {
             User.addData({ priority: Number(answerId) }).setState(STATES.ENTER_TASK_DATE);
             ctx.reply('На какую дату планируете?', dateControls());
             break;
+        case STATES.REPEATING_TASK:
+            switch (answerId) {
+                case 'DAILY':
+                    User.addData({ usual: [0,0,1,0,0] });
+                    break;
+                case 'WEEKLY':
+                    User.addData({ usual: [0,0,7,0,0] })
+                    break;
+                default:
+                    User.addData({ usual: [0,0,1,0,0] })
+            }
+            User.addData({ date: getDateNow() }).setState(STATES.ENTER_TASK_TIME);
         case STATES.CREATING_TASK_ERROR:
             break;
         default:

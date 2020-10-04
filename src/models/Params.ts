@@ -1,6 +1,8 @@
 import { DataTypes, ModelType, Model } from 'sequelize';
+import { ModelKey } from 'Constants/enitityNames';
+import { OrmModelCollection } from 'Src/db/orm-connection';
 
-export function getParamsModel(sequelize): ModelType {
+export function getParamsModel(sequelize, models?: OrmModelCollection, key?: ModelKey): ModelType {
     class Params extends Model {}
 
     Params.init({
@@ -22,7 +24,7 @@ export function getParamsModel(sequelize): ModelType {
     }, {
         sequelize,
         tableName: 'params',
-        modelName: 'Params'
+        modelName: key
     });
 
     return Params;

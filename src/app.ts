@@ -15,11 +15,18 @@ import { getDateNow } from 'Utils/dates';
 import { getModels } from 'Utils/db/getModels';
 import { TaskListService } from 'Services/Task';
 import { NextNotification } from 'Services/Notification';
+import {
+    NOTIFICATION_ENTITY_KEY,
+    TASK_ENTITY_KEY,
+    USER_ENTITY_KEY,
+    USER_PARAMS_ENTITY_KEY,
+    USUAL_EVENTS_ENTITY_KEY
+} from 'Constants/enitityNames';
 
 setTimeout(async () => {
     const DB = getModels();
 
-    const Params = await DB.model('Params').findAll();
+    const Params = await DB.model(USER_PARAMS_ENTITY_KEY).findAll();
     const SETTINGS = {
         TOKEN: ''
     };
@@ -123,7 +130,7 @@ setTimeout(async () => {
                     break;
                 case STATES.TO_TIME:
                     UserState.addData({ toTime: incomingMessage });
-                    DB.model('User').create({
+                    DB.model(USER_ENTITY_KEY).create({
                         id: userId,
                         time_from: UserState.value().fromTime,
                         time_to: UserState.value().toTime
@@ -146,7 +153,7 @@ setTimeout(async () => {
         const thisTime = format(dateNow, TIME_FORMAT, DATE_FNS_OPTIONS);
         const thisDate = format(dateNow, DATE_FORMAT, DATE_FNS_OPTIONS);
 
-        DB.model('Tasks').findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
+        DB.model(TASK_ENTITY_KEY).findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
             const replanTask = [];
 
             result.forEach( item => {
@@ -157,7 +164,7 @@ setTimeout(async () => {
 
         // пересоздание задач, которые повторяются
         const replanTask = [];
-        DB.model('Usual').findAll({ where: { lastTaskDate: thisDate, lastTaskTime: thisTime }, include: [ DB.model('Tasks') ] }).then(records => {
+        DB.model(USUAL_EVENTS_ENTITY_KEY).findAll({ where: { lastTaskDate: thisDate, lastTaskTime: thisTime }, include: [ DB.model(TASK_ENTITY_KEY) ] }).then(records => {
             records.forEach( record => {
                 const { dataValues: usual } = record;
                 const { Task: { dataValues: task }} = usual;
@@ -167,12 +174,12 @@ setTimeout(async () => {
                 replanTask.push({ ...task, date: nextDate})
             })
 
-            DB.model('Tasks').bulkCreate(replanTask);
+            DB.model(TASK_ENTITY_KEY).bulkCreate(replanTask);
         })
 
-        DB.model('Tasks').update(( { done: true } ), { where: { time: thisTime, date: thisDate } } );
+        DB.model(TASK_ENTITY_KEY).update(( { done: true } ), { where: { time: thisTime, date: thisDate } } );
 
-        DB.model('Notifies').findAll({ where: { time: thisTime, date: thisDate }, include: [ DB.model('Tasks') ] }).then((result) => {
+        DB.model(NOTIFICATION_ENTITY_KEY).findAll({ where: { time: thisTime, date: thisDate }, include: [ DB.model(TASK_ENTITY_KEY) ] }).then((result) => {
             result.forEach( item => {
                 const { dataValues: notify } = item;
                 const { Task: { dataValues: task }} = notify;
@@ -183,7 +190,7 @@ setTimeout(async () => {
                 bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} | ${task.date}`, remindControls(task, notify));
 
                 const notificationsDone = task.notificationsDone + 1;
-                DB.model('Tasks').update({ ...task, notificationsDone }, { where: { id: task.id } });
+                DB.model(TASK_ENTITY_KEY).update({ ...task, notificationsDone }, { where: { id: task.id } });
 
                 try {
                     if (notificationsDone <= task.notificationsNeed) {

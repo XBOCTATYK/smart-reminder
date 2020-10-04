@@ -1,12 +1,13 @@
 import { getNextNotifyTime } from 'Utils/calculateTime';
 import { model } from 'Utils/decorators/model';
 import { UserService } from './User';
+import { NOTIFICATION_ENTITY_KEY } from 'Constants/enitityNames';
 
 class Notification {
 
     id: number;
 
-    @model('Notifies')
+    @model(NOTIFICATION_ENTITY_KEY)
     static NotifiesModel;
     static User = UserService;
 

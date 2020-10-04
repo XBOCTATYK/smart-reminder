@@ -2,6 +2,7 @@ import { getTasksModel } from 'Models/Tasks';
 import { model } from 'Utils/decorators/model';
 import { Store } from 'Services/store';
 import { Entity, ListEntity } from 'Services/Entity';
+import { TASK_ENTITY_KEY } from 'Constants/enitityNames';
 
 export class TaskListService extends ListEntity {
     protected id: number;
@@ -9,7 +10,7 @@ export class TaskListService extends ListEntity {
     protected cacheNamePrefix = 'Model_Tasks_List_';
     protected listProp = [];
 
-    @model('Tasks')
+    @model(TASK_ENTITY_KEY)
     protected Model: ReturnType<typeof getTasksModel>;
     protected Store = Store;
 
@@ -26,7 +27,7 @@ export class TaskListService extends ListEntity {
 export class TaskService extends Entity {
     protected cacheNamePrefix = 'Model_Task_';
 
-    @model('Tasks')
+    @model(TASK_ENTITY_KEY)
     protected Model: ReturnType<typeof getTasksModel>;
     protected Store = Store;
 

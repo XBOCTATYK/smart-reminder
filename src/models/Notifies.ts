@@ -1,7 +1,9 @@
 import { DataTypes, ModelType, Model } from 'sequelize';
 import { getTasksModel } from 'Models/Tasks';
+import { ModelKey } from 'Constants/enitityNames';
+import { OrmModelCollection } from 'Src/db/orm-connection';
 
-export function getNotifiesModel(sequelize, models): ModelType {
+export function getNotifiesModel(sequelize, models?: OrmModelCollection, key?: ModelKey): ModelType {
     class Notifies extends Model {}
 
     const TaskModel = getTasksModel(sequelize, models);
@@ -33,7 +35,7 @@ export function getNotifiesModel(sequelize, models): ModelType {
     }, {
         sequelize,
         tableName: 'notifies',
-        modelName: 'Notifies'
+        modelName: key
     });
 
     // @ts-ignore

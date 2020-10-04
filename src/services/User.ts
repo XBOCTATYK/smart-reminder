@@ -3,6 +3,7 @@ import { STATES } from 'Constants/states';
 import { UserStateType } from 'Types/state';
 import { model } from 'Utils/decorators/model';
 import { getUserModel } from 'Models/User';
+import { USER_ENTITY_KEY } from 'Constants/enitityNames';
 
 class UserState {
     private id: number;
@@ -75,7 +76,7 @@ export class UserService {
     private valueProp = {};
     private isChanged = false;
 
-    @model('User')
+    @model(USER_ENTITY_KEY)
     private Model: ReturnType<typeof getUserModel>;
 
     static async create(userId) {

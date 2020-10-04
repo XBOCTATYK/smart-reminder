@@ -1,7 +1,9 @@
 import { DataTypes, ModelType, Model } from 'sequelize';
 import { getTasksModel } from 'Models/Tasks';
+import { ModelKey } from 'Constants/enitityNames';
+import { OrmModelCollection } from 'Src/db/orm-connection';
 
-export function getUsualModel(sequelize, models): ModelType {
+export function getUsualModel(sequelize, models?: OrmModelCollection, key?: ModelKey): ModelType {
     class Usual extends Model {}
 
     const TaskModel = getTasksModel(sequelize, models);
@@ -39,7 +41,7 @@ export function getUsualModel(sequelize, models): ModelType {
     }, {
         sequelize,
         tableName: 'usual',
-        modelName: 'Usual'
+        modelName: key
     })
 
     Usual.belongsTo(TaskModel, {

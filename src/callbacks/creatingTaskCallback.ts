@@ -1,7 +1,7 @@
 import { UserStateService } from 'Src/services/User';
 import { STATES } from 'Constants/states';
 import { getDateNow, getDateTomorrow } from 'Utils/dates';
-import { dateControls } from 'Src/messages/taskCreating';
+import { dateControls, repeatControls } from 'Src/messages/taskCreating';
 
 export function creatingTaskCallback(ctx) {
     const userId = ctx.update?.callback_query?.from?.id;
@@ -10,6 +10,7 @@ export function creatingTaskCallback(ctx) {
     const User = UserStateService(userId);
     const currentState = User.state();
 
+    console.log(currentState);
     switch (currentState) {
         case STATES.ENTER_TASK_DATE:
             switch (answerId) {
@@ -23,7 +24,7 @@ export function creatingTaskCallback(ctx) {
                     break;
                 case 'REPEAT':
                     User.setState(STATES.REPEATING_TASK);
-                    ctx.reply('Как часто выполняется задача?');
+                    ctx.reply('Как часто выполняется задача?', repeatControls());
                     break;
                 default:
                     return ;

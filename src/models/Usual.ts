@@ -12,7 +12,6 @@ export function getUsualModel(sequelize, models?: OrmModelCollection, key?: Mode
         id: {
             type: DataTypes.UUID,
             allowNull: false,
-            autoIncrement: true,
             primaryKey: true
         },
         task_id: {

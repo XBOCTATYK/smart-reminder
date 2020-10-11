@@ -56,6 +56,7 @@ setTimeout(async () => {
         const TasksModel = await DB.model(TASK_ENTITY_KEY).sync({force: true});
         await TasksModel.create(tasksDefaults);
         const NotifiesModel = await DB.model(NOTIFICATION_ENTITY_KEY).sync({force: true});
+        const UsualModel = await DB.model(USUAL_EVENTS_ENTITY_KEY).sync({force: true});
         const ParamsModel = await DB.model(USER_PARAMS_ENTITY_KEY).sync({force: true});
         await paramsDefault.forEach(async (param) => {
             await ParamsModel.create(param);

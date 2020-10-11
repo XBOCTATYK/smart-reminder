@@ -2,9 +2,9 @@ import { NOTIFICATION_ENTITY_KEY, TASK_ENTITY_KEY } from 'Constants/enitityNames
 
 export async function notificationCallback(ctx, DB) {
     const userId = ctx.update?.callback_query?.from?.id;
-    const { taskId, notifNed, notifyId, answerId } = JSON.parse(ctx.update?.callback_query?.data);
+    const { ned, nid, ans } = JSON.parse(ctx.update?.callback_query?.data);
 
-    if (!taskId || !notifNed || !notifyId || !answerId) return ;
+    if (!ned || !nid || !ans) return ;
 
     const messageAnswers = {
         Y: 'Отлично!',
@@ -14,29 +14,29 @@ export async function notificationCallback(ctx, DB) {
 
     try {
         // @ts-ignore
-        const notifyExists = await DB.model(NOTIFICATION_ENTITY_KEY).findOne({ where: { id: notifyId }});
-
-        console.log(notifyExists);
+        const notifyExists = await DB.model(NOTIFICATION_ENTITY_KEY).findOne({ where: { id: nid }, include: [ DB.model(TASK_ENTITY_KEY) ]});
 
         if (notifyExists) {
-            switch (answerId) {
+            const task = notifyExists.Task.dataValues;
+
+            switch (ans) {
                 case 'Y':
-                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: notifyId } });
+                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: nid } });
                     break;
                 case 'N':
-                    await DB.model(TASK_ENTITY_KEY).update({ notificationsNeed: notifNed + 1 }, { where: { id: taskId } });
-                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: notifyId } });
+                    await DB.model(TASK_ENTITY_KEY).update({ notificationsNeed: ned + 1 }, { where: { id: task.id } });
+                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: nid } });
                     break;
                 case 'D':
-                    await DB.model(TASK_ENTITY_KEY).update({ done: true }, { where: { id: taskId } });
-                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: notifyId } });
+                    await DB.model(TASK_ENTITY_KEY).update({ done: true }, { where: { id: task.id } });
+                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: nid } });
                     break;
                 default:
                     console.log('Unrecognized answer');
                     return ;
             }
 
-            ctx.reply(messageAnswers[answerId])
+            ctx.reply(messageAnswers[ans])
         } else {
             ctx.reply('Вы уже давали ответ на это напоминание!')
         }

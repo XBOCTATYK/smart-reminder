@@ -1,3 +1,5 @@
+import { v1 } from 'uuid';
+
 import { getNextNotifyTime } from 'Utils/calculateTime';
 import { model } from 'Utils/decorators/model';
 import { UserService } from './User';
@@ -42,6 +44,7 @@ export class NextNotification extends Notification {
         const newNextNotification = new NextNotification(task.id);
 
         const value = {
+            id: v1(),
             task_id: task.id,
             date: nextNotify.date,
             time: nextNotify.time

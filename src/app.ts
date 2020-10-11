@@ -1,6 +1,7 @@
 import { Telegraf } from 'telegraf';
 import format from 'date-fns/format';
 import { addDays, addHours, addMinutes } from 'date-fns';
+import { v1 } from 'uuid';
 
 import { STATES } from 'Constants/states';
 import { remindControls } from 'Src/messages/remind';
@@ -153,60 +154,85 @@ setTimeout(async () => {
         const thisTime = format(dateNow, TIME_FORMAT, DATE_FNS_OPTIONS);
         const thisDate = format(dateNow, DATE_FORMAT, DATE_FNS_OPTIONS);
 
-        DB.model(TASK_ENTITY_KEY).findAll({ where: { time: thisTime, date: thisDate, done: false } }).then((result) => {
-            const replanTask = [];
+        try {
 
-            result.forEach( item => {
-                const { dataValues } = item;
-                bot.telegram.sendMessage(dataValues.user_id, `Крайний срок задачи: ${dataValues.name} - ${dataValues.time} ${dataValues.date}`);
-            })
-        });
-
-        // пересоздание задач, которые повторяются
-        const replanTask = [];
-        DB.model(USUAL_EVENTS_ENTITY_KEY).findAll({ where: { lastTaskDate: thisDate, lastTaskTime: thisTime }, include: [ DB.model(TASK_ENTITY_KEY) ] }).then(records => {
-            records.forEach( record => {
-                const { dataValues: usual } = record;
-                const { Task: { dataValues: task }} = usual;
-
-                const nextDate = format(addMinutes(addHours(addDays(dateNow, usual.days), usual.hours), usual.minutes), DATE_FORMAT, DATE_FNS_OPTIONS);
-
-                replanTask.push({ ...task, date: nextDate})
-            })
-
-            DB.model(TASK_ENTITY_KEY).bulkCreate(replanTask);
-        })
-
-        DB.model(TASK_ENTITY_KEY).update(( { done: true } ), { where: { time: thisTime, date: thisDate } } );
-
-        DB.model(NOTIFICATION_ENTITY_KEY).findAll({ where: { time: thisTime, date: thisDate }, include: [ DB.model(TASK_ENTITY_KEY) ] }).then((result) => {
-            result.forEach( item => {
-                const { dataValues: notify } = item;
-                const { Task: { dataValues: task }} = notify;
-
-                delete notify.Task;
-
-                const value = { ...task, ...notify };
-                bot.telegram.sendMessage(value.user_id, `Напоминание: ${value.name} - ${task.time} | ${task.date}`, remindControls(task, notify));
-
-                const notificationsDone = task.notificationsDone + 1;
-                DB.model(TASK_ENTITY_KEY).update({ ...task, notificationsDone }, { where: { id: task.id } });
-
-                try {
-                    if (notificationsDone <= task.notificationsNeed) {
-                        NextNotification.create(task)
-                            .then(() => {})
-                            .catch(() => {
-                                bot.telegram.sendMessage(value.user_id, 'Ошибка при создании следующего напоминания');
-                            })
-                    }
-                } catch (e) {
-                    console.log(e);
-                    throw new Error(`Cannot create notify! ${e.message}`);
+            DB.model(TASK_ENTITY_KEY).findAll({
+                where: {
+                    time: thisTime,
+                    date: thisDate,
+                    done: false
                 }
+            }).then((result) => {
+                console.log(result);
+                if (result && result.length > 0) {
+                    result.forEach(item => {
+                        const { dataValues } = item;
+                        bot.telegram.sendMessage(dataValues.user_id, `Крайний срок задачи: ${ dataValues.name } - ${ dataValues.time } ${ dataValues.date }`);
+                    })
 
+                    DB.model(TASK_ENTITY_KEY).update(({ done: true }), { where: { time: thisTime, date: thisDate } });
+                }
+            }).then((res) => {
+                console.log('taskDone', res);
+            });
+
+            // пересоздание задач, которые повторяются
+            const replanTask = [];
+            DB.model(USUAL_EVENTS_ENTITY_KEY).findAll({
+                where: { lastTaskDate: thisDate, lastTaskTime: thisTime },
+                include: [ DB.model(TASK_ENTITY_KEY) ]
+            }).then(records => {
+                records.forEach(async (record) => {
+                    const { dataValues: usual } = record;
+                    const { Task: { dataValues: task } } = usual;
+
+                    const nextDate = format(addMinutes(addHours(addDays(dateNow, usual.days), usual.hours), usual.minutes), DATE_FORMAT, DATE_FNS_OPTIONS);
+
+                    const replanResult = await createNewTask(DB, { ...task, date: nextDate, done: false, notificationsDone: 0 });
+                    replanTask.push(replanResult)
+                })
+
+                return replanTask;
             })
-        })
+                .then((res) => {
+                    console.log('task replaned', res)
+                })
+
+            DB.model(NOTIFICATION_ENTITY_KEY).findAll({
+                where: { time: thisTime, date: thisDate },
+                include: [ DB.model(TASK_ENTITY_KEY) ]
+            }).then((result) => {
+                result.forEach(item => {
+                    const { dataValues: notify } = item;
+                    const { Task: { dataValues: task } } = notify;
+
+                    delete notify.Task;
+
+                    const value = { ...task, ...notify };
+                    bot.telegram.sendMessage(value.user_id, `Напоминание: ${ value.name } - ${ task.time } | ${ task.date }`, remindControls(task, notify));
+
+                    const notificationsDone = task.notificationsDone + 1;
+                    DB.model(TASK_ENTITY_KEY).update({ ...task, notificationsDone }, { where: { id: task.id } });
+
+                    try {
+                        if (notificationsDone <= task.notificationsNeed) {
+                            NextNotification.create(task)
+                                .then(() => {
+                                })
+                                .catch(() => {
+                                    bot.telegram.sendMessage(value.user_id, 'Ошибка при создании следующего напоминания');
+                                })
+                        }
+                    } catch (e) {
+                        console.log(e);
+                        throw new Error(`Cannot create notify! ${ e.message }`);
+                    }
+
+                })
+            })
+        } catch (e) {
+            console.log(e);
+        }
     }, 60000);
 
     bot.on('callback_query', (ctx) => {

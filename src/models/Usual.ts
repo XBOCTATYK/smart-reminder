@@ -10,13 +10,13 @@ export function getUsualModel(sequelize, models?: OrmModelCollection, key?: Mode
 
     Usual.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
             autoIncrement: true,
             primaryKey: true
         },
         task_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             references: {
                 model: TaskModel,
                 key: 'id'

@@ -7,9 +7,8 @@ export function getParamsModel(sequelize, models?: OrmModelCollection, key?: Mod
 
     Params.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
-            autoIncrement: true,
             primaryKey: true,
             unique: true,
         },

@@ -10,14 +10,13 @@ export function getNotifiesModel(sequelize, models?: OrmModelCollection, key?: M
 
     Notifies.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
-            autoIncrement: true,
             primaryKey: true,
             unique: true,
         },
         task_id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             references: {
                 model: TaskModel,
                 key: 'id'

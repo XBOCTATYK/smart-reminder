@@ -11,9 +11,8 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
 
     Tasks.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             allowNull: false,
-            autoIncrement: true,
             primaryKey: true,
             unique: true,
         },

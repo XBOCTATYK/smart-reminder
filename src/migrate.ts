@@ -1,4 +1,5 @@
 import format from 'date-fns/format';
+import { v1 } from 'uuid';
 
 import { ORMConnection } from './db/orm-connection';
 import { getUserModel } from './models/User';
@@ -22,13 +23,14 @@ const userDefaults = {
 
 
 const paramsDefault = [
-    { key: 'TOKEN', value: '' },
-    { key: 'DEFAULT_PRIORITY', value: 5 },
-    { key: 'TIME_FORMAT', value: 'HH.mm' },
-    { key: 'DATE_FORMAT', value: 'dd.MM.yyy' },
+    { id: v1(), key: 'TOKEN', value: '' },
+    { id: v1(), key: 'DEFAULT_PRIORITY', value: 5 },
+    { id: v1(), key: 'TIME_FORMAT', value: 'HH.mm' },
+    { id: v1(), key: 'DATE_FORMAT', value: 'dd.MM.yyy' },
 ];
 
 const tasksDefaults = {
+    id: v1(),
     user_id: 0,
     name: 'Что-то за задача',
     time: '23:50',

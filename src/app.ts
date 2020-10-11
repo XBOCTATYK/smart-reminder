@@ -1,7 +1,7 @@
 import { Telegraf } from 'telegraf';
 import format from 'date-fns/format';
 import { addDays, addHours, addMinutes } from 'date-fns';
-import { v1 } from 'uuid';
+import pino from 'pino';
 
 import { STATES } from 'Constants/states';
 import { remindControls } from 'Src/messages/remind';
@@ -24,9 +24,12 @@ import {
     USUAL_EVENTS_ENTITY_KEY
 } from 'Constants/enitityNames';
 
+const logger = pino();
+
 setTimeout(async () => {
     const DB = getModels();
 
+    logger.info('Getting config from base!');
     const Params = await DB.model(USER_PARAMS_ENTITY_KEY).findAll();
     const SETTINGS = {
         TOKEN: ''
@@ -35,6 +38,8 @@ setTimeout(async () => {
         const { key, value } = item;
         SETTINGS[key] = value;
     });
+
+    logger.info('Config accepted! %o', SETTINGS);
 
     const bot = new Telegraf(SETTINGS.TOKEN);
     bot.command('start', (ctx) => {
@@ -50,6 +55,9 @@ setTimeout(async () => {
 
     bot.command('task', (ctx) => {
         const userId = ctx.message.from.id;
+
+        logger.info('Starting to create task. UserID: %s', userId);
+
         const options = {
             name: 'Новая задача',
             priority: 5,
@@ -66,14 +74,22 @@ setTimeout(async () => {
 
     bot.command('list', async (ctx) => {
         const userId = ctx?.message?.from?.id;
-        const UserTaskList = await TaskListService.create(userId);
 
-        const formattedString = UserTaskList.value().reduce((string, item) => {
-            string += `${item.date} | ${item.time} | ${item.name} \n`;
-            return string;
-        }, '');
+        logger.info('List. UserID: %s', userId);
 
-        await ctx.reply(formattedString);
+        try {
+            const UserTaskList = await TaskListService.create(userId);
+
+            const formattedString = UserTaskList.value().reduce((string, item) => {
+                string += `${item.date} | ${item.time} | ${item.name} \n`;
+                return string;
+            }, '');
+
+            await ctx.reply(formattedString);
+        } catch (e) {
+            logger.error('Cannot get tasklist! %o', e)
+        }
+
     });
 
     bot.on('text', async (ctx) => {

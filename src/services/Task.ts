@@ -11,7 +11,7 @@ export class TaskListService extends ListEntity {
     protected listProp = [];
 
     @model(TASK_ENTITY_KEY)
-    protected Model: ReturnType<typeof getTasksModel>;
+    static Model: ReturnType<typeof getTasksModel>;
     protected Store = Store;
 
     constructor(userId: number) {
@@ -19,7 +19,8 @@ export class TaskListService extends ListEntity {
     }
 
     static async storeResult(newTaskList) {
-        return await newTaskList.Model.findAll({ where: { user_id: newTaskList.id } });
+        newTaskList.Model = TaskListService.Model;
+        return await newTaskList.Model.findAll({ where: { user_id: newTaskList.id, done: false } });
     }
 
 }

@@ -92,6 +92,46 @@ setTimeout(async () => {
 
     });
 
+    bot.command('ct', async (ctx) => {
+        const userId = ctx?.message?.from?.id;
+
+        const defaultOptions = {
+            name: 'Новая задача',
+            priority: 5,
+            time: null,
+            startDate: null,
+            date: getDateNow(),
+        };
+
+        const command = ctx?.update?.message?.text;
+        const commandArray = command.split(' ');
+        const [, name, date, time, priority] = commandArray;
+
+        const taskCreateOptions = {
+            ...defaultOptions,
+            ...{
+                user_id: userId,
+                name,
+                date: date === '-d' ? getDateNow() : date,
+                usual: date === '-d' ? [0, 0, 1, 0, 0] : undefined,
+                time,
+                priority,
+                startTime: format(new Date(), TIME_FORMAT, DATE_FNS_OPTIONS),
+                startDate: getDateNow(),
+            }
+        }
+
+        logger.info('Быстрое создание задачи %o', taskCreateOptions)
+
+        try {
+            await createNewTask(DB, taskCreateOptions);
+            await ctx.reply('Напоминание создано!')
+        } catch (e) {
+            logger.info('Ошибка при создании быстрой задачи. %o', taskCreateOptions)
+            await ctx.reply('Ошибка при создании напоминания!')
+        }
+    })
+
     bot.on('text', async (ctx) => {
         const userId = ctx?.message?.from?.id;
         const UserState = UserStateService(userId);
@@ -108,12 +148,12 @@ setTimeout(async () => {
                     const priorityAsNumber = parseInt(priority);
 
                     if (isNaN(priorityAsNumber)) {
-                        ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
+                        await ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
                         break;
                     }
 
                     UserState.addData({ priority: priorityAsNumber }).setState(STATES.ENTER_TASK_DATE);
-                    ctx.reply('На какую дату планируете?', dateControls());
+                    await ctx.reply('На какую дату планируете?', dateControls());
                     break;
                 case STATES.ENTER_TASK_DATE:
                     let date = incomingMessage.toLowerCase();
@@ -123,7 +163,7 @@ setTimeout(async () => {
                     }
 
                     UserState.addData({ date }).setState(STATES.ENTER_TASK_TIME);
-                    ctx.reply('На какое время планируете?');
+                    await ctx.reply('На какое время планируете?');
                     break;
                 case STATES.ENTER_TASK_TIME:
                     const options = {} as any;
@@ -143,7 +183,7 @@ setTimeout(async () => {
                     break;
                 case STATES.FROM_TIME:
                     UserState.addData({ fromTime: incomingMessage }).setState(STATES.TO_TIME);
-                    ctx.reply('В какое время прекращать присылать напоминания?');
+                    await ctx.reply('В какое время прекращать присылать напоминания?');
                     break;
                 case STATES.TO_TIME:
                     UserState.addData({ toTime: incomingMessage });
@@ -179,7 +219,6 @@ setTimeout(async () => {
                     done: false
                 }
             }).then((result) => {
-                console.log(result);
                 if (result && result.length > 0) {
                     result.forEach(item => {
                         const { dataValues } = item;
@@ -211,7 +250,7 @@ setTimeout(async () => {
                 return replanTask;
             })
                 .then((res) => {
-                    console.log('task replaned', res)
+                    console.log('tasks replaned', res)
                 })
 
             DB.model(NOTIFICATION_ENTITY_KEY).findAll({
@@ -260,7 +299,7 @@ setTimeout(async () => {
 
     });
 
-    bot.launch();
+    await bot.launch();
 
 
 }, 0);

@@ -18,6 +18,7 @@ function getRange(from: string, to: string): { fromInMinutes: number, toInMinute
 }
 
 function getAvailableTime(from: string, to: string, dateTime: Date): Date {
+    console.log(from, to, dateTime)
     const dayStart = startOfDay(dateTime);
     const currentPoint = differenceInMinutes(dateTime, dayStart);
     const { fromInMinutes, toInMinutes } = getRange(from, to);
@@ -48,6 +49,7 @@ function notifyTimes(date1: Date, date2: Date, notifyCount: number): Date[] {
 }
 
 function checkInWorkRange(from: string, to: string, dateTime: Date): boolean {
+    console.log(from, to, dateTime)
     const dayStart = startOfDay(dateTime);
     const currentPoint = differenceInMinutes(dateTime, dayStart);
     const { fromInMinutes, toInMinutes } = getRange(from, to);

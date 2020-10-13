@@ -23,6 +23,7 @@ import {
     USER_PARAMS_ENTITY_KEY,
     USUAL_EVENTS_ENTITY_KEY
 } from 'Constants/enitityNames';
+import { relocateDoneTasks } from 'Utils/relocateDoneTasks';
 
 const logger = pino();
 
@@ -287,6 +288,10 @@ setTimeout(async () => {
             })
         } catch (e) {
             console.log(e);
+        }
+
+        if (thisTime === '00:00') {
+            relocateDoneTasks(DB);
         }
     }, 60000);
 

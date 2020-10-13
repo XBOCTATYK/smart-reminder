@@ -72,7 +72,7 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
         }
     }, {
         sequelize,
-        tableName: 'tasks',
+        tableName: key.toLowerCase(),
         modelName: key
     })
 

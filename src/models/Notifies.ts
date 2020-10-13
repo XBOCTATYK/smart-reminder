@@ -33,7 +33,7 @@ export function getNotifiesModel(sequelize, models?: OrmModelCollection, key?: M
 
     }, {
         sequelize,
-        tableName: 'notifies',
+        tableName: key.toLowerCase(),
         modelName: key
     });
 

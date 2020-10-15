@@ -15,27 +15,26 @@ export async function notificationCallback(ctx, DB) {
     try {
         // @ts-ignore
         const notifyExists = await DB.model(NOTIFICATION_ENTITY_KEY).findOne({ where: { id: nid }, include: [ DB.model(TASK_ENTITY_KEY) ]});
+        const { dataValues: notify } = notifyExists || {};
 
-        if (notifyExists) {
+        if (notify.answer !== 'O') {
             const task = notifyExists.Task.dataValues;
 
             switch (ans) {
                 case 'Y':
-                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: nid } });
                     break;
                 case 'N':
                     await DB.model(TASK_ENTITY_KEY).update({ notificationsNeed: ned + 1 }, { where: { id: task.id } });
-                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: nid } });
                     break;
                 case 'D':
                     await DB.model(TASK_ENTITY_KEY).update({ done: true }, { where: { id: task.id } });
-                    await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { id: nid } });
                     break;
                 default:
                     console.log('Unrecognized answer');
                     return ;
             }
 
+            await DB.model(NOTIFICATION_ENTITY_KEY).update({ answer: ans }, { where: { id: nid } });
             ctx.reply(messageAnswers[ans])
         } else {
             ctx.reply('Вы уже давали ответ на это напоминание!')

@@ -24,6 +24,8 @@ import {
     USUAL_EVENTS_ENTITY_KEY
 } from 'Constants/enitityNames';
 import { relocateDoneTasks } from 'Utils/relocateDoneTasks';
+import { updateNotifies } from 'Utils/updateNotifies';
+import { relocateDoneNotifies } from 'Utils/relocateDoneNotifies';
 
 const logger = pino();
 
@@ -211,8 +213,9 @@ setTimeout(async () => {
         const thisTime = format(dateNow, TIME_FORMAT, DATE_FNS_OPTIONS);
         const thisDate = format(dateNow, DATE_FORMAT, DATE_FNS_OPTIONS);
 
-        try {
+        logger.info('This date - %s. This time - %s', thisDate, thisTime);
 
+        try {
             DB.model(TASK_ENTITY_KEY).findAll({
                 where: {
                     time: thisTime,
@@ -222,14 +225,19 @@ setTimeout(async () => {
             }).then((result) => {
                 if (result && result.length > 0) {
                     result.forEach(item => {
-                        const { dataValues } = item;
-                        bot.telegram.sendMessage(dataValues.user_id, `Крайний срок задачи: ${ dataValues.name } - ${ dataValues.time } ${ dataValues.date }`);
+                        const { dataValues: task } = item;
+                        logger.info('Крайний срок задачи %d', task.id);
+                        bot.telegram.sendMessage(task.user_id, `Крайний срок задачи: ${ task.name } - ${ task.time } ${ task.date }`);
                     })
 
                     DB.model(TASK_ENTITY_KEY).update(({ done: true }), { where: { time: thisTime, date: thisDate } });
                 }
-            }).then((res) => {
+            })
+            .then((res) => {
                 console.log('taskDone', res);
+            })
+            .catch((e) => {
+                logger.error('Ошибка при уведомлении о задаче %o', e);
             });
 
             // пересоздание задач, которые повторяются
@@ -242,6 +250,8 @@ setTimeout(async () => {
                     const { dataValues: usual } = record;
                     const { Task: { dataValues: task } } = usual;
 
+                    logger.info('Пересоздается задача %d | Usual %d', task.id, usual.id);
+
                     const nextDate = format(addMinutes(addHours(addDays(dateNow, usual.days), usual.hours), usual.minutes), DATE_FORMAT, DATE_FNS_OPTIONS);
 
                     const replanResult = await createNewTask(DB, { ...task, date: nextDate, done: false, notificationsDone: 0 });
@@ -253,12 +263,15 @@ setTimeout(async () => {
                 .then((res) => {
                     console.log('tasks replaned', res)
                 })
+                .catch((e) => {
+                    logger.error('Ошибка при перепланировании задачи %o', e);
+                })
 
             DB.model(NOTIFICATION_ENTITY_KEY).findAll({
-                where: { time: thisTime, date: thisDate },
+                where: { time: thisTime, date: thisDate, done: false },
                 include: [ DB.model(TASK_ENTITY_KEY) ]
-            }).then((result) => {
-                result.forEach(item => {
+            }).then( (result) => {
+                result.forEach((item) => {
                     const { dataValues: notify } = item;
                     const { Task: { dataValues: task } } = notify;
 
@@ -269,6 +282,7 @@ setTimeout(async () => {
 
                     const notificationsDone = task.notificationsDone + 1;
                     DB.model(TASK_ENTITY_KEY).update({ ...task, notificationsDone }, { where: { id: task.id } });
+                    updateNotifies(DB, thisDate, thisTime, task);
 
                     try {
                         if (notificationsDone <= task.notificationsNeed) {
@@ -286,12 +300,16 @@ setTimeout(async () => {
 
                 })
             })
+            .catch((e) => {
+                logger.error('Ошибка при обработки уведомления %o', e);
+            })
         } catch (e) {
-            console.log(e);
+            logger.error('Ошибка при срабатывании планировщика %o', e);
         }
 
-        if (thisTime === '00:00') {
+        if (thisTime === '00:01') {
             relocateDoneTasks(DB);
+            relocateDoneNotifies(DB);
         }
     }, 60000);
 

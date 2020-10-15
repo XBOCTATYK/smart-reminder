@@ -29,6 +29,15 @@ export function getNotifiesModel(sequelize, models?: OrmModelCollection, key?: M
         date: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        answer: {
+            type: DataTypes.STRING(1),
+            allowNull: true,
+            defaultValue: 'O'
+        },
+        done: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
         }
 
     }, {

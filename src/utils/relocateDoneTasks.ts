@@ -1,4 +1,4 @@
-import { DONE_TASK_KEY, TASK_ENTITY_KEY } from '../constants/enitityNames';
+import { DONE_TASK_KEY, TASK_ENTITY_KEY } from 'Constants/enitityNames';
 import { ORMConnection } from 'Src/db/orm-connection';
 
 export async function relocateDoneTasks(DB: ORMConnection) {

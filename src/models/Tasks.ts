@@ -48,14 +48,6 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
             defaultValue: 5,
             allowNull: false
         },
-        remembers: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0
-        },
-        forgets: {
-            type: DataTypes.INTEGER,
-            defaultValue: 0
-        },
         notificationsNeed: {
             type: DataTypes.INTEGER,
             defaultValue: 1,

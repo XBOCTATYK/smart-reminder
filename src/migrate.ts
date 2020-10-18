@@ -57,18 +57,16 @@ setTimeout(async () => {
     try {
         const UserModel = await DB.model(USER_ENTITY_KEY).sync({force: true});
         await UserModel.create(userDefaults);
-
-
+        const TasksModel = await DB.model(TASK_ENTITY_KEY).sync({force: true});
+        await TasksModel.create(tasksDefaults);
+        DB.model(DONE_TASK_KEY).sync({force: true})
+        const NotifiesModel = await DB.model(NOTIFICATION_ENTITY_KEY).sync({force: true});
+        DB.model(DONE_NOTIFIES_KEY).sync({force: true})
         const UsualModel = await DB.model(USUAL_EVENTS_ENTITY_KEY).sync({force: true});
         const ParamsModel = await DB.model(USER_PARAMS_ENTITY_KEY).sync({force: true});
         await paramsDefault.forEach(async (param) => {
             await ParamsModel.create(param);
         })
-        const NotifiesModel = await DB.model(NOTIFICATION_ENTITY_KEY).sync({force: true});
-        DB.model(DONE_NOTIFIES_KEY).sync({force: true})
-        const TasksModel = await DB.model(TASK_ENTITY_KEY).sync({force: true});
-        await TasksModel.create(tasksDefaults);
-        DB.model(DONE_TASK_KEY).sync({force: true})
     } catch (e) {
         console.log(e);
     }

@@ -22,7 +22,7 @@ export function getParamsModel(sequelize, models?: OrmModelCollection, key?: Mod
         },
     }, {
         sequelize,
-        tableName: 'params',
+        tableName: key.toLowerCase(),
         modelName: key
     });
 

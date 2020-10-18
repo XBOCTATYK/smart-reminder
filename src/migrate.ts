@@ -55,7 +55,7 @@ const DB = new ORMConnection(process.env.DATABASE_URL, [
 
 setTimeout(async () => {
     try {
-        /*const UserModel = await DB.model(USER_ENTITY_KEY).sync({force: true});
+        const UserModel = await DB.model(USER_ENTITY_KEY).sync({force: true});
         await UserModel.create(userDefaults);
 
 
@@ -63,7 +63,7 @@ setTimeout(async () => {
         const ParamsModel = await DB.model(USER_PARAMS_ENTITY_KEY).sync({force: true});
         await paramsDefault.forEach(async (param) => {
             await ParamsModel.create(param);
-        })*/
+        })
         const NotifiesModel = await DB.model(NOTIFICATION_ENTITY_KEY).sync({force: true});
         DB.model(DONE_NOTIFIES_KEY).sync({force: true})
         const TasksModel = await DB.model(TASK_ENTITY_KEY).sync({force: true});

@@ -26,6 +26,8 @@ import {
 import { relocateDoneTasks } from 'Utils/relocateDoneTasks';
 import { updateNotifies } from 'Utils/updateNotifies';
 import { relocateDoneNotifies } from 'Utils/relocateDoneNotifies';
+import { MainMenu } from 'Src/messages/MainMenu';
+import { showTaskList } from 'Utils/user-stories/taskList';
 
 const logger = pino();
 
@@ -78,20 +80,8 @@ setTimeout(async () => {
     bot.command('list', async (ctx) => {
         const userId = ctx?.message?.from?.id;
 
-        logger.info('List. UserID: %s', userId);
-
-        try {
-            const UserTaskList = await TaskListService.create(userId);
-
-            const formattedString = UserTaskList.value().reduce((string, item) => {
-                string += `${item.date} | ${item.time} | ${item.name} \n`;
-                return string;
-            }, '');
-
-            await ctx.reply(formattedString);
-        } catch (e) {
-            logger.error('Cannot get tasklist! %o', e)
-        }
+        const listString = await showTaskList(userId, logger);
+        await ctx.reply(...listString);
 
     });
 
@@ -135,6 +125,14 @@ setTimeout(async () => {
         }
     })
 
+    bot.command('/back', (ctx) => {
+        const userId = ctx?.message?.from?.id;
+        const UserState = UserStateService(userId);
+
+        UserState.setState(STATES.PENDING_TASK);
+        ctx.reply('Выберите команду', MainMenu())
+    })
+
     bot.on('text', async (ctx) => {
         const userId = ctx?.message?.from?.id;
         const UserState = UserStateService(userId);
@@ -142,6 +140,21 @@ setTimeout(async () => {
         const incomingMessage = ctx.message.text;
 
         switch (currentState) {
+            case STATES.PENDING_TASK:
+                switch (incomingMessage) {
+                    case 'Список':
+                        const listString = await showTaskList(userId, logger);
+                        await ctx.reply(...listString);
+                        break;
+                    case '+ Добавить':
+                        await ctx.reply('Что планируете сделать?');
+
+                        UserStateService(userId, STATES.ENTER_TASK_NAME, {}).setState(STATES.ENTER_TASK_NAME);
+                        break;
+                    default:
+                        break;
+                }
+                break;
                 case STATES.ENTER_TASK_NAME:
                     UserState.addData({ name: incomingMessage }).setState(STATES.ENTER_TASK_PRIORITY);
                     await ctx.reply('Какой приоритет задачи?', priorityControls());
@@ -149,7 +162,7 @@ setTimeout(async () => {
                 case STATES.ENTER_TASK_PRIORITY:
                     const priorityAsNumber = parseInt(incomingMessage);
 
-                    if (isNaN(priorityAsNumber)) {
+                    if (isNaN(priorityAsNumber) || priorityAsNumber > 20) {
                         await ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
                         break;
                     }

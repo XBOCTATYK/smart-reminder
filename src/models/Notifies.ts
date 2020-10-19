@@ -32,12 +32,13 @@ export function getNotifiesModel(sequelize, models?: OrmModelCollection, key?: M
         },
         answer: {
             type: DataTypes.STRING(1),
-            allowNull: true,
-            defaultValue: 'O'
+            allowNull: false,
+            defaultValue: 'O',
         },
         done: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
+            allowNull: false,
         }
 
     }, {

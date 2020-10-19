@@ -46,7 +46,10 @@ export function creatingTaskCallback(ctx) {
                     User.addData({ usual: [0,0,1,0,0] })
             }
             User.addData({ date: getDateNow() }).setState(STATES.ENTER_TASK_TIME);
+            ctx.reply('На какое время планируете?');
+            break;
         case STATES.CREATING_TASK_ERROR:
+            User.setState(STATES.PENDING_TASK);
             break;
         default:
             return;

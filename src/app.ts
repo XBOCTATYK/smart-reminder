@@ -144,11 +144,10 @@ setTimeout(async () => {
         switch (currentState) {
                 case STATES.ENTER_TASK_NAME:
                     UserState.addData({ name: incomingMessage }).setState(STATES.ENTER_TASK_PRIORITY);
-                    ctx.reply('Какой приоритет задачи?', priorityControls());
+                    await ctx.reply('Какой приоритет задачи?', priorityControls());
                     break;
                 case STATES.ENTER_TASK_PRIORITY:
-                    const priority = incomingMessage;
-                    const priorityAsNumber = parseInt(priority);
+                    const priorityAsNumber = parseInt(incomingMessage);
 
                     if (isNaN(priorityAsNumber)) {
                         await ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
@@ -161,6 +160,11 @@ setTimeout(async () => {
                 case STATES.ENTER_TASK_DATE:
                     let date = incomingMessage.toLowerCase();
 
+                    if (!incomingMessage.match(/[\d]{1,2}.[\d]{2}.[\d]{4}/)) {
+                        await ctx.reply('Пример правильного формата даты - 11.08.2021. Попробуйте ввести еще раз');
+                        break;
+                    }
+
                     if (date === 'сегодня') {
                         date = getDateNow();
                     }
@@ -170,6 +174,12 @@ setTimeout(async () => {
                     break;
                 case STATES.ENTER_TASK_TIME:
                     const options = {} as any;
+
+                    if (!incomingMessage.match(/[\d]{1,2}:[\d]{2}/)) {
+                        await ctx.reply('Пример правильного формата времени - 12:00. Попробуйте ввести еще раз');
+                        break;
+                    }
+
                     options.time = incomingMessage;
 
                     options.startTime = format(new Date(), TIME_FORMAT, DATE_FNS_OPTIONS);

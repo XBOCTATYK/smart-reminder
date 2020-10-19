@@ -5,5 +5,6 @@ export async function relocateDoneTasks(DB: ORMConnection) {
     const doneTasks = await DB.model(TASK_ENTITY_KEY).findAll({ where: { done: true } });
     const doneTasksValues = doneTasks.map(item => item.dataValues);
 
+    await DB.model(TASK_ENTITY_KEY).destroy({ where: { done: true } })
     await DB.model(DONE_TASK_KEY).bulkCreate(doneTasksValues);
 }

@@ -1,7 +1,6 @@
 import { NOTIFICATION_ENTITY_KEY, TASK_ENTITY_KEY } from 'Constants/enitityNames';
 
 export async function notificationCallback(ctx, DB) {
-    const userId = ctx.update?.callback_query?.from?.id;
     const { ned, nid, ans } = JSON.parse(ctx.update?.callback_query?.data);
 
     if (!ned || !nid || !ans) return ;
@@ -17,7 +16,7 @@ export async function notificationCallback(ctx, DB) {
         const notifyExists = await DB.model(NOTIFICATION_ENTITY_KEY).findOne({ where: { id: nid }, include: [ DB.model(TASK_ENTITY_KEY) ]});
         const { dataValues: notify } = notifyExists || {};
 
-        if (notify.answer !== 'O') {
+        if (notify.answer === 'O') {
             const task = notifyExists.Task.dataValues;
 
             switch (ans) {

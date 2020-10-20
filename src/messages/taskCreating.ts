@@ -1,29 +1,32 @@
 import Markup from 'telegraf/markup';
+import { TASK_CREATING_ACTION } from 'Constants/callback-actions';
+
+const templateMessage = `${TASK_CREATING_ACTION}`;
 
 export function dateControls() {
     return Markup.inlineKeyboard([
-        Markup.callbackButton('Сегодня', JSON.stringify({ answerId: 'TODAY' })),
-        Markup.callbackButton('Завтра', JSON.stringify({ answerId: 'TOMORROW' })),
-        Markup.callbackButton('Повторяющееся событие', JSON.stringify({ answerId: 'REPEAT' })),
+        Markup.callbackButton('Сегодня', `${templateMessage}/TODAY`),
+        Markup.callbackButton('Завтра', `${templateMessage}/TOMORROW`),
+        Markup.callbackButton('Повторяющееся событие', `${templateMessage}/REPEAT`),
     ])
         .extra()
 }
 
 export function repeatControls() {
     return Markup.inlineKeyboard([
-        Markup.callbackButton('Ежедневно', JSON.stringify({ answerId: 'DAILY' })),
-        Markup.callbackButton('Еженедельно', JSON.stringify({ answerId: 'WEEKLY' })),
+        Markup.callbackButton('Ежедневно', `${templateMessage}/DAILY`),
+        Markup.callbackButton('Еженедельно', `${templateMessage}/WEEKLY`),
     ])
         .extra()
 }
 
 export function priorityControls() {
     return Markup.inlineKeyboard([
-        Markup.callbackButton('2', JSON.stringify({ answerId: '2' })),
-        Markup.callbackButton('4', JSON.stringify({ answerId: '4' })),
-        Markup.callbackButton('6', JSON.stringify({ answerId: '6' })),
-        Markup.callbackButton('8', JSON.stringify({ answerId: '8' })),
-        Markup.callbackButton('10', JSON.stringify({ answerId: '10' })),
+        Markup.callbackButton('2', `${templateMessage}/2`),
+        Markup.callbackButton('4', `${templateMessage}/4`),
+        Markup.callbackButton('6', `${templateMessage}/6`),
+        Markup.callbackButton('8', `${templateMessage}/8`),
+        Markup.callbackButton('10', `${templateMessage}/10`),
     ])
         .extra()
 }

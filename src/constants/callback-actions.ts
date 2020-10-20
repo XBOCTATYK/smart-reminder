@@ -1,0 +1,3 @@
+export const TASK_CREATING_ACTION = 'TASK_CREATING';
+export const TASK_SELECT_ACTION = 'TASK_SELECT';
+export const REMIND_ACTION = 'REMIND';

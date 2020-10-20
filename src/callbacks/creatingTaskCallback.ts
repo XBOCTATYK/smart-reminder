@@ -2,15 +2,23 @@ import { UserStateService } from 'Src/services/User';
 import { STATES } from 'Constants/states';
 import { getDateNow, getDateTomorrow } from 'Utils/dates';
 import { dateControls, repeatControls } from 'Src/messages/taskCreating';
+import { TASK_CREATING_ACTION } from 'Constants/callback-actions';
 
 export function creatingTaskCallback(ctx) {
     const userId = ctx.update?.callback_query?.from?.id;
-    const { answerId } = JSON.parse(ctx.update?.callback_query?.data);
+    const answer = ctx.update?.callback_query?.data;
+
+    if (!answer) return;
+
+    const [action, answerId] = answer.split('/');
+
+    console.log(answer)
+
+    if (action !== TASK_CREATING_ACTION) return;
 
     const User = UserStateService(userId);
     const currentState = User.state();
 
-    console.log(currentState);
     switch (currentState) {
         case STATES.ENTER_TASK_DATE:
             switch (answerId) {

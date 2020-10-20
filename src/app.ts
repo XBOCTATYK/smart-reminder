@@ -28,6 +28,7 @@ import { updateNotifies } from 'Utils/updateNotifies';
 import { relocateDoneNotifies } from 'Utils/relocateDoneNotifies';
 import { MainMenu } from 'Src/messages/MainMenu';
 import { showTaskList } from 'Utils/user-stories/taskList';
+import { taskSelectCallback } from 'Src/callbacks/taskSelectCallback';
 
 const logger = pino();
 
@@ -142,7 +143,7 @@ setTimeout(async () => {
         switch (currentState) {
             case STATES.PENDING_TASK:
                 switch (incomingMessage) {
-                    case 'Список':
+                    case '🗒 Список':
                         const listString = await showTaskList(userId, logger);
                         await ctx.reply(...listString);
                         break;
@@ -339,6 +340,7 @@ setTimeout(async () => {
     bot.on('callback_query', (ctx) => {
         creatingTaskCallback(ctx);
         notificationCallback(ctx, DB).then();
+        taskSelectCallback(ctx, DB).then();
     });
 
     bot.command('stop', (ctx) => {

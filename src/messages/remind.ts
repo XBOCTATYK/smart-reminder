@@ -1,15 +1,13 @@
 import Markup from 'telegraf/markup';
+import { REMIND_ACTION } from 'Constants/callback-actions';
 
 export function remindControls(task, notify) {
-    const messageData = {
-        ned: task.notificationsNeed,
-        nid: notify.id,
-    };
+    const message = `${REMIND_ACTION}/${task.notificationsNeed}/${notify.id}`
 
    return Markup.inlineKeyboard([
-       Markup.callbackButton('Я помню', JSON.stringify({ ...messageData,  ans: 'Y' })),
-       Markup.callbackButton('Я забыл', JSON.stringify({ ...messageData, ans: 'N' })),
-       Markup.callbackButton('Я сделал', JSON.stringify({ ...messageData,  ans: 'D' }))
+       Markup.callbackButton('Я помню', `${message}/Y`),
+       Markup.callbackButton('Я забыл', `${message}/N`),
+       Markup.callbackButton('Я сделал', `${message}/D`)
    ])
        .extra()
 }

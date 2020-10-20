@@ -1,5 +1,6 @@
 import { NOTIFICATION_ENTITY_KEY, TASK_ENTITY_KEY } from '../constants/enitityNames';
 import { TASK_SELECT_ACTION } from '../constants/callback-actions';
+import { taskInfoControls } from 'Src/messages/taskInfo';
 
 export async function taskSelectCallback(ctx, DB) {
     const answer = ctx.update?.callback_query?.data;
@@ -32,5 +33,5 @@ export async function taskSelectCallback(ctx, DB) {
 
    `;
 
-    await ctx.replyWithMarkdown(message);
+    await ctx.replyWithMarkdown(message, taskInfoControls(task.id));
 }

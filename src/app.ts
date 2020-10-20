@@ -29,6 +29,7 @@ import { relocateDoneNotifies } from 'Utils/relocateDoneNotifies';
 import { MainMenu } from 'Src/messages/MainMenu';
 import { showTaskList } from 'Utils/user-stories/taskList';
 import { taskSelectCallback } from 'Src/callbacks/taskSelectCallback';
+import { taskUnderAction } from 'Src/callbacks/taskUnderActionCallback';
 
 const logger = pino();
 
@@ -302,7 +303,10 @@ setTimeout(async () => {
                     delete notify.Task;
 
                     const value = { ...task, ...notify };
-                    bot.telegram.sendMessage(value.user_id, `Напоминание: ${ value.name } - ${ task.time } | ${ task.date }`, remindControls(task, notify));
+
+                    if (notify.answer !== 'X') {
+                        bot.telegram.sendMessage(value.user_id, `Напоминание: ${ value.name } - ${ task.time } | ${ task.date }`, remindControls(task, notify));
+                    }
 
                     const notificationsDone = task.notificationsDone + 1;
                     DB.model(TASK_ENTITY_KEY).update({ ...task, notificationsDone }, { where: { id: task.id } });
@@ -341,6 +345,7 @@ setTimeout(async () => {
         creatingTaskCallback(ctx);
         notificationCallback(ctx, DB).then();
         taskSelectCallback(ctx, DB).then();
+        taskUnderAction(ctx, DB).then();
     });
 
     bot.command('stop', (ctx) => {

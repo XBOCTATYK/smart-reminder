@@ -279,6 +279,7 @@ setTimeout(async () => {
                     const nextDate = format(addMinutes(addHours(addDays(dateNow, usual.days), usual.hours), usual.minutes), DATE_FORMAT, DATE_FNS_OPTIONS);
 
                     const replanResult = await createNewTask(DB, { ...task, date: nextDate, done: false, notificationsDone: 0 });
+                    await DB.model(USUAL_EVENTS_ENTITY_KEY).update({ lastTaskDate: nextDate }, { where: { task_id: task.id } });
                     replanTask.push(replanResult)
                 })
 
@@ -335,8 +336,8 @@ setTimeout(async () => {
         }
 
         if (thisTime === '00:01') {
-            relocateDoneTasks(DB);
             relocateDoneNotifies(DB);
+            relocateDoneTasks(DB);
         }
     }, 60000);
 
@@ -347,11 +348,20 @@ setTimeout(async () => {
         taskUnderAction(ctx, DB).then();
     });
 
+    bot.command('relocateTasks', (ctx) => {
+        const userId = ctx?.message?.from?.id;
+        const PERMIT_ID = 336322411;
+
+        if (userId == PERMIT_ID) {
+            relocateDoneNotifies(DB);
+            relocateDoneTasks(DB);
+        }
+    })
+
     bot.command('stop', (ctx) => {
 
     });
 
     await bot.launch();
-
 
 }, 0);

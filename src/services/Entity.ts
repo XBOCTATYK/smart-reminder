@@ -83,7 +83,7 @@ export class ListEntity {
         if (!taskData) {
             const StoreResult = await this.storeResult(newListEntity);
             newListEntity.listProp = StoreResult ? StoreResult.map(item => item.dataValues) : [];
-            newListEntity.Store.set(`${newListEntity.cacheNamePrefix}${userId}`, newListEntity.listProp);
+            newListEntity.Store.set(`${newListEntity.cacheNamePrefix}${userId}`, newListEntity.listProp, 10);
         } else {
             newListEntity.listProp = taskData;
         }
@@ -117,7 +117,7 @@ export class ListEntity {
             this.diffNew.push(data);
         }
 
-        this.Store.set(`${this.cacheNamePrefix}${this.id}`, this.listProp);
+        this.Store.set(`${this.cacheNamePrefix}${this.id}`, this.listProp, 10);
 
         return this;
     }

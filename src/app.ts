@@ -139,7 +139,7 @@ setTimeout(async () => {
         const PERMIT_ID = 336322411;
 
         if (userId == PERMIT_ID) {
-            await relocateDoneTasks(DB);
+            // await relocateDoneTasks(DB);
         }
     })
 

@@ -15,7 +15,11 @@ export class ORMConnection {
     private modelsList = [];
 
     constructor(connect: string, models: OrmModelList) {
-        const instance = new Sequelize(connect);
+        const instance = new Sequelize(connect, {
+            retry: {
+                max: 5,
+            }
+        });
 
         models.forEach((model) => {
             const modelInstance = model.init(instance, this.models, model.key);

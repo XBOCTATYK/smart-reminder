@@ -134,6 +134,16 @@ setTimeout(async () => {
         ctx.reply('Выберите команду', MainMenu())
     })
 
+    bot.command('relocateTasks', async (ctx) => {
+        const userId = ctx?.message?.from?.id;
+        const PERMIT_ID = 336322411;
+
+        if (userId == PERMIT_ID) {
+            await relocateDoneNotifies(DB);
+            await relocateDoneTasks(DB);
+        }
+    })
+
     bot.on('text', async (ctx) => {
         const userId = ctx?.message?.from?.id;
         const UserState = UserStateService(userId);
@@ -336,8 +346,10 @@ setTimeout(async () => {
         }
 
         if (thisTime === '00:01') {
-            relocateDoneNotifies(DB);
-            relocateDoneTasks(DB);
+            relocateDoneNotifies(DB).then(() => {
+                relocateDoneTasks(DB);
+            });
+
         }
     }, 60000);
 
@@ -347,16 +359,6 @@ setTimeout(async () => {
         taskSelectCallback(ctx, DB).then();
         taskUnderAction(ctx, DB).then();
     });
-
-    bot.command('relocateTasks', (ctx) => {
-        const userId = ctx?.message?.from?.id;
-        const PERMIT_ID = 336322411;
-
-        if (userId == PERMIT_ID) {
-            relocateDoneNotifies(DB);
-            relocateDoneTasks(DB);
-        }
-    })
 
     bot.command('stop', (ctx) => {
 

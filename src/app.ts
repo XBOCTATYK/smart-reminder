@@ -14,7 +14,6 @@ import { notificationCallback } from 'Src/callbacks/notificationCallback';
 import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
 import { getDateNow } from 'Utils/dates';
 import { getModels } from 'Utils/db/getModels';
-import { TaskListService } from 'Services/Task';
 import { NextNotification } from 'Services/Notification';
 import {
     NOTIFICATION_ENTITY_KEY,

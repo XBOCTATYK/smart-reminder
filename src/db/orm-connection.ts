@@ -16,6 +16,7 @@ export class ORMConnection {
 
     constructor(connect: string, models: OrmModelList) {
         const instance = new Sequelize(connect, {
+            timezone: '+03:00',
             retry: {
                 max: 5,
             }

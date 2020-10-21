@@ -139,7 +139,6 @@ setTimeout(async () => {
         const PERMIT_ID = 336322411;
 
         if (userId == PERMIT_ID) {
-            await relocateDoneNotifies(DB);
             await relocateDoneTasks(DB);
         }
     })
@@ -346,10 +345,7 @@ setTimeout(async () => {
         }
 
         if (thisTime === '00:01') {
-            relocateDoneNotifies(DB).then(() => {
-                relocateDoneTasks(DB);
-            });
-
+            relocateDoneTasks(DB);
         }
     }, 60000);
 

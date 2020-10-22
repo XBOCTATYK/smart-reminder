@@ -1,6 +1,6 @@
 import { addDays, addHours, addMinutes, format, parse } from 'date-fns';
 import { POSTPONE_TASK } from 'Constants/callback-actions';
-import { NOTIFICATION_ENTITY_KEY, TASK_ENTITY_KEY } from 'Constants/enitityNames';
+import { DONE_TASK_KEY, NOTIFICATION_ENTITY_KEY, TASK_ENTITY_KEY } from 'Constants/enitityNames';
 import { DATE_FNS_OPTIONS, FULL_FORMAT, TIME_FORMAT } from 'Constants/formats';
 import { createNewTask } from 'Utils/createNewTask';
 import { getDateNow } from 'Utils/dates';
@@ -19,7 +19,12 @@ export async function postponeTaskCallback(ctx, DB, logger) {
 
     const [amount, quantitificator] = taskAction.split('.');
 
-    const taskDB = await DB.model(TASK_ENTITY_KEY).findOne({ where: { id: taskId } });
+    let taskDB = await DB.model(TASK_ENTITY_KEY).findOne({ where: { id: taskId } });
+
+    if (!taskDB) {
+        taskDB = await DB.model(DONE_TASK_KEY).findOne({ where: { id: taskId } });
+    }
+
     const { dataValues: task } = taskDB || {};
 
     if (!task) {

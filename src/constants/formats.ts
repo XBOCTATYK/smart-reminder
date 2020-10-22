@@ -2,6 +2,7 @@ import RU from 'date-fns/locale/ru';
 
 export const DATE_FORMAT = 'dd.MM.yyyy';
 export const TIME_FORMAT = 'HH:mm';
+export const FULL_FORMAT = `${DATE_FORMAT} ${TIME_FORMAT}`;
 
 export const LOCALE = RU;
 

@@ -24,11 +24,12 @@ import {
 } from 'Constants/enitityNames';
 import { relocateDoneTasks } from 'Utils/relocateDoneTasks';
 import { updateNotifies } from 'Utils/updateNotifies';
-import { relocateDoneNotifies } from 'Utils/relocateDoneNotifies';
 import { MainMenu } from 'Src/messages/MainMenu';
 import { showTaskList } from 'Utils/user-stories/taskList';
 import { taskSelectCallback } from 'Src/callbacks/taskSelectCallback';
 import { taskUnderAction } from 'Src/callbacks/taskUnderActionCallback';
+import { postponeTaskCallback } from 'Src/callbacks/postponeTaskCallback';
+import { postponeControls } from 'Src/messages/postponeControls';
 
 const logger = pino();
 
@@ -82,6 +83,13 @@ setTimeout(async () => {
         const userId = ctx?.message?.from?.id;
 
         const listString = await showTaskList(userId, logger);
+        const [message] = listString;
+
+        if (message === '')  {
+            await ctx.reply('У вас нет ни одной запланированной задачи.');
+            return;
+        }
+
         await ctx.reply(...listString);
 
     });
@@ -154,6 +162,13 @@ setTimeout(async () => {
                 switch (incomingMessage) {
                     case '🗒 Список':
                         const listString = await showTaskList(userId, logger);
+                        const [message] = listString;
+
+                        if (message === '')  {
+                            await ctx.reply('У вас нет ни одной запланированной задачи.');
+                            break;
+                        }
+
                         await ctx.reply(...listString);
                         break;
                     case '+ Добавить':
@@ -260,7 +275,7 @@ setTimeout(async () => {
                     result.forEach(item => {
                         const { dataValues: task } = item;
                         logger.info('Крайний срок задачи %d', task.id);
-                        bot.telegram.sendMessage(task.user_id, `Крайний срок задачи: ${ task.name } - ${ task.time } ${ task.date }`);
+                        bot.telegram.sendMessage(task.user_id, `Крайний срок задачи: ${ task.name } - ${ task.time } ${ task.date }`, postponeControls(task.id));
                     })
 
                     DB.model(TASK_ENTITY_KEY).update(({ done: true }), { where: { time: thisTime, date: thisDate } });
@@ -354,6 +369,7 @@ setTimeout(async () => {
         notificationCallback(ctx, DB).then();
         taskSelectCallback(ctx, DB).then();
         taskUnderAction(ctx, DB).then();
+        postponeTaskCallback(ctx, DB, logger).then();
     });
 
     bot.command('stop', (ctx) => {

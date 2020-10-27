@@ -30,6 +30,7 @@ import { taskSelectCallback } from 'Src/callbacks/taskSelectCallback';
 import { taskUnderAction } from 'Src/callbacks/taskUnderActionCallback';
 import { postponeTaskCallback } from 'Src/callbacks/postponeTaskCallback';
 import { postponeControls } from 'Src/messages/postponeControls';
+import { TEXT_COMMANDS } from 'Constants/textCommands';
 
 const logger = pino();
 
@@ -160,7 +161,7 @@ setTimeout(async () => {
         switch (currentState) {
             case STATES.PENDING_TASK:
                 switch (incomingMessage) {
-                    case '🗒 Список':
+                    case TEXT_COMMANDS.LIST:
                         const listString = await showTaskList(userId, logger);
                         const [message] = listString;
 
@@ -171,7 +172,7 @@ setTimeout(async () => {
 
                         await ctx.reply(...listString);
                         break;
-                    case '+ Добавить':
+                    case TEXT_COMMANDS.ADD:
                         await ctx.reply('Что планируете сделать?');
 
                         UserStateService(userId, STATES.ENTER_TASK_NAME, {}).setState(STATES.ENTER_TASK_NAME);

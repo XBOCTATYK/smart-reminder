@@ -33,6 +33,9 @@ import { postponeControls } from 'Src/messages/postponeControls';
 import { TEXT_COMMANDS } from 'Constants/textCommands';
 import { randomElement } from 'Utils/randomElement';
 import { NOTIFY_PHRASES } from 'Constants/phrases/notification';
+import { CREATION_TASK_PHRASES } from 'Constants/phrases/creationTask';
+import { TASK_CREATION_ERROR_PHRASES } from 'Constants/phrases/taskCreationError';
+import { TASK_TIME_PHRASES } from 'Constants/phrases/taskTime';
 
 const logger = pino();
 
@@ -228,11 +231,14 @@ setTimeout(async () => {
                 UserState.addData(options);
 
                 createNewTask(DB, { user_id: userId, ...UserState.value() }).then(() => {
-                    ctx.reply('Напоминание создано!');
+                    const createdPhrase = randomElement(CREATION_TASK_PHRASES);
+                    ctx.reply(createdPhrase);
                     UserState.done();
                 }).catch(err => {
                     UserState.setState(STATES.CREATING_TASK_ERROR);
-                    ctx.reply('Произошла ошибка при создании задачи!')
+
+                    const errorPhrase = randomElement(TASK_CREATION_ERROR_PHRASES);
+                    ctx.reply(errorPhrase)
                 });
                 break;
             case STATES.FROM_TIME:
@@ -278,7 +284,9 @@ setTimeout(async () => {
                     result.forEach(item => {
                         const { dataValues: task } = item;
                         logger.info('Крайний срок задачи %d', task.id);
-                        bot.telegram.sendMessage(task.user_id, `Крайний срок задачи: ${ task.name } - ${ task.time } ${ task.date }`, postponeControls(task.id));
+
+                        const taskTimePhrase = randomElement(TASK_TIME_PHRASES);
+                        bot.telegram.sendMessage(task.user_id, `${taskTimePhrase} ${ task.name } - ${ task.time } ${ task.date }`, postponeControls(task.id));
                     })
 
                     DB.model(TASK_ENTITY_KEY).update(({ done: true }), { where: { time: thisTime, date: thisDate } });

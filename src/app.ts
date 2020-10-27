@@ -31,6 +31,8 @@ import { taskUnderAction } from 'Src/callbacks/taskUnderActionCallback';
 import { postponeTaskCallback } from 'Src/callbacks/postponeTaskCallback';
 import { postponeControls } from 'Src/messages/postponeControls';
 import { TEXT_COMMANDS } from 'Constants/textCommands';
+import { randomElement } from 'Utils/randomElement';
+import { NOTIFY_PHRASES } from 'Constants/phrases/notification';
 
 const logger = pino();
 
@@ -72,7 +74,7 @@ setTimeout(async () => {
             time: null,
             startTime: null,
             startDate: null,
-            date: getDateNow(),
+            date: getDateNow()
         };
 
         ctx.reply('Что планируете сделать?');
@@ -84,9 +86,9 @@ setTimeout(async () => {
         const userId = ctx?.message?.from?.id;
 
         const listString = await showTaskList(userId, logger);
-        const [message] = listString;
+        const [ message ] = listString;
 
-        if (message === '')  {
+        if (message === '') {
             await ctx.reply('У вас нет ни одной запланированной задачи.');
             return;
         }
@@ -103,12 +105,12 @@ setTimeout(async () => {
             priority: 5,
             time: null,
             startDate: null,
-            date: getDateNow(),
+            date: getDateNow()
         };
 
         const command = ctx?.update?.message?.text;
         const commandArray = command.split(' ');
-        const [, name, date, time, priority] = commandArray;
+        const [ , name, date, time, priority ] = commandArray;
 
         const taskCreateOptions = {
             ...defaultOptions,
@@ -116,11 +118,11 @@ setTimeout(async () => {
                 user_id: userId,
                 name,
                 date: date === '-d' ? getDateNow() : date,
-                usual: date === '-d' ? [0, 0, 1, 0, 0] : undefined,
+                usual: date === '-d' ? [ 0, 0, 1, 0, 0 ] : undefined,
                 time,
                 priority,
                 startTime: format(new Date(), TIME_FORMAT, DATE_FNS_OPTIONS),
-                startDate: getDateNow(),
+                startDate: getDateNow()
             }
         }
 
@@ -163,9 +165,9 @@ setTimeout(async () => {
                 switch (incomingMessage) {
                     case TEXT_COMMANDS.LIST:
                         const listString = await showTaskList(userId, logger);
-                        const [message] = listString;
+                        const [ message ] = listString;
 
-                        if (message === '')  {
+                        if (message === '') {
                             await ctx.reply('У вас нет ни одной запланированной задачи.');
                             break;
                         }
@@ -181,80 +183,80 @@ setTimeout(async () => {
                         break;
                 }
                 break;
-                case STATES.ENTER_TASK_NAME:
-                    UserState.addData({ name: incomingMessage }).setState(STATES.ENTER_TASK_PRIORITY);
-                    await ctx.reply('Какой приоритет задачи?', priorityControls());
+            case STATES.ENTER_TASK_NAME:
+                UserState.addData({ name: incomingMessage }).setState(STATES.ENTER_TASK_PRIORITY);
+                await ctx.reply('Какой приоритет задачи?', priorityControls());
+                break;
+            case STATES.ENTER_TASK_PRIORITY:
+                const priorityAsNumber = parseInt(incomingMessage);
+
+                if (isNaN(priorityAsNumber) || priorityAsNumber > 20) {
+                    await ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
                     break;
-                case STATES.ENTER_TASK_PRIORITY:
-                    const priorityAsNumber = parseInt(incomingMessage);
+                }
 
-                    if (isNaN(priorityAsNumber) || priorityAsNumber > 20) {
-                        await ctx.reply('Приоритет должен быть числом (желательно от 0 до 20). Попробуйте еще раз.');
-                        break;
-                    }
+                UserState.addData({ priority: priorityAsNumber }).setState(STATES.ENTER_TASK_DATE);
+                await ctx.reply('На какую дату планируете?', dateControls());
+                break;
+            case STATES.ENTER_TASK_DATE:
+                let date = incomingMessage.toLowerCase();
 
-                    UserState.addData({ priority: priorityAsNumber }).setState(STATES.ENTER_TASK_DATE);
-                    await ctx.reply('На какую дату планируете?', dateControls());
+                if (!incomingMessage.match(/[\d]{1,2}.[\d]{2}.[\d]{4}/)) {
+                    await ctx.reply('Пример правильного формата даты - 11.08.2021. Попробуйте ввести еще раз');
                     break;
-                case STATES.ENTER_TASK_DATE:
-                    let date = incomingMessage.toLowerCase();
+                }
 
-                    if (!incomingMessage.match(/[\d]{1,2}.[\d]{2}.[\d]{4}/)) {
-                        await ctx.reply('Пример правильного формата даты - 11.08.2021. Попробуйте ввести еще раз');
-                        break;
-                    }
+                if (date === 'сегодня') {
+                    date = getDateNow();
+                }
 
-                    if (date === 'сегодня') {
-                        date = getDateNow();
-                    }
+                UserState.addData({ date }).setState(STATES.ENTER_TASK_TIME);
+                await ctx.reply('На какое время планируете?');
+                break;
+            case STATES.ENTER_TASK_TIME:
+                const options = {} as any;
 
-                    UserState.addData({ date }).setState(STATES.ENTER_TASK_TIME);
-                    await ctx.reply('На какое время планируете?');
+                if (!incomingMessage.match(/[\d]{1,2}:[\d]{2}/)) {
+                    await ctx.reply('Пример правильного формата времени - 12:00. Попробуйте ввести еще раз');
                     break;
-                case STATES.ENTER_TASK_TIME:
-                    const options = {} as any;
+                }
 
-                    if (!incomingMessage.match(/[\d]{1,2}:[\d]{2}/)) {
-                        await ctx.reply('Пример правильного формата времени - 12:00. Попробуйте ввести еще раз');
-                        break;
-                    }
+                options.time = incomingMessage;
 
-                    options.time = incomingMessage;
+                options.startTime = format(new Date(), TIME_FORMAT, DATE_FNS_OPTIONS);
+                options.startDate = getDateNow();
+                UserState.addData(options);
 
-                    options.startTime = format(new Date(), TIME_FORMAT, DATE_FNS_OPTIONS);
-                    options.startDate = getDateNow();
-                    UserState.addData(options);
-
-                    createNewTask(DB, { user_id: userId, ...UserState.value() }).then(() => {
-                        ctx.reply('Напоминание создано!');
-                        UserState.done();
-                    }).catch(err => {
-                        UserState.setState(STATES.CREATING_TASK_ERROR);
-                        ctx.reply('Произошла ошибка при создании задачи!')
-                    });
-                    break;
-                case STATES.FROM_TIME:
-                    UserState.addData({ fromTime: incomingMessage }).setState(STATES.TO_TIME);
-                    await ctx.reply('В какое время прекращать присылать напоминания?');
-                    break;
-                case STATES.TO_TIME:
-                    UserState.addData({ toTime: incomingMessage });
-                    DB.model(USER_ENTITY_KEY).create({
-                        id: userId,
-                        time_from: UserState.value().fromTime,
-                        time_to: UserState.value().toTime
-                    }).then(() => {
-                        UserState.setState(STATES.PENDING_TASK);
-                        ctx.reply('Спасибо! Ваши настройки сохранены!');
-                    }).catch(() => {
-                        ctx.reply('Произошла ошибка! Попробуйте ввести данные еще раз.');
-                        ctx.reply('В какое время прекращать присылать напоминания?');
-                        UserState.setState(STATES.TO_TIME);
-                    });
-                    break;
-                default:
-                    break;
-            }
+                createNewTask(DB, { user_id: userId, ...UserState.value() }).then(() => {
+                    ctx.reply('Напоминание создано!');
+                    UserState.done();
+                }).catch(err => {
+                    UserState.setState(STATES.CREATING_TASK_ERROR);
+                    ctx.reply('Произошла ошибка при создании задачи!')
+                });
+                break;
+            case STATES.FROM_TIME:
+                UserState.addData({ fromTime: incomingMessage }).setState(STATES.TO_TIME);
+                await ctx.reply('В какое время прекращать присылать напоминания?');
+                break;
+            case STATES.TO_TIME:
+                UserState.addData({ toTime: incomingMessage });
+                DB.model(USER_ENTITY_KEY).create({
+                    id: userId,
+                    time_from: UserState.value().fromTime,
+                    time_to: UserState.value().toTime
+                }).then(() => {
+                    UserState.setState(STATES.PENDING_TASK);
+                    ctx.reply('Спасибо! Ваши настройки сохранены!');
+                }).catch(() => {
+                    ctx.reply('Произошла ошибка! Попробуйте ввести данные еще раз.');
+                    ctx.reply('В какое время прекращать присылать напоминания?');
+                    UserState.setState(STATES.TO_TIME);
+                });
+                break;
+            default:
+                break;
+        }
     });
 
     setInterval(() => {
@@ -282,12 +284,12 @@ setTimeout(async () => {
                     DB.model(TASK_ENTITY_KEY).update(({ done: true }), { where: { time: thisTime, date: thisDate } });
                 }
             })
-            .then((res) => {
-                console.log('taskDone', res);
-            })
-            .catch((e) => {
-                logger.error('Ошибка при уведомлении о задаче %o', e);
-            });
+                .then((res) => {
+                    console.log('taskDone', res);
+                })
+                .catch((e) => {
+                    logger.error('Ошибка при уведомлении о задаче %o', e);
+                });
 
             // пересоздание задач, которые повторяются
             const replanTask = [];
@@ -303,7 +305,12 @@ setTimeout(async () => {
 
                     const nextDate = format(addMinutes(addHours(addDays(dateNow, usual.days), usual.hours), usual.minutes), DATE_FORMAT, DATE_FNS_OPTIONS);
 
-                    const replanResult = await createNewTask(DB, { ...task, date: nextDate, done: false, notificationsDone: 0 });
+                    const replanResult = await createNewTask(DB, {
+                        ...task,
+                        date: nextDate,
+                        done: false,
+                        notificationsDone: 0
+                    });
                     await DB.model(USUAL_EVENTS_ENTITY_KEY).update({ lastTaskDate: nextDate }, { where: { task_id: task.id } });
                     replanTask.push(replanResult)
                 })
@@ -320,7 +327,7 @@ setTimeout(async () => {
             DB.model(NOTIFICATION_ENTITY_KEY).findAll({
                 where: { time: thisTime, date: thisDate, done: false },
                 include: [ DB.model(TASK_ENTITY_KEY) ]
-            }).then( (result) => {
+            }).then((result) => {
                 result.forEach((item) => {
                     const { dataValues: notify } = item;
                     const { Task: { dataValues: task } } = notify;
@@ -330,7 +337,14 @@ setTimeout(async () => {
                     const value = { ...task, ...notify };
 
                     if (notify.answer !== 'X') {
-                        bot.telegram.sendMessage(value.user_id, `Напоминание: ${ value.name } - ${ task.time } | ${ task.date }`, remindControls(task, notify));
+                        const randomPhrase = randomElement<string>(NOTIFY_PHRASES);
+                        bot.telegram.sendMessage(
+                            value.user_id, `
+${ randomPhrase }
+${ value.name } - ${ task.time } | ${ task.date }
+                        `,
+                            remindControls(task, notify)
+                        );
                     }
 
                     const notificationsDone = task.notificationsDone + 1;
@@ -353,9 +367,9 @@ setTimeout(async () => {
 
                 })
             })
-            .catch((e) => {
-                logger.error('Ошибка при обработки уведомления %o', e);
-            })
+                .catch((e) => {
+                    logger.error('Ошибка при обработки уведомления %o', e);
+                })
         } catch (e) {
             logger.error('Ошибка при срабатывании планировщика %o', e);
         }

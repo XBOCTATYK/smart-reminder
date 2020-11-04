@@ -15,26 +15,27 @@ export class Difference implements IDifference {
     diff: number;
 
     static of(date1, date2) {
-        if (!date2) {
-            if (date1 instanceof Difference) {
-                return date1;
-            }
-
-            return new Difference(date1);
-        }
-
         return new Difference(date1, date2);
     }
 
-    constructor(date1, date2?) {
+    constructor(date1: Date | ExtendedDate | Difference, date2?: Date | ExtendedDate) {
         if (!date1) {
             this.from = ExtendedDate.of(new Date(0));
             this.to = ExtendedDate.of(new Date(0));
         }
 
+        if (date1 instanceof Difference) {
+            this.from = date1.dateFrom();
+            this.to = date1.dateTo();
+
+            return;
+        }
+
         if (!date2) {
             this.from = ExtendedDate.of(new Date(0));
             this.to = ExtendedDate.of(date1);
+
+            return;
         }
 
         this.from = ExtendedDate.of(date1);

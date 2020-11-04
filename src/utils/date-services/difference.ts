@@ -6,10 +6,12 @@ import differenceInHours from 'date-fns/differenceInHours';
 import differenceInMilliseconds from 'date-fns/differenceInMilliseconds';
 
 import { ExtendedDate } from './extended-date';
+import { IDifference } from './dirrerence.interface';
+import { IExtendedDate } from './extended-date.interface';
 
-export class Difference {
-    from: ExtendedDate;
-    to: ExtendedDate;
+export class Difference implements IDifference {
+    from: IExtendedDate;
+    to: IExtendedDate;
     diff: number;
 
     static of(date1, date2) {
@@ -26,12 +28,12 @@ export class Difference {
 
     constructor(date1, date2?) {
         if (!date1) {
-            this.from = ExtendedDate.of(0);
-            this.to = ExtendedDate.of(0);
+            this.from = ExtendedDate.of(new Date(0));
+            this.to = ExtendedDate.of(new Date(0));
         }
 
         if (!date2) {
-            this.from = ExtendedDate.of(0);
+            this.from = ExtendedDate.of(new Date(0));
             this.to = ExtendedDate.of(date1);
         }
 
@@ -61,7 +63,7 @@ export class Difference {
         return differenceInDays(this.from.get(), this.to.get());
     }
 
-    inMonth() {
+    inMonths() {
         return differenceInMonths(this.from.get(), this.to.get());
     }
 
@@ -109,11 +111,11 @@ export class Difference {
     }
 
     dateFrom() {
-        return ExtendedDate.of(this.from);
+        return this.from;
     }
 
     dateTo() {
-        return ExtendedDate.of(this.to);
+        return this.to;
     }
 
     intersection(diffObj: Difference) {
@@ -152,5 +154,9 @@ export class Difference {
         }
 
         return Difference.of(dateFrom, dateTo);
+    }
+
+    valueOf() {
+        return this.diff;
     }
 }

@@ -11,6 +11,7 @@ import startOfDay from 'date-fns/startOfDay';
 
 import { DATE_FNS_OPTIONS, DateFnsOptions } from 'Constants/formats';
 import { IExtendedDate } from './extended-date.interface';
+import { Difference } from './difference';
 
 /**
  * Расширенный класс для работы с датами. Связка date-fns с приложением.
@@ -27,11 +28,11 @@ export class ExtendedDate implements IExtendedDate {
         const newDate = new ExtendedDate(date);
 
         if (newDate.toString() === 'Invalid Date') {
-            return new ExtendedDate(ExtendedDate.parse(date, format, options))
+            return new ExtendedDate(ExtendedDate.parse(date.toString(), format, options))
         }
     }
 
-    constructor(date: Date | ExtendedDate, format?: string, options = DATE_FNS_OPTIONS) {
+    constructor(date: Date | ExtendedDate, format?: string, options: DateFnsOptions = DATE_FNS_OPTIONS) {
         this.value = (date instanceof ExtendedDate) ? date.get() : date;
         this.options = options;
     }
@@ -81,7 +82,7 @@ export class ExtendedDate implements IExtendedDate {
     }
 
     difference(date) {
-        return ExtendedDate.of(ExtendedDate.of(this.value), ExtendedDate.of(date))
+        return Difference.of(ExtendedDate.of(this.value), ExtendedDate.of(date))
     }
 
     valueOf() {

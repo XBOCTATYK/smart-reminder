@@ -1,8 +1,6 @@
-import { DateFnsOptions } from '../../constants/formats';
 import { Difference } from './difference';
 
 export interface IExtendedDate {
-    constructor(date: Date | IExtendedDate, format?, options?: DateFnsOptions)
 
     addMilliseconds(amount: number): IExtendedDate
 

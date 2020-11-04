@@ -10,15 +10,16 @@ import parse from 'date-fns/parse';
 import startOfDay from 'date-fns/startOfDay';
 
 import { DATE_FNS_OPTIONS, DateFnsOptions } from 'Constants/formats';
+import { IExtendedDate } from './extended-date.interface';
 
 /**
  * Расширенный класс для работы с датами. Связка date-fns с приложением.
  */
-export class ExtendedDate {
+export class ExtendedDate implements IExtendedDate {
     value: Date = null;
     options: DateFnsOptions = DATE_FNS_OPTIONS;
 
-    static of(date, format?, options = DATE_FNS_OPTIONS) {
+    static of(date: Date | ExtendedDate, format?: string, options = DATE_FNS_OPTIONS): ExtendedDate {
         if (date instanceof ExtendedDate) {
             return date;
         }
@@ -30,8 +31,8 @@ export class ExtendedDate {
         }
     }
 
-    constructor(date, format?, options = DATE_FNS_OPTIONS) {
-        this.value = new Date(date);
+    constructor(date: Date | ExtendedDate, format?: string, options = DATE_FNS_OPTIONS) {
+        this.value = (date instanceof ExtendedDate) ? date.get() : date;
         this.options = options;
     }
 

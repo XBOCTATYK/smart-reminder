@@ -1,5 +1,6 @@
 import { Sequelize, Model } from 'sequelize';
 import { ModelKey } from 'Constants/enitityNames';
+import { Shape } from 'Types/shape';
 
 export type OrmModelCollection = {
     [key in ModelKey]?: typeof Model;
@@ -11,7 +12,7 @@ type OrmModelList = Array<{
 }>
 
 export class ORMConnection {
-    private models = {};
+    private models: Shape<typeof Model> = {};
     private modelsList = [];
 
     constructor(connect: string, models: OrmModelList) {

@@ -1,5 +1,6 @@
 import { NOTIFICATION_ENTITY_KEY, TASK_ENTITY_KEY } from 'Constants/enitityNames';
 import { REMIND_ACTION } from 'Constants/callback-actions';
+import { ANSWERS } from 'Constants/answers';
 
 export async function notificationCallback(ctx, DB) {
     const message = ctx.update?.callback_query?.data;
@@ -13,9 +14,9 @@ export async function notificationCallback(ctx, DB) {
     if (!notificationsNeed || !notifyId || !answer) return ;
 
     const messageAnswers = {
-        Y: 'Отлично!',
-        N: 'ОК! Повторим напоминание чуть позже',
-        D: 'Отлично! Больше не напоминаю.'
+        [ANSWERS.YES]: 'Отлично!',
+        [ANSWERS.NO]: 'ОК! Повторим напоминание чуть позже',
+        [ANSWERS.DONE]: 'Отлично! Больше не напоминаю.'
     };
 
     try {
@@ -23,16 +24,16 @@ export async function notificationCallback(ctx, DB) {
         const notifyExists = await DB.model(NOTIFICATION_ENTITY_KEY).findOne({ where: { id: notifyId }, include: [ DB.model(TASK_ENTITY_KEY) ]});
         const { dataValues: notify } = notifyExists || {};
 
-        if (notify.answer === 'O') {
+        if (notify.answer === ANSWERS.WAITING) {
             const task = notifyExists.Task.dataValues;
 
             switch (answer) {
-                case 'Y':
+                case ANSWERS.YES:
                     break;
-                case 'N':
+                case ANSWERS.NO:
                     await DB.model(TASK_ENTITY_KEY).update({ notificationsNeed: notificationsNeed + 1 }, { where: { id: task.id } });
                     break;
-                case 'D':
+                case ANSWERS.DONE:
                     await DB.model(TASK_ENTITY_KEY).update({ done: true }, { where: { id: task.id } });
                     await DB.model(NOTIFICATION_ENTITY_KEY).destroy({ where: { task_id: task.id, done: false } });
                     break;

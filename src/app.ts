@@ -36,6 +36,7 @@ import { NOTIFY_PHRASES } from 'Constants/phrases/notification';
 import { CREATION_TASK_PHRASES } from 'Constants/phrases/creationTask';
 import { TASK_CREATION_ERROR_PHRASES } from 'Constants/phrases/taskCreationError';
 import { TASK_TIME_PHRASES } from 'Constants/phrases/taskTime';
+import { ANSWERS } from 'Constants/answers';
 
 const logger = pino();
 
@@ -344,7 +345,7 @@ setTimeout(async () => {
 
                     const value = { ...task, ...notify };
 
-                    if (notify.answer !== 'X') {
+                    if (notify.answer !== ANSWERS.CANCELLED) {
                         const randomPhrase = randomElement<string>(NOTIFY_PHRASES);
                         bot.telegram.sendMessage(
                             value.user_id, `

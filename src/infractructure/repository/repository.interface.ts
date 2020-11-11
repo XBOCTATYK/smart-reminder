@@ -9,12 +9,12 @@ export interface IRepository {
 }
 
 export interface ITaskRepository extends IRepository {
-    findOne(id: number): TaskDTO
-    findByNearestDateTime(datetime: Date): TaskDTO[]
-    findByUser(userId?: number): TaskDTO[]
-    findDone(userId: number): TaskDTO[]
-    findActual(userId: number): TaskDTO[]
-    findAll(): TaskDTO[]
+    forUser(userId: number): ITaskRepository;
+    actual(userId: number): ITaskRepository;
+    done(userId: number): ITaskRepository;
+    withId(userId: number): ITaskRepository;
+    inThisTime(): ITaskRepository;
+    get(): Promise<TaskDTO[]>;
 }
 
 export interface IUserRepository extends IRepository {

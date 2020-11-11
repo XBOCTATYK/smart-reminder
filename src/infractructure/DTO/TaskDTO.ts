@@ -1,4 +1,5 @@
 import { GeneratedId } from '../decorators/generated-id';
+import { NotificationsDTO } from './NotificationsDTO';
 
 interface ITaskDTO {
     id: string;
@@ -10,6 +11,7 @@ interface ITaskDTO {
     type?: number;
     priority?: number;
     startDate?: Date;
+    notifications?: NotificationsDTO[];
 }
 
 @GeneratedId
@@ -23,16 +25,17 @@ export class TaskDTO implements ITaskDTO {
     type?: number;
     priority?: number;
     startDate?: Date;
+    notifications?: NotificationsDTO[];
 
     constructor(data: ITaskDTO) {
-        this.setName(data.name);
-        this.setDate(data.date);
-        this.setTime(data.time);
-        this.setPriority(data.priority);
-        this.setNotificationsNeed(data.notificationsNeed);
-        this.setNotificationsDone(data.notificationsDone);
-        this.setType(data.type);
-        this.setStartDate(data.startDate);
+        this.setName(data?.name);
+        this.setDate(data?.date);
+        this.setTime(data?.time);
+        this.setPriority(data?.priority);
+        this.setNotificationsNeed(data?.notificationsNeed);
+        this.setNotificationsDone(data?.notificationsDone);
+        this.setType(data?.type);
+        this.setStartDate(data?.startDate);
     }
 
     setName(name?: string) {
@@ -97,5 +100,9 @@ export class TaskDTO implements ITaskDTO {
         }
 
         this.startDate = date;
+    }
+
+    addNotification(notification: NotificationsDTO) {
+        this.notifications.push(notification);
     }
 }

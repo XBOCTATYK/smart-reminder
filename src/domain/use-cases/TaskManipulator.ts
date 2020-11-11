@@ -1,7 +1,8 @@
 import { ITaskCases } from '../../interactors/task/task-cases.interface';
+import { IRepository } from '../../infractructure/repository/repository.interface';
 
 export class TaskManipulator implements ITaskCases {
-    Repository
+    repository: IRepository;
 
     constructor() {
 

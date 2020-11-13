@@ -10,6 +10,9 @@ export class TaskRepository implements IRepository {
         id: undefined,
         date: undefined
     };
+    private saveData = {
+        user_id: undefined
+    }
 
     constructor(db) {
         this.db = db;
@@ -23,6 +26,7 @@ export class TaskRepository implements IRepository {
 
     forUser(userId: string) {
         this.modifiers['user_id'] = userId;
+        this.saveData['user_id'] = userId;
         return this;
     }
 
@@ -52,5 +56,23 @@ export class TaskRepository implements IRepository {
         const resultDTO = taskList.map(task => this.ejectData(task));
 
         return resultDTO;
+    }
+
+    async save(task: TaskDTO) {
+        const taskDTO = task;
+
+        this.db.update({
+            id: taskDTO.id,
+            name: taskDTO.name,
+            date: taskDTO.date,
+            time: taskDTO.time,
+            notificationsNeed: taskDTO.notificationsNeed,
+            notificationsDone: taskDTO.notificationsDone,
+            priority: taskDTO.priority || 2,
+            startDate: taskDTO.startDate || new Date(),
+            user_id: this.saveData || taskDTO.user?.id,
+        }, {
+            where: this.modifiers
+        })
     }
 }

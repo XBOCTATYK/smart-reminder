@@ -1,5 +1,9 @@
 import { GeneratedId } from '../decorators/generated-id';
+import { NumberType } from '../decorators/validators/NumberType';
+import { Required } from '../decorators/validators/Required';
+import { UserDTO } from './UserDTO';
 import { NotificationsDTO } from './NotificationsDTO';
+import { DTO } from '../decorators/validators/DTO';
 
 interface ITaskDTO {
     id: string;
@@ -12,19 +16,21 @@ interface ITaskDTO {
     priority?: number;
     startDate?: Date;
     notifications?: NotificationsDTO[];
+    user?: UserDTO;
 }
 
 @GeneratedId
 export class TaskDTO implements ITaskDTO {
-    id: string;
-    name: string;
-    date: string;
-    time: string;
-    notificationsNeed: number;
-    notificationsDone: number;
-    type?: number;
-    priority?: number;
+    @Required id: string;
+    @Required name: string;
+    @Required date: string;
+    @Required time: string;
+    @NumberType @Required notificationsNeed: number;
+    @NumberType @Required notificationsDone: number;
+    @NumberType @Required type?: number;
+    @NumberType @Required priority?: number;
     startDate?: Date;
+    @DTO user?: UserDTO;
     notifications?: NotificationsDTO[];
 
     constructor(data: ITaskDTO) {
@@ -36,6 +42,7 @@ export class TaskDTO implements ITaskDTO {
         this.setNotificationsDone(data?.notificationsDone);
         this.setType(data?.type);
         this.setStartDate(data?.startDate);
+        this.setUser(data?.user);
     }
 
     setName(name?: string) {
@@ -46,6 +53,7 @@ export class TaskDTO implements ITaskDTO {
         }
 
         this.name = name;
+        return this;
     }
 
     setDate(date?: string) {
@@ -56,6 +64,7 @@ export class TaskDTO implements ITaskDTO {
         }
 
         this.date = date;
+        return this;
     }
 
     setTime(time?: string) {
@@ -64,22 +73,21 @@ export class TaskDTO implements ITaskDTO {
         }
 
         this.time = time;
+        return this;
     }
 
     setPriority(amount?: number) {
         if (!amount) return;
 
-        if (isNaN(amount)) {
-            throw new Error('WRONG_PRIORITY_DATA_FORMAT')
-        }
-
         this.priority = amount;
+        return this;
     }
 
     setNotificationsNeed(amount?: number) {
         if (!amount) return;
 
         this.notificationsNeed = amount;
+        return this;
     }
 
     setNotificationsDone(amount?: number) {
@@ -92,6 +100,7 @@ export class TaskDTO implements ITaskDTO {
         if (!type) return;
 
         this.type = type;
+        return this;
     }
 
     setStartDate(date?: Date) {
@@ -100,9 +109,24 @@ export class TaskDTO implements ITaskDTO {
         }
 
         this.startDate = date;
+        return this;
     }
 
     addNotification(notification: NotificationsDTO) {
+        if (!notification.isConsistence) {
+            throw new Error('')
+        }
+
         this.notifications.push(notification);
+        return this;
+    }
+
+    setUser(user: UserDTO) {
+        this.user = user;
+        return this;
+    }
+
+    checkConsistence() {
+
     }
 }

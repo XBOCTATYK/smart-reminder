@@ -1,3 +1,6 @@
+import { DTOError } from '../../domain/errors';
+import { ICheckRequired } from 'Src/infractructure/interfaces/main';
+
 interface IUserDTO {
     id: number;
     startTime: Date;
@@ -6,12 +9,15 @@ interface IUserDTO {
     dontDisturbTimes?: Array<{ from: Date, to: Date }>
 }
 
-export class UserDTO implements IUserDTO {
+export class UserDTO implements IUserDTO, ICheckRequired {
     id: number;
     startTime: Date;
     endTime: Date;
     timezone: string;
     dontDisturbTimes?: Array<{ from: Date, to: Date }>
+    checkRequires(): boolean {
+        return true;
+    }
 
     constructor(data: IUserDTO) {
         this.setId(data.id);
@@ -25,7 +31,7 @@ export class UserDTO implements IUserDTO {
         const isDate = time instanceof Date;
 
         if (!isDate || time.toString() === 'Invalid Date') {
-            throw new Error('START_TIME_WRONG_FORMAT')
+            throw new DTOError('START_TIME_WRONG_FORMAT')
         }
 
         return time;
@@ -33,7 +39,7 @@ export class UserDTO implements IUserDTO {
 
     setId(id: number) {
         if (!id) {
-            throw new Error('EMPTY_USER_ID');
+            throw new DTOError('EMPTY_USER_ID');
         }
 
         this.id = id;
@@ -47,7 +53,7 @@ export class UserDTO implements IUserDTO {
         const validEndTime = this.isInvalidDate(time);
 
         if (validEndTime.getTime < this.startTime.getTime()) {
-            throw new Error('END_TIME_LESS_THAN_START')
+            throw new DTOError('END_TIME_LESS_THAN_START')
         }
 
         this.endTime = validEndTime;

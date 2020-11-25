@@ -30,6 +30,8 @@ export class ExtendedDate implements IExtendedDate {
         if (newDate.toString() === 'Invalid Date') {
             return new ExtendedDate(ExtendedDate.parse(date.toString(), format, options))
         }
+
+        return newDate;
     }
 
     constructor(date: Date | ExtendedDate, format?: string, options: DateFnsOptions = DATE_FNS_OPTIONS) {

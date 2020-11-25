@@ -8,9 +8,8 @@ export class User {
 
     }
 
-    addTask(taskData) {
-        const newTask = new Task(taskData);
-
+    addTask(taskData: Task) {
+        taskData.createNotification(this);
     }
 
 }

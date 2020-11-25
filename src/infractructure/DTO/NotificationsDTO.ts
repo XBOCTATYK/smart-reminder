@@ -1,6 +1,7 @@
 import { Answer } from 'Constants/answers';
 import { GeneratedId } from '../decorators/generated-id';
 import { TaskDTO } from './TaskDTO';
+import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
 
 interface INotificationsDTO {
     id?: string;
@@ -11,7 +12,7 @@ interface INotificationsDTO {
 }
 
 @GeneratedId
-export class NotificationsDTO implements INotificationsDTO {
+export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckRequired {
     id: string;
     date: Date;
     answer?: Answer;
@@ -20,5 +21,13 @@ export class NotificationsDTO implements INotificationsDTO {
 
     constructor(data: INotificationsDTO) {
 
+    }
+
+    checkRequired(): boolean {
+        return true;
+    }
+
+    checkConsistence(): boolean {
+        return this.checkRequired();
     }
 }

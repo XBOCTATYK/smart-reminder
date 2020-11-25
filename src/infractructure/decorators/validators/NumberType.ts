@@ -5,7 +5,10 @@ export function NumberType(target, propertyKey) {
                 throw new Error(`SETTER_ERROR ${ propertyKey } ${ value } | TARGET_TYPE=number`)
             }
 
-            target[propertyKey] = value;
+            this[`_${ propertyKey }`] = value;
+        },
+        get(): any {
+            return this[`_${ propertyKey }`];
         }
     });
 }

@@ -4,6 +4,8 @@ import { Required } from '../decorators/validators/Required';
 import { UserDTO } from './UserDTO';
 import { NotificationsDTO } from './NotificationsDTO';
 import { DTO } from '../decorators/validators/DTO';
+import { DTOError } from '../../domain/errors';
+import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
 
 interface ITaskDTO {
     id: string;
@@ -20,7 +22,7 @@ interface ITaskDTO {
 }
 
 @GeneratedId
-export class TaskDTO implements ITaskDTO {
+export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     @Required id: string;
     @Required name: string;
     @Required date: string;
@@ -32,6 +34,9 @@ export class TaskDTO implements ITaskDTO {
     startDate?: Date;
     @DTO user?: UserDTO;
     notifications?: NotificationsDTO[];
+    checkRequires(): boolean {
+        return true;
+    }
 
     constructor(data: ITaskDTO) {
         this.setName(data?.name);
@@ -49,7 +54,7 @@ export class TaskDTO implements ITaskDTO {
         if (!name) return;
 
         if (name.length > 1000) {
-            throw new Error('TOO_LONG_NAME')
+            throw new DTOError('TOO_LONG_NAME')
         }
 
         this.name = name;
@@ -60,7 +65,7 @@ export class TaskDTO implements ITaskDTO {
         if (!date) return;
 
         if (!date.match(/[\d]{1,2}.[\d]{2}.[\d]{4}/)) {
-            throw new Error('WRONG_DATE_FORMAT')
+            throw new DTOError('WRONG_DATE_FORMAT')
         }
 
         this.date = date;
@@ -69,7 +74,7 @@ export class TaskDTO implements ITaskDTO {
 
     setTime(time?: string) {
         if (!time.match(/[\d]{1,2}:[\d]{2}/)) {
-            throw new Error('WRONG_TIME_FORMAT')
+            throw new DTOError('WRONG_TIME_FORMAT')
         }
 
         this.time = time;
@@ -112,9 +117,9 @@ export class TaskDTO implements ITaskDTO {
         return this;
     }
 
-    addNotification(notification: NotificationsDTO) {
-        if (!notification.isConsistence) {
-            throw new Error('')
+    addNotification(notification: NotificationsDTO & IConsistent) {
+        if (!notification.checkConsistence()) {
+            throw new DTOError('DATA_IS_NOT_CONSISTENCE')
         }
 
         this.notifications.push(notification);
@@ -122,11 +127,13 @@ export class TaskDTO implements ITaskDTO {
     }
 
     setUser(user: UserDTO) {
+        if (!user) return this;
+
         this.user = user;
         return this;
     }
 
     checkConsistence() {
-
+        return this.checkRequires();
     }
 }

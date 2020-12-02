@@ -23,6 +23,10 @@ export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckR
 
     }
 
+    checkRequires(): boolean {
+        throw new Error("Method not implemented.");
+    }
+
     checkRequired(): boolean {
         return true;
     }

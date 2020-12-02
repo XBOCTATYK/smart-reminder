@@ -32,7 +32,7 @@ export class ORMConnection {
         })
     }
 
-    model(name: ModelKey) {
+    model(name: ModelKey): any {
         return this.models[name];
     }
 

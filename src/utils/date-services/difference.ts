@@ -49,27 +49,27 @@ export class Difference implements IDifference {
             this.from = temp;
         }
 
-        this.diff = differenceInMilliseconds(this.from.get(), this.to.get());
+        this.diff = differenceInMilliseconds(this.to.get(), this.from.get());
     }
 
     inMinutes() {
-        return differenceInMinutes(this.from.get(), this.to.get());
+        return differenceInMinutes(this.to.get(), this.from.get());
     }
 
     inHours() {
-        return differenceInHours(this.from.get(), this.to.get());
+        return differenceInHours(this.to.get(), this.from.get());
     }
 
     inDays() {
-        return differenceInDays(this.from.get(), this.to.get());
+        return differenceInDays(this.to.get(), this.from.get());
     }
 
     inMonths() {
-        return differenceInMonths(this.from.get(), this.to.get());
+        return differenceInMonths(this.to.get(), this.from.get());
     }
 
     inYears() {
-        return differenceInYears(this.from.get(), this.to.get());
+        return differenceInYears(this.to.get(), this.from.get());
     }
 
     get() {

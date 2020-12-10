@@ -8,8 +8,11 @@ import addYears from 'date-fns/addYears';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import startOfDay from 'date-fns/startOfDay';
+import closest from 'date-fns/closestTo';
+import isBefore from 'date-fns/isBefore';
+import isAfter from 'date-fns/isAfter';
 
-import { DATE_FNS_OPTIONS, DateFnsOptions } from 'Constants/formats';
+import { DATE_FNS_OPTIONS, DATE_FORMAT, DateFnsOptions } from 'Constants/formats';
 import { IExtendedDate } from './extended-date.interface';
 import { Difference } from './difference';
 
@@ -19,8 +22,13 @@ import { Difference } from './difference';
 export class ExtendedDate implements IExtendedDate {
     value: Date = null;
     options: DateFnsOptions = DATE_FNS_OPTIONS;
+    formatting: string;
 
-    static of(date: Date | ExtendedDate, format?: string, options = DATE_FNS_OPTIONS): ExtendedDate {
+    static of(date: Date | ExtendedDate | string, format?: string, options = DATE_FNS_OPTIONS): ExtendedDate {
+        if (typeof date === 'string') {
+            return new ExtendedDate(ExtendedDate.parse(date, format, options))
+        }
+
         if (date instanceof ExtendedDate) {
             return date;
         }
@@ -34,12 +42,18 @@ export class ExtendedDate implements IExtendedDate {
         return newDate;
     }
 
-    constructor(date: Date | ExtendedDate, format?: string, options: DateFnsOptions = DATE_FNS_OPTIONS) {
-        this.value = (date instanceof ExtendedDate) ? date.get() : date;
+    constructor(date: Date | ExtendedDate | string, format?: string, options: DateFnsOptions = DATE_FNS_OPTIONS) {
+        if (typeof date === 'string') {
+            this.value = ExtendedDate.parse(date, format, options);
+        } else {
+            this.value = (date instanceof ExtendedDate) ? date.get() : date;
+        }
+
+        this.formatting = format;
         this.options = options;
     }
 
-    private static parse(value: string, format: string, options: DateFnsOptions) {
+    private static parse(value: string, format: string = DATE_FORMAT, options: DateFnsOptions) {
         return parse(value, format, 0, options)
     }
 
@@ -75,8 +89,28 @@ export class ExtendedDate implements IExtendedDate {
         return ExtendedDate.of(startOfDay(this.value))
     }
 
+    isBeforeThan(date: ExtendedDate | Date | string) {
+        return isBefore(this.value, ExtendedDate.of(date, this.formatting).get())
+    }
+
+    isAfterThan(date: ExtendedDate | Date | string) {
+        return isAfter(this.value, ExtendedDate.of(date, this.formatting).get())
+    }
+
     format(formatStr: string) {
         return format(this.value, formatStr, this.options)
+    }
+
+    closest(dates: (ExtendedDate | Date)[]) {
+        const resultDates = dates.map((date) => {
+            if (date instanceof ExtendedDate) {
+                return date.value;
+            }
+
+            return date;
+        })
+
+        return ExtendedDate.of(closest(this.value, resultDates))
     }
 
     get() {
@@ -89,5 +123,38 @@ export class ExtendedDate implements IExtendedDate {
 
     valueOf() {
         return this.value.getTime();
+    }
+}
+
+/**
+ *  Класс, если нужно только показатель времени
+ */
+export class Time extends ExtendedDate {
+    static clearDate(date: Date | ExtendedDate | string) {
+        const startOfDate = (ExtendedDate.of(date, 'HH:mm').startOfDay());
+        const minutesToTime = (startOfDate.difference(ExtendedDate.of(date, 'HH:mm'))).inMinutes();
+        const clearedTime = (ExtendedDate.of(new Date(0)));
+
+        return clearedTime.addMinutes(minutesToTime);
+    }
+
+    static of(date: Date | ExtendedDate | string): ExtendedDate {
+        const clearedTime = this.clearDate(date);
+
+        console.log(clearedTime)
+        return super.of(clearedTime, 'HH:mm');
+    }
+
+    constructor(date: Date | ExtendedDate) {
+        const clearedTime = Time.clearDate(date);
+        super(clearedTime, 'HH:mm');
+    }
+
+    isBeforeThan(date: ExtendedDate | Date | string) {
+        return isBefore(this.value, Time.of(date).get())
+    }
+
+    isAfterThan(date: ExtendedDate | Date | string) {
+        return isAfter(this.value, Time.of(date).get())
     }
 }

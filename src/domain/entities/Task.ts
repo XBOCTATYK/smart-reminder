@@ -27,22 +27,29 @@ export class Task {
         this.date = taskData.date;
     }
 
-    createNotification(user: User) {
+    private createNotification() {
         if (this.done) {
             throw new BusinessError('CANNOT_CREATE_NOTIFICATION_TASK_IS_DONE')
         }
 
-        const nextNotifyDate = getNextNotifyTime(user, this.date)
+        const nextNotifyDate = getNextNotifyTime(this.user, this)
 
         this.nextNotification = new Notification(nextNotifyDate);
     }
 
     planNextNotification() {
         this.createNotification()
+        return this;
+    }
+
+    setUser(user: User) {
+        this.user = user;
+        return this;
     }
 
     setDone() {
         this.done = true;
+        return this;
     }
 
     isDone() {
@@ -51,10 +58,12 @@ export class Task {
 
     increaseNotificationsCount() {
         this.notificationsNeed += 1;
+        return this;
     }
 
     decreaseNotificationCount() {
         this.notificationsNeed -= 1;
+        return this;
     }
 
     doneNotifications() {
@@ -63,6 +72,8 @@ export class Task {
         if (this.notificationsDone >= this.notificationsNeed) {
             this.done = true;
         }
+
+        return this;
     }
 }
 

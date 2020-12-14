@@ -1,20 +1,23 @@
 import { DTOError } from '../../domain/errors';
 import { ICheckRequired } from 'Src/infractructure/interfaces/main';
+import { Required } from 'Src/infractructure/decorators/validators/Required';
+import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 
 interface IUserDTO {
     id: number;
-    startTime: Date;
-    endTime: Date;
-    timezone: string;
+    startTime?: Date;
+    endTime?: Date;
+    timezone?: string;
     dontDisturbTimes?: Array<{ from: Date, to: Date }>
 }
 
 export class UserDTO implements IUserDTO, ICheckRequired {
-    id: number;
-    startTime: Date;
-    endTime: Date;
-    timezone: string;
-    dontDisturbTimes?: Array<{ from: Date, to: Date }>
+    @Required id: number;
+    @Required @DateType startTime: Date;
+    @Required @DateType endTime: Date;
+    timezone: string = '0';
+    @Required dontDisturbTimes?: Array<{ from: Date, to: Date }>
+
     checkRequires(): boolean {
         return true;
     }
@@ -37,7 +40,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         return time;
     }
 
-    setId(id: number) {
+    setId(id?: number) {
         if (!id) {
             throw new DTOError('EMPTY_USER_ID');
         }
@@ -45,11 +48,15 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         this.id = id;
     }
 
-    setStartTime(time: Date) {
+    setStartTime(time?: Date) {
+        if (!time) return;
+
         this.startTime = this.isInvalidDate(time);
     }
 
-    setEndTime(time: Date) {
+    setEndTime(time?: Date) {
+        if (!time) return;
+
         const validEndTime = this.isInvalidDate(time);
 
         if (validEndTime.getTime < this.startTime.getTime()) {
@@ -65,7 +72,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         this.timezone = timezone;
     }
 
-    setDontDisturbTimes(dates: Array<{ from: Date, to: Date }>) {
+    setDontDisturbTimes(dates?: Array<{ from: Date, to: Date }>) {
         if (!dates) {
             this.dontDisturbTimes = [];
             return;

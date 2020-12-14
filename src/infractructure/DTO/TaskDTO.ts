@@ -1,17 +1,17 @@
 import { GeneratedId } from '../decorators/generated-id';
 import { NumberType } from '../decorators/validators/NumberType';
 import { Required } from '../decorators/validators/Required';
+import { DTOError } from '../../domain/errors';
 import { UserDTO } from './UserDTO';
 import { NotificationsDTO } from './NotificationsDTO';
 import { DTO } from '../decorators/validators/DTO';
-import { DTOError } from '../../domain/errors';
 import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
+import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 
 interface ITaskDTO {
-    id: string;
+    id?: string;
     name?: string;
-    date?: string;
-    time?: string;
+    date?: Date;
     notificationsNeed?: number;
     notificationsDone?: number;
     type?: number;
@@ -25,13 +25,12 @@ interface ITaskDTO {
 export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     @Required id: string;
     @Required name: string;
-    @Required date: string;
-    @Required time: string;
+    @Required @DateType date: Date;
     @NumberType @Required notificationsNeed: number;
     @NumberType @Required notificationsDone: number;
     @NumberType @Required type?: number;
     @NumberType @Required priority?: number;
-    startDate?: Date;
+    @DateType startDate?: Date;
     @DTO user?: UserDTO;
     notifications?: NotificationsDTO[];
     checkRequires(): boolean {
@@ -41,7 +40,6 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     constructor(data: ITaskDTO) {
         this.setName(data?.name);
         this.setDate(data?.date);
-        this.setTime(data?.time);
         this.setPriority(data?.priority);
         this.setNotificationsNeed(data?.notificationsNeed);
         this.setNotificationsDone(data?.notificationsDone);
@@ -61,23 +59,10 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
         return this;
     }
 
-    setDate(date?: string) {
+    setDate(date?: Date) {
         if (!date) return;
 
-        if (!date.match(/[\d]{1,2}.[\d]{2}.[\d]{4}/)) {
-            throw new DTOError('WRONG_DATE_FORMAT')
-        }
-
         this.date = date;
-        return this;
-    }
-
-    setTime(time?: string) {
-        if (!time.match(/[\d]{1,2}:[\d]{2}/)) {
-            throw new DTOError('WRONG_TIME_FORMAT')
-        }
-
-        this.time = time;
         return this;
     }
 
@@ -123,11 +108,12 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
             throw new DTOError('DATA_IS_NOT_CONSISTENCE')
         }
 
+        notification.setTask(this);
         this.notifications.push(notification);
         return this;
     }
 
-    setUser(user: UserDTO) {
+    setUser(user?: UserDTO) {
         if (!user) return this;
 
         this.user = user;

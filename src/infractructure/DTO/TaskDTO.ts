@@ -9,11 +9,11 @@ import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main'
 
 interface ITaskDTO {
     id: string;
-    name: string;
-    date: string;
-    time: string;
-    notificationsNeed: number;
-    notificationsDone: number;
+    name?: string;
+    date?: string;
+    time?: string;
+    notificationsNeed?: number;
+    notificationsDone?: number;
     type?: number;
     priority?: number;
     startDate?: Date;
@@ -99,6 +99,7 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
         if (!amount) return;
 
         this.notificationsDone = amount;
+        return this;
     }
 
     setType(type?: number) {

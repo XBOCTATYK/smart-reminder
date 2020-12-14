@@ -37,8 +37,24 @@ import { CREATION_TASK_PHRASES } from 'Constants/phrases/creationTask';
 import { TASK_CREATION_ERROR_PHRASES } from 'Constants/phrases/taskCreationError';
 import { TASK_TIME_PHRASES } from 'Constants/phrases/taskTime';
 import { ANSWERS } from 'Constants/answers';
+import { Time } from 'Utils/date-services/extended-date';
+import { TaskDTO } from 'Src/infractructure/DTO/TaskDTO';
 
 const logger = pino();
+
+
+const expTask = new TaskDTO({
+    name: 'Vasil',
+    date: '12.03.2021',
+    time: '22:10',
+})
+    .setPriority(3)
+    .setNotificationsNeed(5)
+    .setNotificationsDone(3)
+    .setType(3)
+
+console.log(expTask)
+console.log(expTask.checkRequires())
 
 setTimeout(async () => {
     const DB = getModels();

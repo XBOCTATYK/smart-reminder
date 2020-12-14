@@ -14,8 +14,16 @@ export function Required(target, propKey) {
             value: []
         })
 
-        target.checkRequires = () => {
-            return target.requires;
+        target.checkRequires = function () {
+            let valid = true;
+
+            target.requires.forEach( item => {
+                if (this[item] === undefined || this[item] === null) {
+                    valid = false;
+                }
+            })
+
+            return valid;
         }
     }
 

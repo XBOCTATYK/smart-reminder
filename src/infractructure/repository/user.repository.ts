@@ -27,14 +27,17 @@ export class UserRepository implements IRepository {
     withId(userId: string) {
         this.modifiers.id = userId;
         this.saveData.id = userId;
+        return this;
     }
 
     active() {
         this.modifiers.active = true;
+        return this;
     }
 
     inactive() {
         this.modifiers.active = false;
+        return this;
     }
 
 

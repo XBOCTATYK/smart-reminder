@@ -16,11 +16,8 @@ export class UserDTO implements IUserDTO, ICheckRequired {
     @Required @DateType startTime: Date;
     @Required @DateType endTime: Date;
     timezone: string = '0';
-    @Required dontDisturbTimes?: Array<{ from: Date, to: Date }>
-
-    checkRequires(): boolean {
-        return true;
-    }
+    dontDisturbTimes?: Array<{ from: Date, to: Date }>
+    @Required active: boolean;
 
     constructor(data: IUserDTO) {
         this.setId(data.id);
@@ -30,7 +27,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         this.setDontDisturbTimes(data.dontDisturbTimes);
     }
 
-    private isInvalidDate(time: any) {
+    private isInvalidDate(time: Date): Date {
         const isDate = time instanceof Date;
 
         if (!isDate || time.toString() === 'Invalid Date') {
@@ -59,7 +56,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
 
         const validEndTime = this.isInvalidDate(time);
 
-        if (validEndTime.getTime < this.startTime.getTime()) {
+        if (validEndTime.getTime() < this.startTime.getTime()) {
             throw new DTOError('END_TIME_LESS_THAN_START')
         }
 
@@ -79,5 +76,19 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         }
 
         this.dontDisturbTimes = dates.map( date => ({ from: this.isInvalidDate(date.from), to: this.isInvalidDate(date.to) }))
+    }
+
+    setActive(isActive: boolean) {
+        if (isActive === undefined || isActive === null) return;
+
+        this.setActive(isActive);
+    }
+
+    checkRequires(): boolean {
+        return true;
+    }
+
+    checkConsistence() {
+        return this.checkRequires();
     }
 }

@@ -1,24 +1,26 @@
 import { IRepository } from './repository.interface';
-import { Model, Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
+import { RepositoryError } from '../../domain/errors';
 
 export class TaskRepository implements IRepository {
-    db: typeof Model;
-    private modifiers = {
+    model: any; //typeof Model;
+
+    protected modifiers = {
         user_id: undefined,
         done: undefined,
         id: undefined,
         date: undefined
     };
-    private saveData = {
+    protected saveData = {
         user_id: undefined
     }
 
     constructor(db) {
-        this.db = db;
+        this.model = db;
     }
 
-    private ejectData(modelResult: Model<{}, {}>) {
+    protected ejectData(modelResult) {
         const data = modelResult?.dataValues;
 
         return data ? new TaskDTO(data) : null;
@@ -42,37 +44,56 @@ export class TaskRepository implements IRepository {
 
     withId(id: string) {
         this.modifiers.id = id;
+        return this;
     }
 
     inThisTime() {
         this.modifiers.date = {
             [Op.between]: [new Date(Date.now() - 36000), new Date()],
         }
+
+        return this;
     }
 
 
     async get() {
-        const taskList = await this.db.findAll({ where: this.modifiers });
-        const resultDTO = taskList.map(task => this.ejectData(task));
-
-        return resultDTO;
+        const taskList = await this.model.findAll({ where: this.modifiers });
+        return taskList.map(task => this.ejectData(task));
     }
 
-    async save(task: TaskDTO) {
-        const taskDTO = task;
-
-        this.db.update({
-            id: taskDTO.id,
+    private mapDTO(taskDTO: TaskDTO) {
+        return {
             name: taskDTO.name,
             date: taskDTO.date,
-            time: taskDTO.time,
             notificationsNeed: taskDTO.notificationsNeed,
             notificationsDone: taskDTO.notificationsDone,
             priority: taskDTO.priority || 2,
             startDate: taskDTO.startDate || new Date(),
-            user_id: this.saveData || taskDTO.user?.id,
-        }, {
+            user_id: this.saveData.user_id || taskDTO.user?.id,
+        }
+    }
+
+    protected checkDTO(taskDTO: TaskDTO) {
+        const consistence = taskDTO.checkConsistence();
+
+        if (!consistence) {
+            throw new RepositoryError('Task Repository. TaskDTO is not consistent!');
+        }
+    }
+
+    async save(task: TaskDTO) {
+        this.checkDTO(task);
+        this.model.update(
+            this.mapDTO(task), {
             where: this.modifiers
+        })
+    }
+
+    async create(task: TaskDTO) {
+        this.checkDTO(task);
+        this.model.create({
+            id: task.id,
+            ...this.mapDTO(task)
         })
     }
 }

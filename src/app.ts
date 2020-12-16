@@ -39,19 +39,27 @@ import { TASK_TIME_PHRASES } from 'Constants/phrases/taskTime';
 import { ANSWERS } from 'Constants/answers';
 import { Time } from 'Utils/date-services/extended-date';
 import { TaskDTO } from 'Src/infractructure/DTO/TaskDTO';
+import { UserDTO } from 'Src/infractructure/DTO/UserDTO';
 
 const logger = pino();
 
 
 const expTask = new TaskDTO({
     name: 'Vasil',
-    date: '12.03.2021',
-    time: '22:10',
+    date: new Date(2021, 3, 22),
 })
     .setPriority(3)
     .setNotificationsNeed(5)
     .setNotificationsDone(3)
     .setType(3)
+
+const user = new UserDTO({
+    id: 3432,
+    startTime: new Date(0),
+    endTime: new Date(100)
+})
+
+expTask.setUser(user)
 
 console.log(expTask)
 console.log(expTask.checkRequires())

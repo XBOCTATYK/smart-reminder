@@ -157,4 +157,12 @@ export class Time extends ExtendedDate {
     isAfterThan(date: ExtendedDate | Date | string) {
         return isAfter(this.value, Time.of(date).get())
     }
+
+    difference(date: ExtendedDate | Date | string) {
+        return Difference.of(ExtendedDate.of(this.value), Time.of(date))
+    }
+
+    valueOf() {
+        return this.value.getTime();
+    }
 }

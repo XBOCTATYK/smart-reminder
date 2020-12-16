@@ -1,6 +1,7 @@
 import { GeneratedId } from '../decorators/generated-id';
 import { Required } from '../decorators/validators/Required';
 import { DateType } from '../decorators/validators/DateType';
+import { NumberType } from '../decorators/validators/NumberType';
 
 interface IUsualDTO {
     id?: string;
@@ -17,11 +18,11 @@ interface IUsualDTO {
 export class UsualDTO implements IUsualDTO {
     @Required id: string;
     @Required @DateType lastTaskDate: Date;
-    years: number = 0;
-    months: number = 0;
-    days: number = 0;
-    hours: number = 0;
-    minutes: number = 0;
+    @NumberType years: number = 0;
+    @NumberType months: number = 0;
+    @NumberType days: number = 0;
+    @NumberType hours: number = 0;
+    @NumberType minutes: number = 0;
     @Required done: boolean;
 
     constructor(data: IUsualDTO) {

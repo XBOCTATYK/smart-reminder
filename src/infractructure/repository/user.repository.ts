@@ -64,7 +64,7 @@ export class UserRepository implements IRepository {
 
     async save(userDTO: UserDTO) {
         this.checkDTO(userDTO)
-        this.model.update(
+        await this.model.update(
             this.mapDTO(userDTO), {
             where: this.modifiers
         })
@@ -72,7 +72,7 @@ export class UserRepository implements IRepository {
 
     async create(userDTO: UserDTO) {
         this.checkDTO(userDTO)
-        this.model.create({
+        await this.model.create({
             id: this.saveData.id || userDTO.id,
             ...this.mapDTO(userDTO)
         })

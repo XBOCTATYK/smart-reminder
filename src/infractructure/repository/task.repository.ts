@@ -83,7 +83,7 @@ export class TaskRepository implements IRepository {
 
     async save(task: TaskDTO) {
         this.checkDTO(task);
-        this.model.update(
+        await this.model.update(
             this.mapDTO(task), {
             where: this.modifiers
         })
@@ -91,7 +91,7 @@ export class TaskRepository implements IRepository {
 
     async create(task: TaskDTO) {
         this.checkDTO(task);
-        this.model.create({
+        await this.model.create({
             id: task.id,
             ...this.mapDTO(task)
         })

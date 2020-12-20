@@ -27,15 +27,7 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
             type: DataTypes.STRING,
             allowNull: false,
         },
-        time: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
         date: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        startTime: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -46,6 +38,11 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
         priority: {
             type: DataTypes.INTEGER,
             defaultValue: 5,
+            allowNull: false
+        },
+        type: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1,
             allowNull: false
         },
         notificationsNeed: {

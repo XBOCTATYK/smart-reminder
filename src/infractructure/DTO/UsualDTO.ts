@@ -4,6 +4,7 @@ import { DateType } from '../decorators/validators/DateType';
 import { NumberType } from '../decorators/validators/NumberType';
 import { DTO } from '../decorators/validators/DTO';
 import { TaskDTO } from './TaskDTO';
+import { SkipNullableSetter } from '../decorators/methods/skipNullableSetter';
 
 interface IUsualDTO {
     id?: string;
@@ -39,58 +40,52 @@ export class UsualDTO implements IUsualDTO {
         this.setMinutes(data.minutes);
         this.setDone(data.done);
         this.setTaskId(data.task_id);
-    }
+    }k
 
+    @SkipNullableSetter
     setTaskId(id?: string) {
-        if (!id) return;
-
         this.task_id = id;
 
         return this;
     }
 
+    @SkipNullableSetter
     setLastTaskDate(date?: Date) {
-        if (!date) return ;
-
         this.lastTaskDate = date;
 
         return this;
     }
 
+    @SkipNullableSetter
     setYears(years?: number) {
-        if (!years) return ;
-
         this.years = years;
 
         return this;
     }
 
+    @SkipNullableSetter
     setMonths(months?: number) {
-        if (!months) return ;
-
         this.months = months;
 
         return this;
     }
-    setDays(days?: number) {
-        if (!days) return ;
 
+    @SkipNullableSetter
+    setDays(days?: number) {
         this.days = days;
 
         return this;
     }
 
+    @SkipNullableSetter
     setHours(hours?: number) {
-        if (!hours) return ;
-
         this.hours = hours;
 
         return this;
     }
 
+    @SkipNullableSetter
     setMinutes(minutes?: number) {
-        if (!minutes) return ;
-
         this.minutes = minutes;
 
         return this;
@@ -104,9 +99,8 @@ export class UsualDTO implements IUsualDTO {
         return this;
     }
 
+    @SkipNullableSetter
     setTask(task?: TaskDTO) {
-        if (!task) return ;
-
         this.Task = task;
 
         return this;

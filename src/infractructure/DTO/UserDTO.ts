@@ -2,13 +2,15 @@ import { DTOError } from '../../domain/errors';
 import { ICheckRequired } from 'Src/infractructure/interfaces/main';
 import { Required } from 'Src/infractructure/decorators/validators/Required';
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
+import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
 
 interface IUserDTO {
     id: number;
     startTime?: Date;
     endTime?: Date;
     timezone?: string;
-    dontDisturbTimes?: Array<{ from: Date, to: Date }>
+    dontDisturbTimes?: Array<{ from: Date, to: Date }>;
+    active: boolean;
 }
 
 export class UserDTO implements IUserDTO, ICheckRequired {
@@ -25,6 +27,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         this.setEndTime(data.endTime);
         this.setTimezone(data.timezone);
         this.setDontDisturbTimes(data.dontDisturbTimes);
+        this.setActive(data.active)
     }
 
     private isInvalidDate(time: Date): Date {
@@ -43,17 +46,19 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         }
 
         this.id = id;
+
+        return this;
     }
 
+    @SkipNullableSetter
     setStartTime(time?: Date) {
-        if (!time) return;
-
         this.startTime = this.isInvalidDate(time);
+
+        return this;
     }
 
+    @SkipNullableSetter
     setEndTime(time?: Date) {
-        if (!time) return;
-
         const validEndTime = this.isInvalidDate(time);
 
         if (validEndTime.getTime() < this.startTime.getTime()) {
@@ -61,27 +66,34 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         }
 
         this.endTime = validEndTime;
+
+        return this;
     }
 
+    @SkipNullableSetter
     setTimezone(timezone?: string) {
-        if (!timezone) return;
-
         this.timezone = timezone;
+
+        return this;
     }
 
     setDontDisturbTimes(dates?: Array<{ from: Date, to: Date }>) {
         if (!dates) {
             this.dontDisturbTimes = [];
-            return;
+            return this;
         }
 
-        this.dontDisturbTimes = dates.map( date => ({ from: this.isInvalidDate(date.from), to: this.isInvalidDate(date.to) }))
+        this.dontDisturbTimes = dates.map( date => ({ from: this.isInvalidDate(date.from), to: this.isInvalidDate(date.to) }));
+
+        return this;
     }
 
     setActive(isActive: boolean) {
         if (isActive === undefined || isActive === null) return;
 
-        this.setActive(isActive);
+        this.active = isActive;
+
+        return this;
     }
 
     checkRequires(): boolean {

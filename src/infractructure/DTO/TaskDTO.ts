@@ -7,6 +7,7 @@ import { NotificationsDTO } from './NotificationsDTO';
 import { DTO } from '../decorators/validators/DTO';
 import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
+import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
 
 interface ITaskDTO {
     id?: string;
@@ -33,6 +34,7 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     @DateType startDate?: Date;
     @DTO user?: UserDTO;
     notifications?: NotificationsDTO[];
+
     checkRequires(): boolean {
         return true;
     }
@@ -48,9 +50,8 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
         this.setUser(data?.user);
     }
 
+    @SkipNullableSetter
     setName(name?: string) {
-        if (!name) return;
-
         if (name.length > 1000) {
             throw new DTOError('TOO_LONG_NAME')
         }
@@ -59,37 +60,32 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
         return this;
     }
 
+    @SkipNullableSetter
     setDate(date?: Date) {
-        if (!date) return;
-
         this.date = date;
         return this;
     }
 
+    @SkipNullableSetter
     setPriority(amount?: number) {
-        if (!amount) return;
-
         this.priority = amount;
         return this;
     }
 
+    @SkipNullableSetter
     setNotificationsNeed(amount?: number) {
-        if (!amount) return;
-
         this.notificationsNeed = amount;
         return this;
     }
 
+    @SkipNullableSetter
     setNotificationsDone(amount?: number) {
-        if (!amount) return;
-
         this.notificationsDone = amount;
         return this;
     }
 
+    @SkipNullableSetter
     setType(type?: number) {
-        if (!type) return;
-
         this.type = type;
         return this;
     }
@@ -97,6 +93,8 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     setStartDate(date?: Date) {
         if (!date) {
             this.startDate = new Date();
+
+            return this;
         }
 
         this.startDate = date;

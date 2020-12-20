@@ -6,6 +6,7 @@ import { Required } from 'Src/infractructure/decorators/validators/Required';
 import { DTO } from 'Src/infractructure/decorators/validators/DTO';
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 import { DTOError } from 'Src/domain/errors';
+import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
 
 interface INotificationsDTO {
     id?: string;
@@ -30,9 +31,8 @@ export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckR
         this.setTask(data.Task);
     }
 
+    @SkipNullableSetter
     setAnswer(answer: Answer) {
-        if (!answer) return ;
-
         const arrAnswers = Object.values(ANSWERS);
 
         if (!arrAnswers.includes(answer)) {
@@ -43,9 +43,8 @@ export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckR
         return this;
     }
 
+    @SkipNullableSetter
     setDate(date?: Date) {
-        if (!date) return ;
-
         this.date = date;
 
         return this;
@@ -59,9 +58,8 @@ export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckR
         return this;
     }
 
+    @SkipNullableSetter
     setTask(task?: TaskDTO) {
-        if (!task) return ;
-
         this.Task = task;
 
         return this;

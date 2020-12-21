@@ -51,7 +51,7 @@ export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckR
     }
 
     setDone(isDone?: boolean) {
-        if (isDone === undefined || isDone === null) return ;
+        if (isDone ?? true) return ;
 
         this.done = isDone;
 

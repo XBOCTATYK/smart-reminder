@@ -1,5 +1,7 @@
 import { IRepository } from './repository.interface';
 import { TaskDTO } from '../DTO/TaskDTO';
+import { NotificationsDTO } from '../DTO/NotificationsDTO';
+import { UsualDTO } from '../DTO/UsualDTO';
 
 export class UsualRepository implements IRepository {
     model: any;
@@ -41,5 +43,12 @@ export class UsualRepository implements IRepository {
     withId(id: string) {
         this.modifiers.id = id;
         return this;
+    }
+
+    private mapDTO(usualDTO: UsualDTO) {
+        return {
+            days: usualDTO.days,
+            ['task_id']: usualDTO.Task.id,
+        }
     }
 }

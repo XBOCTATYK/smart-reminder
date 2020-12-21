@@ -49,6 +49,7 @@ const expTask = new TaskDTO({
     date: new Date(2021, 3, 22),
 })
     .setPriority(3)
+    .setType()
     .setNotificationsNeed(5)
     .setNotificationsDone(3)
     .setType(3)
@@ -56,7 +57,8 @@ const expTask = new TaskDTO({
 const user = new UserDTO({
     id: 3432,
     startTime: new Date(0),
-    endTime: new Date(100)
+    endTime: new Date(100),
+    active: true
 })
 
 expTask.setUser(user)
@@ -64,7 +66,7 @@ expTask.setUser(user)
 console.log(expTask)
 console.log(expTask.checkRequires())
 
-setTimeout(async () => {
+/*setTimeout(async () => {
     const DB = getModels();
 
     logger.info('Getting config from base!');
@@ -426,4 +428,4 @@ ${ value.name } - ${ task.time } | ${ task.date }
 
     await bot.launch();
 
-}, 0);
+}, 0);*/

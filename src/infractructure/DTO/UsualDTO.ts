@@ -5,6 +5,7 @@ import { NumberType } from '../decorators/validators/NumberType';
 import { DTO } from '../decorators/validators/DTO';
 import { TaskDTO } from './TaskDTO';
 import { SkipNullableSetter } from '../decorators/methods/skipNullableSetter';
+import { ICheckRequired, IConsistent } from '../interfaces/main';
 
 interface IUsualDTO {
     id?: string;
@@ -19,7 +20,7 @@ interface IUsualDTO {
 }
 
 @GeneratedId
-export class UsualDTO implements IUsualDTO {
+export class UsualDTO implements IUsualDTO, IConsistent, ICheckRequired {
     @Required id: string;
     @Required task_id: string;
     @DTO Task: TaskDTO;
@@ -104,5 +105,13 @@ export class UsualDTO implements IUsualDTO {
         this.Task = task;
 
         return this;
+    }
+
+    checkRequires(): boolean {
+        return true;
+    }
+
+    checkConsistence(): boolean {
+        return this.checkRequires()
     }
 }

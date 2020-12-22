@@ -1,7 +1,7 @@
 import { IRepository } from './repository.interface';
 import { TaskDTO } from '../DTO/TaskDTO';
-import { NotificationsDTO } from '../DTO/NotificationsDTO';
 import { UsualDTO } from '../DTO/UsualDTO';
+import { RepositoryError } from '../../domain/errors';
 
 export class UsualRepository implements IRepository {
     model: any;
@@ -47,8 +47,43 @@ export class UsualRepository implements IRepository {
 
     private mapDTO(usualDTO: UsualDTO) {
         return {
+            hours: usualDTO.hours,
+            years: usualDTO.years,
             days: usualDTO.days,
-            ['task_id']: usualDTO.Task.id,
+            months: usualDTO.months,
+            minutes: usualDTO.minutes,
+            ['task_id']: usualDTO.Task.id
         }
+    }
+
+    protected checkDTO(usual: UsualDTO) {
+        const consistence = usual.checkConsistence();
+
+        if (!consistence) {
+            throw new RepositoryError('Usual Repository. UsualDTO is not consistent!');
+        }
+    }
+
+    async get() {
+        const taskList = await this.model.findAll({ where: this.modifiers, include: this.includedModels });
+        return taskList.map(task => this.ejectData(task));
+    }
+
+    async save(usual: UsualDTO) {
+        this.checkDTO(usual);
+        await this.model.update({
+                id: usual.id,
+                ...this.mapDTO(usual)
+            }, {
+                where: this.modifiers
+            })
+    }
+
+    async create(usual: UsualDTO) {
+        this.checkDTO(usual);
+        await this.model.create({
+            id: usual.id,
+            ...this.mapDTO(usual)
+        })
     }
 }

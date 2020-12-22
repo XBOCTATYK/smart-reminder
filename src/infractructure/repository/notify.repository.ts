@@ -109,8 +109,9 @@ export class NotifyRepository implements IRepository {
     async save(notification: NotificationsDTO) {
         this.checkDTO(notification);
         await this.model.update({
-            id: notification.id,
             ...this.mapDTO(notification)
+        }, {
+            where: this.modifiers
         })
     }
 

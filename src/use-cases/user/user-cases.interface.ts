@@ -23,20 +23,25 @@ export class UserCases implements IUserCases {
     userRepository: UserRepository;
     banListInteractor: BanListInteractor;
 
+    protected async getActiveUser(userId: number) {
+        const userEntity = new User(userId);
+        const banList = await this.banListInteractor.getBanList();
+
+        banList.hasUserInList(userEntity);
+
+        if (userEntity.isBanned) {
+            throw new UserStoryError('USER_BANNED')
+        }
+
+        return userEntity;
+    }
+
     async addUser(userInfo: any): Promise<boolean> {
         try {
-            const user = await this.userRepository.withId(userInfo.id).get();
+            const [user] = await this.userRepository.withId(userInfo.id).get();
 
             if (!user) {
-                const userEntity = new User(userInfo.id);
-                const banList = await this.banListInteractor.getBanList();
-
-                banList.hasUserInList(userEntity);
-
-                if (userEntity.isBanned) {
-                    throw new UserStoryError('USER_BANNED')
-                }
-
+                const userEntity = this.getActiveUser(userInfo.id);
                 const userDTO = new UserDTO(userInfo);
 
                 userDTO.setActive(true);
@@ -51,19 +56,19 @@ export class UserCases implements IUserCases {
         }
     }
 
-    changeEndTime(time: Date): Promise<boolean> {
+    async changeEndTime(time: Date): Promise<boolean> {
         return Promise.resolve(false);
     }
 
-    changeSomeParams(params: UserDTO): Promise<boolean> {
+    async changeSomeParams(params: UserDTO): Promise<boolean> {
         return Promise.resolve(false);
     }
 
-    changeStartTime(time: Date): Promise<boolean> {
+    async changeStartTime(time: Date): Promise<boolean> {
         return Promise.resolve(false);
     }
 
-    changeTimezone(timezone: number): Promise<boolean> {
+    async changeTimezone(timezone: number): Promise<boolean> {
         return Promise.resolve(false);
     }
 
@@ -85,15 +90,28 @@ export class UserCases implements IUserCases {
         }
     }
 
-    getParams(userId: number): Promise<UserDTO> {
+    async getParams(userId: number): Promise<UserDTO> {
         return Promise.resolve(undefined);
     }
 
-    start(userId: number): Promise<boolean> {
-        return Promise.resolve(false);
+    async start(userId: number): Promise<boolean> {
+        try {
+            const [user] = await this.userRepository.withId(userId).get();
+
+            if (user) {
+                const userEntity = this.getActiveUser(userId);
+                const userDTO = new UserDTO(user);
+
+                userDTO.setActive(true);
+
+                await this.userRepository.withId(userId).save(userDTO);
+            }
+        } catch (e) {
+            return false;
+        }
     }
 
-    stop(userId: number): Promise<boolean> {
+    async stop(userId: number): Promise<boolean> {
         return Promise.resolve(false);
     }
 

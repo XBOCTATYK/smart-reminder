@@ -10,11 +10,14 @@ export class User {
     endTime: Date;
 
     constructor(userData) {
-        const { id } = userData;
+        const { id, startTime, endTime } = userData;
 
         if (!id) {
             throw new BusinessError('NO_USER_IDENTIFIER')
         }
+
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     addTask(taskData: Task) {
@@ -26,4 +29,5 @@ export class User {
         const notificationDate = ExtendedDate.of(notification.time)
     }
 
+    isBanned: boolean;
 }

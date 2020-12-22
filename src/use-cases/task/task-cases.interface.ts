@@ -3,7 +3,7 @@ import { TaskDTO } from '../../infractructure/DTO/TaskDTO';
 import { IDataInteractor } from '../data-interactor.interface';
 
 export interface ITaskCases extends IDataInteractor {
-    repository: IRepository;
+    userRepository: IRepository;
 
     createTask(taskInfo: TaskDTO): Promise<TaskDTO>;
     getTask(id: string): Promise<TaskDTO>;

@@ -4,7 +4,7 @@ import { Answer } from 'Constants/answers';
 import { IDataInteractor } from '../data-interactor.interface';
 
 export interface INotificationsCases extends IDataInteractor {
-    repository: IRepository;
+    userRepository: IRepository;
 
     sendNotifications(): Promise<NotificationsDTO[]>
     getNotifications(dateTime: Date): Promise<NotificationsDTO[]>

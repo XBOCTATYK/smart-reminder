@@ -24,7 +24,7 @@ export class UserRepository implements IRepository {
         return data ? new UserDTO(data) : null;
     }
 
-    withId(userId: string) {
+    withId(userId: number) {
         this.modifiers.id = userId;
         this.saveData.id = userId;
         return this;

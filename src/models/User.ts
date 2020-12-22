@@ -25,6 +25,10 @@ export function getUserModel(sequelize: Sequelize, models?: OrmModelCollection, 
         duration: {
             type: DataTypes.INTEGER,
             defaultValue: 100,
+        },
+        active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
         }
 
     }, {

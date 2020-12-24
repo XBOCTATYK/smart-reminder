@@ -2,7 +2,7 @@ import { IRepository } from './repository.interface';
 import { UserDTO } from '../DTO/UserDTO';
 import { RepositoryError } from '../../domain/errors';
 
-export class UserRepository implements IRepository {
+export class UserRepository implements IRepository<UserDTO> {
     model: any;
 
     protected modifiers = {
@@ -68,6 +68,8 @@ export class UserRepository implements IRepository {
             this.mapDTO(userDTO), {
             where: this.modifiers
         })
+
+        return true;
     }
 
     async create(userDTO: UserDTO) {
@@ -76,5 +78,13 @@ export class UserRepository implements IRepository {
             id: this.saveData.id || userDTO.id,
             ...this.mapDTO(userDTO)
         })
+
+        return true;
+    }
+
+    async remove() {
+        this.model.destroy({ where: this.modifiers })
+
+        return true;
     }
 }

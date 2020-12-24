@@ -3,7 +3,7 @@ import { TaskDTO } from '../DTO/TaskDTO';
 import { UsualDTO } from '../DTO/UsualDTO';
 import { RepositoryError } from '../../domain/errors';
 
-export class UsualRepository implements IRepository {
+export class UsualRepository implements IRepository<UsualDTO> {
     model: any;
     taskModel: any;
 
@@ -77,6 +77,8 @@ export class UsualRepository implements IRepository {
             }, {
                 where: this.modifiers
             })
+
+        return true;
     }
 
     async create(usual: UsualDTO) {
@@ -85,5 +87,13 @@ export class UsualRepository implements IRepository {
             id: usual.id,
             ...this.mapDTO(usual)
         })
+
+        return true;
+    }
+
+    async remove() {
+        this.model.destroy({ where: this.modifiers })
+
+        return true;
     }
 }

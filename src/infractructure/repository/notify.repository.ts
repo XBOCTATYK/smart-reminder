@@ -4,7 +4,7 @@ import { TaskDTO } from '../DTO/TaskDTO';
 import { NotificationsDTO } from '../DTO/NotificationsDTO';
 import { RepositoryError } from '../../domain/errors';
 
-export class NotifyRepository implements IRepository {
+export class NotifyRepository implements IRepository<NotificationsDTO> {
     model: any;
     taskModel: any;
 
@@ -113,6 +113,8 @@ export class NotifyRepository implements IRepository {
         }, {
             where: this.modifiers
         })
+
+        return true;
     }
 
     async create(notification: NotificationsDTO) {
@@ -121,5 +123,13 @@ export class NotifyRepository implements IRepository {
             id: notification.id,
             ...this.mapDTO(notification)
         })
+
+        return true;
+    }
+
+    async remove() {
+        this.model.destroy({ where: this.modifiers })
+
+        return true;
     }
 }

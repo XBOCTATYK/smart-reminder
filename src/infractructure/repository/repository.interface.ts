@@ -3,12 +3,16 @@ import { TaskDTO } from '../DTO/TaskDTO';
 import { UserDTO } from '../DTO/UserDTO';
 import { NotificationsDTO } from '../DTO/NotificationsDTO';
 
-export interface IRepository {
+export interface IRepository<T> {
     model: typeof Model;
 
+    get(): Promise<T[]>;
+    save(T): Promise<boolean>;
+    create(T): Promise<boolean>;
+    remove(): Promise<boolean>;
 }
 
-export interface ITaskRepository extends IRepository {
+export interface ITaskRepository extends IRepository<TaskDTO> {
     forUser(userId: number): ITaskRepository;
     actual(userId: number): ITaskRepository;
     done(userId: number): ITaskRepository;
@@ -17,19 +21,13 @@ export interface ITaskRepository extends IRepository {
     get(): Promise<TaskDTO[]>;
 }
 
-export interface IUserRepository extends IRepository {
+export interface IUserRepository extends IRepository<UserDTO> {
     findOne(id: number): UserDTO
     byTaskId(taskId: number): UserDTO
-    findAll(): UserDTO[]
 }
 
-export interface INotificationsRepository extends IRepository {
+export interface INotificationsRepository extends IRepository<NotificationsDTO> {
     findOne(id: string): NotificationsDTO
     findByTask(taskId: string): NotificationsDTO
     findByUser(userId: string): NotificationsDTO[]
-    findAll(): NotificationsDTO[]
-}
-
-export interface IParams extends IRepository {
-    get()
 }

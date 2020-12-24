@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { RepositoryError } from '../../domain/errors';
 
-export class TaskRepository implements IRepository {
+export class TaskRepository implements IRepository<TaskDTO> {
     model: any; //typeof Model;
 
     protected modifiers = {
@@ -55,6 +55,22 @@ export class TaskRepository implements IRepository {
         return this;
     }
 
+    ratherThan(date: Date) {
+        this.modifiers.date = {
+            [Op.lt]: [date],
+        }
+
+        return this;
+    }
+
+    futureThan(date: Date) {
+        this.modifiers.date = {
+            [Op.gt]: [date],
+        }
+
+        return this;
+    }
+
 
     async get() {
         const taskList = await this.model.findAll({ where: this.modifiers });
@@ -87,6 +103,8 @@ export class TaskRepository implements IRepository {
             this.mapDTO(task), {
             where: this.modifiers
         })
+
+        return true;
     }
 
     async create(task: TaskDTO) {
@@ -95,5 +113,13 @@ export class TaskRepository implements IRepository {
             id: task.id,
             ...this.mapDTO(task)
         })
+
+        return true;
+    }
+
+    async remove() {
+        this.model.destroy({ where: this.modifiers })
+
+        return true;
     }
 }

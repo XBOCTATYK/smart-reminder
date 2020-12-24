@@ -20,6 +20,7 @@ interface ITaskDTO {
     startDate?: Date;
     notifications?: NotificationsDTO[];
     user?: UserDTO;
+    done: boolean;
 }
 
 @GeneratedId
@@ -34,6 +35,7 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     @DateType startDate?: Date;
     @DTO user?: UserDTO;
     notifications?: NotificationsDTO[];
+    @Required done: boolean;
 
     checkRequires(): boolean {
         return true;
@@ -88,6 +90,10 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     setType(type?: number) {
         this.type = type;
         return this;
+    }
+
+    setDone() {
+        this.done = true;
     }
 
     setStartDate(date?: Date) {

@@ -1,9 +1,9 @@
-import { IRepository } from './repository.interface';
+import { IRepository, ITaskRepository } from './repository.interface';
 import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { RepositoryError } from '../../domain/errors';
 
-export class TaskRepository implements IRepository<TaskDTO> {
+export class TaskRepository implements ITaskRepository {
     model: any; //typeof Model;
 
     protected modifiers = {
@@ -26,7 +26,7 @@ export class TaskRepository implements IRepository<TaskDTO> {
         return data ? new TaskDTO(data) : null;
     }
 
-    forUser(userId: string) {
+    forUser(userId: number) {
         this.modifiers['user_id'] = userId;
         this.saveData['user_id'] = userId;
         return this;

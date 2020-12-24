@@ -13,10 +13,11 @@ export interface IUserCases extends IDataInteractor {
     start(userId: number): Promise<boolean>;
     delete(userId: number): Promise<boolean>;
     getParams(userId: number): Promise<UserDTO>;
-    changeTimezone(timezone: number): Promise<boolean>;
+    changeTimezone(userId: number, timezone: string): Promise<boolean>;
     changeStartTime(time: Date): Promise<boolean>;
     changeEndTime(time: Date): Promise<boolean>;
     changeSomeParams(params: UserDTO): Promise<boolean>;
+    checkUser(userId: number): Promise<UserDTO>;
 }
 
 export class UserCases implements IUserCases {
@@ -36,6 +37,17 @@ export class UserCases implements IUserCases {
         return userEntity;
     }
 
+    protected async findUser(userId: number) {
+        const [user] = await this.userRepository.withId(userId).get();
+
+        if (!user) {
+            throw new UserStoryError('USER_DOESNT_EXISTS');
+        }
+
+        const userEntity = this.getActiveUser(userId);
+        return new UserDTO(user);
+    }
+
     async addUser(userInfo: any): Promise<boolean> {
         try {
             const [user] = await this.userRepository.withId(userInfo.id).get();
@@ -50,7 +62,7 @@ export class UserCases implements IUserCases {
                 return true;
             }
 
-            throw new UserStoryError('USER_EXISTS');
+            throw new UserStoryError('USER_ALREADY_EXISTS');
         } catch (e) {
             return false;
         }
@@ -68,21 +80,24 @@ export class UserCases implements IUserCases {
         return Promise.resolve(false);
     }
 
-    async changeTimezone(timezone: number): Promise<boolean> {
-        return Promise.resolve(false);
+    async changeTimezone(userId: number, timezone: string): Promise<boolean> {
+        try {
+            const userDTO = await this.findUser(userId);
+
+            userDTO.setTimezone(timezone);
+            await this.userRepository.withId(userId).save(userDTO);
+
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 
     async delete(userId: number): Promise<boolean> {
         try {
-            const [user] = await this.userRepository.withId(userId).get();
+            const userDTO = await this.findUser(userId);
 
-            if (!user) {
-                throw new UserStoryError('USER_DOESNT_EXISTS');
-            }
-
-            const userDTO = new UserDTO(user);
             userDTO.setActive(false);
-
             await this.userRepository.withId(userId).save(userDTO);
             return true;
         } catch (e) {
@@ -96,23 +111,33 @@ export class UserCases implements IUserCases {
 
     async start(userId: number): Promise<boolean> {
         try {
-            const [user] = await this.userRepository.withId(userId).get();
+            const userDTO = await this.findUser(userId);
 
-            if (user) {
-                const userEntity = this.getActiveUser(userId);
-                const userDTO = new UserDTO(user);
-
-                userDTO.setActive(true);
-
-                await this.userRepository.withId(userId).save(userDTO);
-            }
+            userDTO.setActive(true);
+            await this.userRepository.withId(userId).save(userDTO);
         } catch (e) {
             return false;
         }
     }
 
     async stop(userId: number): Promise<boolean> {
-        return Promise.resolve(false);
+        try {
+            const userDTO = await this.findUser(userId);
+
+            userDTO.setActive(false);
+            await this.userRepository.withId(userId).save(userDTO);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async checkUser(userId: number): Promise<UserDTO> {
+        try {
+            const user = await this.findUser(userId);
+            return user;
+        } catch (e) {
+            return null;
+        }
     }
 
 }

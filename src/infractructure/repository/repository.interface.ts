@@ -14,11 +14,12 @@ export interface IRepository<T> {
 
 export interface ITaskRepository extends IRepository<TaskDTO> {
     forUser(userId: number): ITaskRepository;
-    actual(userId: number): ITaskRepository;
-    done(userId: number): ITaskRepository;
-    withId(userId: number): ITaskRepository;
+    actual(): ITaskRepository;
+    done(): ITaskRepository;
+    withId(taskId: string): ITaskRepository;
     inThisTime(): ITaskRepository;
-    get(): Promise<TaskDTO[]>;
+    ratherThan(date: Date): ITaskRepository;
+    futureThan(date: Date): ITaskRepository;
 }
 
 export interface IUserRepository extends IRepository<UserDTO> {

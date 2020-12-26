@@ -7,7 +7,7 @@ export function DTO(target, propertyKey) {
             if (value.checkRequires()) {
                 this[`_${ propertyKey }`] = value;
             } else {
-                throw new SetterError(`SETTER_ERROR ${ propertyKey } ${ value } | TARGET_TYPE=DTO`)
+                throw new SetterError(`${ propertyKey }=${ value } | TARGET_TYPE=DTO`)
             }
         },
         get() {

@@ -5,3 +5,7 @@ export interface ICheckRequired {
 export interface IConsistent {
     checkConsistence(): boolean;
 }
+
+export interface IWithId<T> {
+    withId: (id: string) => T;
+}

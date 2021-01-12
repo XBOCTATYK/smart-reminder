@@ -1,8 +1,9 @@
 import { IRepository } from './repository.interface';
-import { Model, Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { NotificationsDTO } from '../DTO/NotificationsDTO';
 import { RepositoryError } from '../../domain/errors';
+import { TASK_DISPERSION_TIME } from '../../constants/time';
 
 export class NotifyRepository implements IRepository<NotificationsDTO> {
     model: any;
@@ -62,7 +63,7 @@ export class NotifyRepository implements IRepository<NotificationsDTO> {
 
     inThisTime() {
         this.modifiers.date = {
-            [Op.between]: [new Date(Date.now() - 36000), new Date()],
+            [Op.between]: [new Date(Date.now() - TASK_DISPERSION_TIME), new Date()],
         }
 
         return this;

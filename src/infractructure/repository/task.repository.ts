@@ -1,7 +1,8 @@
-import { IRepository, ITaskRepository } from './repository.interface';
+import { ITaskRepository } from './repository.interface';
 import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { RepositoryError } from '../../domain/errors';
+import { TASK_DISPERSION_TIME } from '../../constants/time';
 
 export class TaskRepository implements ITaskRepository {
     model: any; //typeof Model;
@@ -49,7 +50,7 @@ export class TaskRepository implements ITaskRepository {
 
     inThisTime() {
         this.modifiers.date = {
-            [Op.between]: [new Date(Date.now() - 36000), new Date()],
+            [Op.between]: [new Date(Date.now() - TASK_DISPERSION_TIME), new Date()],
         }
 
         return this;

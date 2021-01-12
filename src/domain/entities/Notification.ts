@@ -1,6 +1,7 @@
 import { Answer, ANSWERS } from '../../constants/answers';
 import { ExtendedDate } from '../../utils/date-services/extended-date';
 import { BusinessError } from '../errors';
+import { BUSINESS_ERROR } from 'Constants/errors';
 
 export class Notification {
     time: ExtendedDate;
@@ -22,11 +23,11 @@ export class Notification {
 
     setAnswer(answer: Answer) {
         if (!Object.values(ANSWERS).includes(answer)) {
-            throw new BusinessError('UNRECOGNIZED_ANSWER')
+            throw new BusinessError(BUSINESS_ERROR.UNRECOGNIZED_ANSWER)
         }
 
         if (answer !== ANSWERS.WAITING) {
-            throw new BusinessError('ANSWER_IS_SETTED')
+            throw new BusinessError(BUSINESS_ERROR.ANSWER_IS_SETTED)
         }
 
         this.answer = answer;

@@ -7,6 +7,7 @@ import { DTO } from 'Src/infractructure/decorators/validators/DTO';
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 import { DTOError } from 'Src/domain/errors';
 import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
+import { DTO_ERROR } from 'Constants/errors';
 
 interface INotificationsDTO {
     id?: string;
@@ -36,7 +37,7 @@ export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckR
         const arrAnswers = Object.values(ANSWERS);
 
         if (!arrAnswers.includes(answer)) {
-            throw new DTOError(`WRONG_ANSWER`)
+            throw new DTOError(DTO_ERROR.WRONG_ANSWER)
         }
         this.answer = answer;
 

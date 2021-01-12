@@ -68,4 +68,16 @@ export class TaskCases implements ITaskCases {
             .actual()
             .get();
     }
+
+    async notifyAboutTask(onGetTasks: (tasks: TaskDTO[]) => Promise<any>) {
+        const tasks = await this.taskRepository.inThisTime().actual().get();
+        const result = await onGetTasks(tasks);
+
+        if (result) {
+            tasks.forEach(async (task) => {
+                task.setDone();
+                await this.taskRepository.withId(task.id).save(task);
+            })
+        }
+    }
 }

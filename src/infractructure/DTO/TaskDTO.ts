@@ -8,6 +8,7 @@ import { DTO } from '../decorators/validators/DTO';
 import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
+import { DTO_ERROR } from 'Constants/errors';
 
 interface ITaskDTO {
     id?: string;
@@ -55,7 +56,7 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     @SkipNullableSetter
     setName(name?: string) {
         if (name.length > 1000) {
-            throw new DTOError('TOO_LONG_NAME')
+            throw new DTOError(DTO_ERROR.TOO_LONG_NAME)
         }
 
         this.name = name;
@@ -109,7 +110,7 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
 
     addNotification(notification: NotificationsDTO & IConsistent) {
         if (!notification.checkConsistence()) {
-            throw new DTOError('DATA_IS_NOT_CONSISTENCE')
+            throw new DTOError(DTO_ERROR.DATA_IS_NOT_CONSISTENCE)
         }
 
         notification.setTask(this);

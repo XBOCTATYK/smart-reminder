@@ -3,6 +3,7 @@ import { ICheckRequired } from 'Src/infractructure/interfaces/main';
 import { Required } from 'Src/infractructure/decorators/validators/Required';
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
+import { DTO_ERROR } from 'Constants/errors';
 
 interface IUserDTO {
     id: number;
@@ -34,7 +35,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         const isDate = time instanceof Date;
 
         if (!isDate || time.toString() === 'Invalid Date') {
-            throw new DTOError('START_TIME_WRONG_FORMAT')
+            throw new DTOError(DTO_ERROR.START_TIME_WRONG_FORMAT)
         }
 
         return time;
@@ -42,7 +43,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
 
     setId(id?: number) {
         if (!id) {
-            throw new DTOError('EMPTY_USER_ID');
+            throw new DTOError(DTO_ERROR.EMPTY_USER_ID);
         }
 
         this.id = id;
@@ -62,7 +63,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
         const validEndTime = this.isInvalidDate(time);
 
         if (validEndTime.getTime() < this.startTime.getTime()) {
-            throw new DTOError('END_TIME_LESS_THAN_START')
+            throw new DTOError(DTO_ERROR.END_TIME_LESS_THAN_START)
         }
 
         this.endTime = validEndTime;

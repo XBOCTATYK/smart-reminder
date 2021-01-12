@@ -1,10 +1,12 @@
+import { BUSINESS_ERROR } from 'Constants/errors';
+
 import { getNextNotifyTime } from '../../utils/calculateTime';
 import { User } from './User';
 import { Notification } from './Notification';
 import { BusinessError } from '../errors';
 
 export class Task {
-    user: User;
+    user?: User;
     date: Date;
     nextNotification: Notification;
     notificationsNeed: number;
@@ -13,11 +15,11 @@ export class Task {
 
     constructor(taskData) {
         if (taskData.priority <= 0) {
-            throw new BusinessError('ZERO_PRIORITY')
+            throw new BusinessError(BUSINESS_ERROR.ZERO_PRIORITY)
         }
 
         if (taskData.priority > 20) {
-            throw new BusinessError('TOO_HIGH_PRIORITY')
+            throw new BusinessError(BUSINESS_ERROR.TOO_HIGH_PRIORITY)
         }
 
         if (taskData.notificationsNeed <= taskData.notificationsDone) {
@@ -29,7 +31,7 @@ export class Task {
 
     private createNotification() {
         if (this.done) {
-            throw new BusinessError('CANNOT_CREATE_NOTIFICATION_TASK_IS_DONE')
+            throw new BusinessError(BUSINESS_ERROR.CANNOT_CREATE_NOTIFICATION_TASK_IS_DONE)
         }
 
         const nextNotifyDate = getNextNotifyTime(this.user, this)

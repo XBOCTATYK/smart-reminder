@@ -4,6 +4,7 @@ import { UserRepository } from '../../infractructure/repository/user.repository'
 import { UserStoryError } from '../../domain/errors';
 import { User } from '../../domain/entities/User';
 import { BanListInteractor } from '../ban-list/ban-list-interactor';
+import { USER_STORY_ERROR } from '../../constants/errors';
 
 export interface IUserCases extends IDataInteractor {
     userRepository: UserRepository;
@@ -31,7 +32,7 @@ export class UserCases implements IUserCases {
         banList.hasUserInList(userEntity);
 
         if (userEntity.isBanned) {
-            throw new UserStoryError('USER_BANNED')
+            throw new UserStoryError(USER_STORY_ERROR.USER_BANNED)
         }
 
         return userEntity;
@@ -41,7 +42,7 @@ export class UserCases implements IUserCases {
         const [user] = await this.userRepository.withId(userId).get();
 
         if (!user) {
-            throw new UserStoryError('USER_DOESNT_EXISTS');
+            throw new UserStoryError(USER_STORY_ERROR.USER_DOESNT_EXISTS);
         }
 
         const userEntity = this.getActiveUser(userId);
@@ -62,7 +63,7 @@ export class UserCases implements IUserCases {
                 return true;
             }
 
-            throw new UserStoryError('USER_ALREADY_EXISTS');
+            throw new UserStoryError(USER_STORY_ERROR.USER_ALREADY_EXISTS);
         } catch (e) {
             return false;
         }

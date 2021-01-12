@@ -2,6 +2,7 @@ import { Task } from './Task';
 import { Notification } from './Notification';
 import { BusinessError } from '../errors';
 import { ExtendedDate } from 'Utils/date-services/extended-date';
+import { BUSINESS_ERROR } from 'Constants/errors';
 
 export class User {
     id: number;
@@ -13,7 +14,7 @@ export class User {
         const { id, startTime, endTime } = userData;
 
         if (!id) {
-            throw new BusinessError('NO_USER_IDENTIFIER')
+            throw new BusinessError(BUSINESS_ERROR.NO_USER_IDENTIFIER)
         }
 
         this.startTime = startTime;

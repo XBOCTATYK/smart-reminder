@@ -9,12 +9,21 @@ export class User {
     tasks: Task[];
     startTime: Date;
     endTime: Date;
+    timezone: number;
 
     constructor(userData) {
-        const { id, startTime, endTime } = userData;
+        const { id, startTime, endTime, timezone } = userData;
 
         if (!id) {
-            throw new BusinessError(BUSINESS_ERROR.NO_USER_IDENTIFIER)
+            throw new BusinessError(BUSINESS_ERROR.NO_USER_IDENTIFIER);
+        }
+
+        if (timezone > 12 && timezone < -12) {
+            throw new BusinessError(BUSINESS_ERROR.INCORRECT_TIMEZONE);
+        }
+
+        if (this.startTime.getTime() > this.endTime.getTime()) {
+            throw new BusinessError(BUSINESS_ERROR.END_TIME_LESS_THAN_START);
         }
 
         this.startTime = startTime;

@@ -124,6 +124,10 @@ export class ExtendedDate implements IExtendedDate {
     valueOf() {
         return this.value.getTime();
     }
+
+    toString() {
+        return this.value.toString();
+    }
 }
 
 /**

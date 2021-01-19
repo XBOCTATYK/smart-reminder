@@ -1,11 +1,11 @@
-import { IRepository } from './repository.interface';
+import { INotificationsRepository, IRepository } from './repository.interface';
 import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { NotificationsDTO } from '../DTO/NotificationsDTO';
 import { RepositoryError } from '../../domain/errors';
 import { TASK_DISPERSION_TIME } from '../../constants/time';
 
-export class NotifyRepository implements IRepository<NotificationsDTO> {
+export class NotifyRepository implements INotificationsRepository {
     model: any;
     taskModel: any;
 
@@ -34,34 +34,39 @@ export class NotifyRepository implements IRepository<NotificationsDTO> {
         return data ? new TaskDTO(data) : null;
     }
 
-    forUser(userId: string) {
+    forUser(userId: string): INotificationsRepository {
         this.includedModels.push(this.taskModel);
         this.saveData['user_id'] = userId;
         return this;
     }
 
-    forTask(taskId: string) {
+    forTask(taskId: string): INotificationsRepository {
         this.modifiers['task_id'] = taskId;
         this.saveData['task_id'] = taskId;
         return this;
     }
 
-    actual() {
+    actual(): INotificationsRepository {
         this.modifiers.done = false;
         return this;
     }
 
-    done() {
+    notActual(): INotificationsRepository {
         this.modifiers.done = true;
         return this;
     }
 
-    withId(id: string) {
+    done(): INotificationsRepository {
+        this.modifiers.done = true;
+        return this;
+    }
+
+    withId(id: string): INotificationsRepository {
         this.modifiers.id = id;
         return this;
     }
 
-    inThisTime() {
+    inThisTime(): INotificationsRepository {
         this.modifiers.date = {
             [Op.between]: [new Date(Date.now() - TASK_DISPERSION_TIME), new Date()],
         }
@@ -69,7 +74,7 @@ export class NotifyRepository implements IRepository<NotificationsDTO> {
         return this;
     }
 
-    ratherThan(date: Date) {
+    ratherThan(date: Date): INotificationsRepository {
         this.modifiers.date = {
             [Op.lt]: [date],
         }
@@ -77,9 +82,19 @@ export class NotifyRepository implements IRepository<NotificationsDTO> {
         return this;
     }
 
-    futureThan(date: Date) {
+    futureThan(date: Date): INotificationsRepository {
         this.modifiers.date = {
             [Op.gt]: [date],
+        }
+
+        return this;
+    }
+
+    inTime(date: Date): INotificationsRepository {
+        const dateInMilliseconds = date.getTime();
+
+        this.modifiers.date = {
+            [Op.between]: [new Date(dateInMilliseconds - TASK_DISPERSION_TIME), date],
         }
 
         return this;

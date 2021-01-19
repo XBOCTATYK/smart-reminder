@@ -1,4 +1,4 @@
-import { ITaskRepository } from './repository.interface';
+import { INotificationsRepository, ITaskRepository } from './repository.interface';
 import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { RepositoryError } from '../../domain/errors';
@@ -27,28 +27,23 @@ export class TaskRepository implements ITaskRepository {
         return data ? new TaskDTO(data) : null;
     }
 
-    forUser(userId: number) {
+    forUser(userId: number): ITaskRepository {
         this.modifiers['user_id'] = userId;
         this.saveData['user_id'] = userId;
         return this;
     }
 
-    actual() {
-        this.modifiers.done = false;
-        return this;
-    }
-
-    done() {
+    done(): ITaskRepository {
         this.modifiers.done = true;
         return this;
     }
 
-    withId(id: string) {
+    withId(id: string): ITaskRepository {
         this.modifiers.id = id;
         return this;
     }
 
-    inThisTime() {
+    inThisTime(): ITaskRepository {
         this.modifiers.date = {
             [Op.between]: [new Date(Date.now() - TASK_DISPERSION_TIME), new Date()],
         }
@@ -56,7 +51,7 @@ export class TaskRepository implements ITaskRepository {
         return this;
     }
 
-    ratherThan(date: Date) {
+    ratherThan(date: Date): ITaskRepository {
         this.modifiers.date = {
             [Op.lt]: [date],
         }
@@ -64,9 +59,19 @@ export class TaskRepository implements ITaskRepository {
         return this;
     }
 
-    futureThan(date: Date) {
+    futureThan(date: Date): ITaskRepository {
         this.modifiers.date = {
             [Op.gt]: [date],
+        }
+
+        return this;
+    }
+
+    inTime(date: Date): ITaskRepository {
+        const dateInMilliseconds = date.getTime();
+
+        this.modifiers.date = {
+            [Op.between]: [new Date(dateInMilliseconds - TASK_DISPERSION_TIME), date],
         }
 
         return this;

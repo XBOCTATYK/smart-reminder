@@ -1,8 +1,8 @@
-import { IRepository } from './repository.interface';
+import { IRepository, IUserRepository } from './repository.interface';
 import { UserDTO } from '../DTO/UserDTO';
 import { RepositoryError } from '../../domain/errors';
 
-export class UserRepository implements IRepository<UserDTO> {
+export class UserRepository implements IUserRepository {
     model: any;
 
     protected modifiers = {

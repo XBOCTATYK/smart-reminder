@@ -3,6 +3,18 @@ import { TaskDTO } from '../DTO/TaskDTO';
 import { UserDTO } from '../DTO/UserDTO';
 import { NotificationsDTO } from '../DTO/NotificationsDTO';
 
+export interface ITimeCharacter<Repository> {
+    inThisTime(): Repository;
+    inTime(date: Date): Repository;
+    ratherThan(date: Date): Repository;
+    futureThan(date: Date): Repository;
+}
+
+export interface IActual<Repository> {
+    actual(): Repository
+    notActual(): Repository
+}
+
 export interface IRepository<T> {
     model: typeof Model;
 
@@ -12,23 +24,19 @@ export interface IRepository<T> {
     remove(): Promise<boolean>;
 }
 
-export interface ITaskRepository extends IRepository<TaskDTO> {
+export interface ITaskRepository extends IRepository<TaskDTO>, ITimeCharacter<ITaskRepository> {
     forUser(userId: number): ITaskRepository;
-    actual(): ITaskRepository;
     done(): ITaskRepository;
     withId(taskId: string): ITaskRepository;
-    inThisTime(): ITaskRepository;
-    ratherThan(date: Date): ITaskRepository;
-    futureThan(date: Date): ITaskRepository;
 }
 
 export interface IUserRepository extends IRepository<UserDTO> {
-    findOne(id: number): UserDTO
-    byTaskId(taskId: number): UserDTO
+    active(): IUserRepository
+    inactive(): IUserRepository
 }
 
-export interface INotificationsRepository extends IRepository<NotificationsDTO> {
-    findOne(id: string): NotificationsDTO
-    findByTask(taskId: string): NotificationsDTO
-    findByUser(userId: string): NotificationsDTO[]
+export interface INotificationsRepository extends IRepository<NotificationsDTO>, ITimeCharacter<INotificationsRepository>, IActual<INotificationsRepository> {
+    withId(notifyId: string): INotificationsRepository;
+    forTask(taskId: string): INotificationsRepository;
+    forUser(userId: string): INotificationsRepository;
 }

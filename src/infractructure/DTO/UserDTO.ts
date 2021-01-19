@@ -9,7 +9,7 @@ interface IUserDTO {
     id: number;
     startTime?: Date;
     endTime?: Date;
-    timezone?: string;
+    timezone?: number;
     dontDisturbTimes?: Array<{ from: Date, to: Date }>;
     active: boolean;
 }
@@ -18,7 +18,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
     @Required id: number;
     @Required @DateType startTime: Date;
     @Required @DateType endTime: Date;
-    timezone: string = '0';
+    timezone: number = 0;
     dontDisturbTimes?: Array<{ from: Date, to: Date }>
     @Required active: boolean;
 
@@ -72,7 +72,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
     }
 
     @SkipNullableSetter
-    setTimezone(timezone?: string) {
+    setTimezone(timezone?: number) {
         this.timezone = timezone;
 
         return this;

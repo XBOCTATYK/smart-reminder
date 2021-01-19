@@ -27,7 +27,7 @@ export class TaskCases implements ITaskCases {
     userCases: IUserCases;
 
     async createTask(userId: number, taskInfo: Task): Promise<TaskDTO> {
-        const taskDTO = new TaskDTO(taskInfo);
+        const taskDTO = new TaskDTO({ ...taskInfo, user: new UserDTO({ ...taskInfo.user }) });
 
         await this.taskRepository.forUser(userId).create(taskDTO);
         return taskDTO;
@@ -78,6 +78,8 @@ export class TaskCases implements ITaskCases {
                 task.setDone();
                 await this.taskRepository.withId(task.id).save(task);
             })
+
+            return true;
         }
     }
 }

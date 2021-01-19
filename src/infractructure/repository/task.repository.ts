@@ -38,6 +38,11 @@ export class TaskRepository implements ITaskRepository {
         return this;
     }
 
+    actual(): ITaskRepository {
+        this.modifiers.done = false;
+        return this;
+    }
+
     withId(id: string): ITaskRepository {
         this.modifiers.id = id;
         return this;

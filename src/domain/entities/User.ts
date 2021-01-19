@@ -10,6 +10,7 @@ export class User {
     startTime: Date;
     endTime: Date;
     timezone: number;
+    active: boolean;
 
     constructor(userData) {
         const { id, startTime, endTime, timezone } = userData;

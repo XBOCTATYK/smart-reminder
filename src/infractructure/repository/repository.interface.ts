@@ -25,6 +25,7 @@ export interface IRepository<T> {
 }
 
 export interface ITaskRepository extends IRepository<TaskDTO>, ITimeCharacter<ITaskRepository> {
+    actual(): ITaskRepository
     forUser(userId: number): ITaskRepository;
     done(): ITaskRepository;
     withId(taskId: string): ITaskRepository;

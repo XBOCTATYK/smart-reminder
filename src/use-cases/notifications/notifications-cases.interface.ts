@@ -33,15 +33,15 @@ export class NotificationsCases implements INotificationsCases {
         return notificationsDTOs;
     }
 
-    answer(notifyId: string, answer: Answer): Promise<boolean> {
+    async answer(notifyId: string, answer: Answer): Promise<boolean> {
         return Promise.resolve(false);
     }
 
-    doneNotification(notifyId: string): Promise<boolean> {
+    async doneNotification(notifyId: string): Promise<boolean> {
         return Promise.resolve(false);
     }
 
-    relocateNotification(notifyId: string, amount: string): Promise<boolean> {
+    async relocateNotification(notifyId: string, amount: string): Promise<boolean> {
         return Promise.resolve(false);
     }
 }

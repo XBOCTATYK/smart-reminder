@@ -4,6 +4,7 @@ import { Required } from 'Src/infractructure/decorators/validators/Required';
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
 import { DTO_ERROR } from 'Constants/errors';
+import { NumberType } from 'Src/infractructure/decorators/validators/NumberType';
 
 interface IUserDTO {
     id: number;
@@ -18,7 +19,7 @@ export class UserDTO implements IUserDTO, ICheckRequired {
     @Required id: number;
     @Required @DateType startTime: Date;
     @Required @DateType endTime: Date;
-    timezone: number = 0;
+    @NumberType timezone: number = 0;
     dontDisturbTimes?: Array<{ from: Date, to: Date }>
     @Required active: boolean;
 

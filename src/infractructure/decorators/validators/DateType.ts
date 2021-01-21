@@ -1,16 +1,5 @@
-import { SetterError } from 'Src/domain/errors';
+import { createValidatingDecorator } from 'Src/infractructure/decorators/validators/createValidatingDecorator';
+import { SETTER_ERRORS } from 'Constants/errors';
 
-export function DateType(target, propertyKey) {
-    Object.defineProperty(target, propertyKey, {
-        set(value: Date) {
-            if (!(value instanceof Date)) {
-                throw new SetterError(`${ propertyKey }=${ value } | TARGET_TYPE=date`)
-            }
+export const DateType = createValidatingDecorator<Date>((value) => !(value instanceof Date), `${SETTER_ERRORS.TARGET_TYPE}=DATE`)
 
-            this[`_${ propertyKey }`] = value;
-        },
-        get(): any {
-            return this[`_${ propertyKey }`];
-        }
-    });
-}

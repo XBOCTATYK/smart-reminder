@@ -1,14 +1,13 @@
+import { SETTER_ERRORS } from 'Constants/errors';
 import { SetterError } from '../../../domain/errors';
 
-const DEFAULT_MESSAGE = 'Value is not valid!'
+const DEFAULT_MESSAGE = SETTER_ERRORS.DATA_IS_NOT_VALID;
 
 type PredicateFunc<T> = (value: T) => boolean;
 
 export function createValidatingDecorator<T = string>(predicateFunc: PredicateFunc<T>, message = DEFAULT_MESSAGE) {
     return function (target, propertyKey) {
         const setter = Object.getOwnPropertyDescriptor(target, propertyKey)?.set;
-        console.log(propertyKey)
-        console.log(setter)
 
         Object.defineProperty(target, propertyKey, {
             configurable: true,
@@ -26,8 +25,6 @@ export function createValidatingDecorator<T = string>(predicateFunc: PredicateFu
                 } else {
                     target[`_${ propertyKey }`] = value;
                 }
-
-
             },
             get(): any {
                 return this[`_${ propertyKey }`];

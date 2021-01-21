@@ -8,6 +8,7 @@ import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 import { DTOError } from 'Src/domain/errors';
 import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
 import { DTO_ERROR } from 'Constants/errors';
+import { OneOf } from 'Src/infractructure/decorators/validators/OneOf';
 
 interface INotificationsDTO {
     id?: string;
@@ -17,11 +18,13 @@ interface INotificationsDTO {
     done?: boolean;
 }
 
+const ANSWERS_CASES = Object.keys(ANSWERS);
+
 @GeneratedId
 export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckRequired {
     @Required id: string;
     @Required @DateType date: Date;
-    @Required answer?: Answer;
+    @Required @OneOf(ANSWERS_CASES) answer?: Answer;
     @Required @DTO Task?: TaskDTO;
     @Required done: boolean;
 

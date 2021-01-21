@@ -13,7 +13,7 @@ export class Task {
     notificationsDone: number;
     done: boolean;
 
-    constructor(taskData) {
+    constructor(taskData: any) {
         if (taskData.priority <= 0) {
             throw new BusinessError(BUSINESS_ERROR.ZERO_PRIORITY)
         }
@@ -32,6 +32,10 @@ export class Task {
     private createNotification() {
         if (this.done) {
             throw new BusinessError(BUSINESS_ERROR.CANNOT_CREATE_NOTIFICATION_TASK_IS_DONE)
+        }
+
+        if (!this.user) {
+            throw new BusinessError(BUSINESS_ERROR.USER_IS_NOT_DEFINED)
         }
 
         const nextNotifyDate = getNextNotifyTime(this.user, this)

@@ -31,8 +31,10 @@ export class User {
         this.endTime = endTime;
     }
 
-    addTask(taskData: Task) {
-        taskData.setUser(this).planNextNotification();
+    addTask(task: Task) {
+        task.setUser(this).planNextNotification();
+        this.tasks.push(task);
+
         return this;
     }
 

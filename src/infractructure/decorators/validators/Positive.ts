@@ -1,6 +1,3 @@
 import { createValidatingDecorator } from 'Src/infractructure/decorators/validators/createValidatingDecorator';
 
-export const NumberType = createValidatingDecorator<number>((value) => isNaN(value), 'TARGET_TYPE=number')
-
-
-
+export const Positive = createValidatingDecorator<number>((value) => (value < 0), 'VALUE_MUST_BE_POSITIVE')

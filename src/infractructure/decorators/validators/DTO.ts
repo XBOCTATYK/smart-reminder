@@ -1,17 +1,4 @@
 import { ICheckRequired } from 'Src/infractructure/interfaces/main';
-import { SetterError } from 'Src/domain/errors';
+import { createValidatingDecorator } from 'Src/infractructure/decorators/validators/createValidatingDecorator';
 
-export function DTO(target, propertyKey) {
-    Object.defineProperty(target, propertyKey, {
-        set(value: ICheckRequired) {
-            if (value.checkRequires()) {
-                this[`_${ propertyKey }`] = value;
-            } else {
-                throw new SetterError(`${ propertyKey }=${ value } | TARGET_TYPE=DTO`)
-            }
-        },
-        get() {
-            return this[`_${ propertyKey }`];
-        }
-    });
-}
+export const DTO = createValidatingDecorator<ICheckRequired>((value) => !value.checkRequires(), 'TARGET_TYPE=DTO')

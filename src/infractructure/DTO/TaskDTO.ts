@@ -9,6 +9,7 @@ import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main'
 import { DateType } from 'Src/infractructure/decorators/validators/DateType';
 import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
 import { DTO_ERROR } from 'Constants/errors';
+import { Positive } from 'Src/infractructure/decorators/validators/Positive';
 
 interface ITaskDTO {
     id?: string;
@@ -29,10 +30,10 @@ export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     @Required id: string;
     @Required name: string;
     @Required @DateType date: Date;
-    @NumberType @Required notificationsNeed: number;
-    @NumberType @Required notificationsDone: number;
+    @NumberType @Positive @Required notificationsNeed: number;
+    @NumberType @Positive @Required notificationsDone: number;
     @NumberType @Required type?: number;
-    @NumberType @Required priority?: number;
+    @NumberType @Positive @Required priority?: number;
     @DateType startDate?: Date;
     @DTO user?: UserDTO;
     notifications?: NotificationsDTO[];

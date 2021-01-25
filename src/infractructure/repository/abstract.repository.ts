@@ -1,7 +1,6 @@
 import { RepositoryError } from '../../domain/errors';
 import { IConsistent } from '../interfaces/main';
 import { AbstractDTO } from '../DTO/AbstractDTO';
-import { NotificationsDTO } from '../DTO/NotificationsDTO';
 
 export class AbstractRepository<DTO extends IConsistent> {
     name = 'Abstract';
@@ -29,8 +28,19 @@ export class AbstractRepository<DTO extends IConsistent> {
         return itemList.map(task => this.ejectData(task));
     }
 
-    diff(thisDTOList: DTO[]) {
-        return {}
+    diffs(thisDTOList: DTO[]) {
+        const keys = Object.keys(thisDTOList[0]);
+
+        keys.reduce( (diff, key) => {
+            const obj = { [key]: undefined }
+
+            return thisDTOList.forEach(( DTOItem) => {
+                if (DTOItem[key] !== obj[key]) {
+                    diff.push(obj);
+                }
+            })
+        }, [])
+
     }
 
     protected mapDTO(thisDTO: DTO) {

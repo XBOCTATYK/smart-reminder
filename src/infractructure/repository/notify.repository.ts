@@ -117,18 +117,24 @@ export class NotifyRepository implements INotificationsRepository {
         }
     }
 
+    protected diff(notifications: NotificationsDTO[]) {
+        return {}
+    }
+
     async get() {
         const taskList = await this.model.findAll({ where: this.modifiers, include: this.includedModels });
         return taskList.map(task => this.ejectData(task));
     }
 
-    async save(notification: NotificationsDTO) {
-        this.checkDTO(notification);
-        await this.model.update({
-            ...this.mapDTO(notification)
-        }, {
-            where: this.modifiers
-        })
+    async save(notification: NotificationsDTO | NotificationsDTO[]) {
+
+        if (Array.isArray(notification)) {
+            const diffs = this.diff(notification);
+
+            await this.model.update(diffs, { where: this.modifiers })
+        } else {
+            await this.model.update(this.mapDTO(notification), { where: this.modifiers })
+        }
 
         return true;
     }

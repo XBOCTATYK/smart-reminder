@@ -70,9 +70,7 @@ export class UsualRepository implements IRepository<UsualDTO> {
     }
 
     async save(usual: UsualDTO) {
-        this.checkDTO(usual);
         await this.model.update({
-                id: usual.id,
                 ...this.mapDTO(usual)
             }, {
                 where: this.modifiers

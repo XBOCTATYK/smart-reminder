@@ -63,7 +63,6 @@ export class UserRepository implements IUserRepository {
     }
 
     async save(userDTO: UserDTO) {
-        this.checkDTO(userDTO)
         await this.model.update(
             this.mapDTO(userDTO), {
             where: this.modifiers

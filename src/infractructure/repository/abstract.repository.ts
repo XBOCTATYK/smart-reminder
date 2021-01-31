@@ -28,34 +28,12 @@ export class AbstractRepository<DTO extends IConsistent> {
         return itemList.map(task => this.ejectData(task));
     }
 
-    diffs(thisDTOList: DTO[]) {
-        const keys = Object.keys(thisDTOList[0]);
-
-        keys.reduce( (diff, key) => {
-            const obj = { [key]: undefined }
-
-            return thisDTOList.forEach(( DTOItem) => {
-                if (DTOItem[key] !== obj[key]) {
-                    diff.push(obj);
-                }
-            })
-        }, [])
-
-    }
-
     protected mapDTO(thisDTO: DTO) {
         return { ...thisDTO }
     }
 
-    async save(itemDTO: DTO | DTO[]) {
-
-        if (Array.isArray(itemDTO)) {
-            const diffs = this.diff(itemDTO);
-
-            await this.model.update(diffs, { where: this.modifiers })
-        } else {
-            await this.model.update(this.mapDTO(itemDTO), { where: this.modifiers })
-        }
+    async save(itemDTO: DTO) {
+        await this.model.update(this.mapDTO(itemDTO), { where: this.modifiers })
 
         return true;
     }

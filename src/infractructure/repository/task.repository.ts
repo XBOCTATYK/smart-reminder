@@ -108,19 +108,11 @@ export class TaskRepository implements ITaskRepository {
         }
     }
 
-    protected diff(tasks: TaskDTO[]) {
-        return {}
-    }
-
-    async save(task: TaskDTO | TaskDTO[]) {
-        //this.checkDTO(task);
-        if (Array.isArray(task)) {
-            const diffs = this.diff(task);
-
-            await this.model.update(diffs, { where: this.modifiers })
-        } else {
-            await this.model.update(this.mapDTO(task), { where: this.modifiers })
-        }
+    async save(task: TaskDTO) {
+        await this.model.update(
+            this.mapDTO(task),
+            { where: this.modifiers }
+            )
 
         return true;
     }

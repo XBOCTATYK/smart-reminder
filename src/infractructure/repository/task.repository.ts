@@ -1,4 +1,4 @@
-import { INotificationsRepository, ITaskRepository } from './repository.interface';
+import { ITaskRepository } from './repository.interface';
 import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { RepositoryError } from '../../domain/errors';

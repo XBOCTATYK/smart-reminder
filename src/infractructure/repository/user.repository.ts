@@ -1,4 +1,4 @@
-import { IRepository, IUserRepository } from './repository.interface';
+import { IUserRepository } from './repository.interface';
 import { UserDTO } from '../DTO/UserDTO';
 import { RepositoryError } from '../../domain/errors';
 

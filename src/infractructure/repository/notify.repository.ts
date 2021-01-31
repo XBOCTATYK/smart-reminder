@@ -1,4 +1,4 @@
-import { INotificationsRepository, IRepository } from './repository.interface';
+import { INotificationsRepository } from './repository.interface';
 import { Op } from 'sequelize';
 import { TaskDTO } from '../DTO/TaskDTO';
 import { NotificationsDTO } from '../DTO/NotificationsDTO';
@@ -115,10 +115,6 @@ export class NotifyRepository implements INotificationsRepository {
         if (!consistence) {
             throw new RepositoryError('Notifications Repository. NotificationsDTO is not consistent!');
         }
-    }
-
-    protected diff(notifications: NotificationsDTO[]) {
-        return {}
     }
 
     async get() {

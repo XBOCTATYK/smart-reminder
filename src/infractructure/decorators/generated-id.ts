@@ -1,6 +1,7 @@
 import { v1 } from 'uuid';
 
-export function GeneratedId<T extends { new (...args: any[]): {} }>(constructor: T) {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function GeneratedId<T extends { new (...args: any[]): { } }>(constructor: T) {
     return class extends constructor {
         id: string;
         setId() {

@@ -1,7 +1,7 @@
-import { IRepository } from './repository.interface';
-import { TaskDTO } from '../DTO/TaskDTO';
-import { UsualDTO } from '../DTO/UsualDTO';
-import { RepositoryError } from '../../domain/errors';
+import { IRepository } from 'Repository/repository.interface';
+import { TaskDTO } from 'DTO/TaskDTO';
+import { UsualDTO } from 'DTO/UsualDTO';
+import { RepositoryError } from 'Domain/errors';
 
 export class UsualRepository implements IRepository<UsualDTO> {
     model: any;

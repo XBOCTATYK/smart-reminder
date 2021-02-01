@@ -1,11 +1,12 @@
-import { GeneratedId } from '../decorators/generated-id';
-import { Required } from '../decorators/validators/Required';
-import { DateType } from '../decorators/validators/DateType';
-import { NumberType } from '../decorators/validators/NumberType';
-import { DTO } from '../decorators/validators/DTO';
-import { TaskDTO } from './TaskDTO';
-import { SkipNullableSetter } from '../decorators/methods/skipNullableSetter';
-import { ICheckRequired, IConsistent } from '../interfaces/main';
+import { GeneratedId } from 'Decorators/generated-id';
+import { Required } from 'Decorators/validators/Required';
+import { DateType } from 'Decorators/validators/DateType';
+import { NumberType } from 'Decorators/validators/NumberType';
+import { DTO } from 'Decorators/validators/DTO';
+import { SkipNullableSetter } from 'Decorators/methods/skipNullableSetter';
+import { TaskDTO } from 'DTO/TaskDTO';
+
+import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
 
 interface IUsualDTO {
     id?: string;

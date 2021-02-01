@@ -1,7 +1,7 @@
 import Model from 'sequelize';
-import { TaskDTO } from '../DTO/TaskDTO';
-import { UserDTO } from '../DTO/UserDTO';
-import { NotificationsDTO } from '../DTO/NotificationsDTO';
+import { TaskDTO } from 'DTO/TaskDTO';
+import { UserDTO } from 'DTO/UserDTO';
+import { NotificationsDTO } from 'DTO/NotificationsDTO';
 
 export interface ITimeCharacter<Repository> {
     inThisTime(): Repository;

@@ -1,6 +1,7 @@
-import { RepositoryError } from '../../domain/errors';
-import { IConsistent } from '../interfaces/main';
-import { AbstractDTO } from '../DTO/AbstractDTO';
+import { RepositoryError } from 'Domain/errors';
+import { IConsistent } from 'Src/infractructure/interfaces/main';
+import { AbstractDTO } from 'DTO/AbstractDTO';
+import { ModelResult } from 'Types/models';
 
 export class AbstractRepository<DTO extends IConsistent> {
     name = 'Abstract';
@@ -9,7 +10,7 @@ export class AbstractRepository<DTO extends IConsistent> {
     modifiers = {};
     includedModels: [];
 
-    protected checkDTO(thisDTO: DTO) {
+    protected checkDTO(thisDTO: DTO): void {
         const consistence = thisDTO.checkConsistence();
 
         if (!consistence) {
@@ -17,7 +18,7 @@ export class AbstractRepository<DTO extends IConsistent> {
         }
     }
 
-    protected ejectData(modelResult) {
+    protected ejectData(modelResult: ModelResult): AbstractDTO | null {
         const data = modelResult?.dataValues;
 
         return data ? new AbstractDTO(data) : null;
@@ -32,7 +33,7 @@ export class AbstractRepository<DTO extends IConsistent> {
         return { ...thisDTO }
     }
 
-    async save(itemDTO: DTO) {
+    async save(itemDTO: DTO): Promise<boolean> {
         await this.model.update(this.mapDTO(itemDTO), { where: this.modifiers })
 
         return true;

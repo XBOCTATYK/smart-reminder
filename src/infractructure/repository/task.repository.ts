@@ -1,8 +1,9 @@
-import { ITaskRepository } from './repository.interface';
 import { Op } from 'sequelize';
-import { TaskDTO } from '../DTO/TaskDTO';
-import { RepositoryError } from '../../domain/errors';
-import { TASK_DISPERSION_TIME } from '../../constants/time';
+
+import { ITaskRepository } from 'Repository/repository.interface';
+import { TaskDTO } from 'DTO/TaskDTO';
+import { RepositoryError } from 'Domain/errors';
+import { TASK_DISPERSION_TIME } from 'Constants/time';
 
 export class TaskRepository implements ITaskRepository {
     model: any; //typeof Model;

@@ -1,6 +1,6 @@
-import { IUserRepository } from './repository.interface';
-import { UserDTO } from '../DTO/UserDTO';
-import { RepositoryError } from '../../domain/errors';
+import { IUserRepository } from 'Repository/repository.interface';
+import { UserDTO } from 'DTO/UserDTO';
+import { RepositoryError } from 'Domain/errors';
 
 export class UserRepository implements IUserRepository {
     model: any;

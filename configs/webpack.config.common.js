@@ -13,6 +13,10 @@ module.exports = {
             Types: path.join(rootPath, './src/types'),
             Constants: path.join(rootPath, './src/constants'),
             Utils: path.join(rootPath, './src/utils'),
+            Repository: path.join(rootPath, './src/infractructure/repository'),
+            Domain: path.join(rootPath, './src/domain'),
+            DTO: path.join(rootPath, './src/infractructure/DTO'),
+            Decorators: path.join(rootPath, './src/infractructure/decorators'),
         }
     }
 };

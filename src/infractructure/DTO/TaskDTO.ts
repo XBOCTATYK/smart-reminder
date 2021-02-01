@@ -1,15 +1,16 @@
-import { GeneratedId } from '../decorators/generated-id';
-import { NumberType } from '../decorators/validators/NumberType';
-import { Required } from '../decorators/validators/Required';
-import { DTOError } from '../../domain/errors';
-import { UserDTO } from './UserDTO';
-import { NotificationsDTO } from './NotificationsDTO';
-import { DTO } from '../decorators/validators/DTO';
-import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
-import { DateType } from 'Src/infractructure/decorators/validators/DateType';
-import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
+import { GeneratedId } from 'Decorators/generated-id';
+import { NumberType } from 'Decorators/validators/NumberType';
+import { Required } from 'Decorators/validators/Required';
+import { DTOError } from 'Domain/errors';
+import { DTO } from 'Decorators/validators/DTO';
+import { Positive } from 'Decorators/validators/Positive';
+import { DateType } from 'Decorators/validators/DateType';
+import { SkipNullableSetter } from 'Decorators/methods/skipNullableSetter';
+import { UserDTO } from 'DTO/UserDTO';
+import { NotificationsDTO } from 'DTO/NotificationsDTO';
 import { DTO_ERROR } from 'Constants/errors';
-import { Positive } from 'Src/infractructure/decorators/validators/Positive';
+
+import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
 
 interface ITaskDTO {
     id?: string;

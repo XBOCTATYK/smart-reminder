@@ -1,14 +1,15 @@
 import { Answer, ANSWERS } from 'Constants/answers';
-import { GeneratedId } from '../decorators/generated-id';
-import { TaskDTO } from './TaskDTO';
-import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
-import { Required } from 'Src/infractructure/decorators/validators/Required';
-import { DTO } from 'Src/infractructure/decorators/validators/DTO';
-import { DateType } from 'Src/infractructure/decorators/validators/DateType';
-import { DTOError } from 'Src/domain/errors';
-import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
+import { GeneratedId } from 'Decorators/generated-id';
+import { OneOf } from 'Decorators/validators/OneOf';
+import { Required } from 'Decorators/validators/Required';
+import { DTO } from 'Decorators/validators/DTO';
+import { DateType } from 'Decorators/validators/DateType';
+import { SkipNullableSetter } from 'Decorators/methods/skipNullableSetter';
+import { TaskDTO } from 'DTO/TaskDTO';
 import { DTO_ERROR } from 'Constants/errors';
-import { OneOf } from 'Src/infractructure/decorators/validators/OneOf';
+import { DTOError } from 'Domain/errors';
+
+import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
 
 interface INotificationsDTO {
     id?: string;

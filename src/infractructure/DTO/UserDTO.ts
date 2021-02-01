@@ -1,10 +1,11 @@
-import { DTOError } from '../../domain/errors';
-import { ICheckRequired } from 'Src/infractructure/interfaces/main';
-import { Required } from 'Src/infractructure/decorators/validators/Required';
-import { DateType } from 'Src/infractructure/decorators/validators/DateType';
-import { SkipNullableSetter } from 'Src/infractructure/decorators/methods/skipNullableSetter';
+import { DTOError } from 'Domain/errors';
+import { Required } from 'Decorators/validators/Required';
+import { DateType } from 'Decorators/validators/DateType';
+import { SkipNullableSetter } from 'Decorators/methods/skipNullableSetter';
+import { NumberType } from 'Decorators/validators/NumberType';
 import { DTO_ERROR } from 'Constants/errors';
-import { NumberType } from 'Src/infractructure/decorators/validators/NumberType';
+
+import { ICheckRequired } from 'Src/infractructure/interfaces/main';
 
 interface IUserDTO {
     id: number;

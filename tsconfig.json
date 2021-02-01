@@ -26,6 +26,10 @@
         "paths": {
             "Src/*": ["src/*"],
             "Models/*": ["src/models/*"],
+            "Decorators/*": ["src/infractructure/decorators/*"],
+            "Domain/*": ["src/domain/*"],
+            "DTO/*": ["src/infractructure/DTO/*"],
+            "Repository/*": ["src/infractructure/repository/*"],
             "Services/*": ["src/services/*"],
             "Types/*": ["src/types/*"],
             "Constants/*": ["src/constants/*"],

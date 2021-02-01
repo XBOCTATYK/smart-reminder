@@ -4,7 +4,7 @@
  * @param propKey
  * @constructor
  */
-export function Required(target, propKey) {
+export function Required(target, propKey: string): void {
     const arrRequiredFields = target?.requires;
 
     if (!arrRequiredFields) {

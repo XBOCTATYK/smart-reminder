@@ -1,7 +1,7 @@
-import { Answer, ANSWERS } from '../../constants/answers';
-import { ExtendedDate } from '../../utils/date-services/extended-date';
-import { BusinessError } from '../errors';
+import { Answer, ANSWERS } from 'Constants/answers';
 import { BUSINESS_ERROR } from 'Constants/errors';
+import { BusinessError } from 'Domain/errors';
+import { ExtendedDate } from 'Utils/date-services/extended-date';
 
 export class Notification {
     time: ExtendedDate;

@@ -1,9 +1,8 @@
+import { User } from 'Domain/entities/User';
+import { Notification } from 'Domain/entities/Notification';
+import { BusinessError } from 'Domain/errors';
 import { BUSINESS_ERROR } from 'Constants/errors';
-
-import { getNextNotifyTime } from '../../utils/calculateTime';
-import { User } from './User';
-import { Notification } from './Notification';
-import { BusinessError } from '../errors';
+import { getNextNotifyTime } from 'Utils/calculateTime';
 
 export class Task {
     user?: User;

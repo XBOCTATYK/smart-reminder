@@ -1,4 +1,4 @@
-import { User } from './User';
+import { User } from 'Domain/entities/User';
 
 export class BanList {
     list: number[] = [];

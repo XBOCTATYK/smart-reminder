@@ -1,5 +1,7 @@
 import { Sequelize, Model } from 'sequelize';
+
 import { ModelKey } from 'Constants/enitityNames';
+
 import { Shape } from 'Types/shape';
 
 export type OrmModelCollection = {

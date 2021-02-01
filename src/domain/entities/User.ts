@@ -1,8 +1,9 @@
-import { Task } from './Task';
-import { Notification } from './Notification';
-import { BusinessError } from '../errors';
-import { ExtendedDate } from 'Utils/date-services/extended-date';
+import { Task } from 'Domain/entities/Task';
+import { Notification } from 'Domain/entities/Notification';
+import { BusinessError } from 'Domain/errors';
+
 import { BUSINESS_ERROR } from 'Constants/errors';
+import { ExtendedDate } from 'Utils/date-services/extended-date';
 
 export class User {
     id: number;

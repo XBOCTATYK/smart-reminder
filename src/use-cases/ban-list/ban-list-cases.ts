@@ -1,7 +1,7 @@
 import { User } from '../../domain/entities/User';
 import { BanList } from '../../domain/entities/BanList';
 
-export class BanListInteractor {
+export class BanListCases {
     async getBanList() {
         return new BanList([]);
     }

@@ -38,34 +38,9 @@ import { TASK_CREATION_ERROR_PHRASES } from 'Constants/phrases/taskCreationError
 import { TASK_TIME_PHRASES } from 'Constants/phrases/taskTime';
 import { ANSWERS } from 'Constants/answers';
 import { Time } from 'Utils/date-services/extended-date';
-import { TaskDTO } from 'Src/infractructure/DTO/TaskDTO';
-import { UserDTO } from 'Src/infractructure/DTO/UserDTO';
 import { User } from 'Domain/entities/User';
 
 const logger = pino();
-
-
-const expTask = new TaskDTO({
-    name: 'Vasil',
-    date: new Date(2021, 3, 22),
-})
-    .setPriority(3)
-    .setType()
-    .setNotificationsNeed(5)
-    .setNotificationsDone(3)
-    .setType(3)
-
-const user = new UserDTO({
-    id: 3432,
-    startTime: new Date(0),
-    endTime: new Date(100),
-    active: true
-})
-
-expTask.setUser(user)
-
-console.log(expTask)
-console.log(expTask.checkRequires())
 
 setTimeout( async () => {
     const DB = getModels();

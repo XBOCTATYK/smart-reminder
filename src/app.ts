@@ -40,6 +40,7 @@ import { ANSWERS } from 'Constants/answers';
 import { Time } from 'Utils/date-services/extended-date';
 import { TaskDTO } from 'Src/infractructure/DTO/TaskDTO';
 import { UserDTO } from 'Src/infractructure/DTO/UserDTO';
+import { User } from 'Domain/entities/User';
 
 const logger = pino();
 
@@ -65,6 +66,39 @@ expTask.setUser(user)
 
 console.log(expTask)
 console.log(expTask.checkRequires())
+
+setTimeout( async () => {
+    const DB = getModels();
+
+    logger.info('Getting config from base!');
+    const Params = await DB.model(USER_PARAMS_ENTITY_KEY).findAll();
+    const SETTINGS = {
+        TOKEN: ''
+    };
+    Params.forEach(item => {
+        const { key, value } = item;
+        SETTINGS[key] = value;
+    });
+
+    logger.info('Config accepted! %o', SETTINGS);
+
+    const bot = new Telegraf(SETTINGS.TOKEN);
+
+    bot.command('start', (ctx) => {
+        const userId = ctx.message.from.id;
+        const state = STATES.FROM_TIME;
+        const startTime = '09:00';
+        const endTime = '22:00';
+
+        ctx.reply('С какого времени вам нужно начинать напоминать?').then(() => {
+            const userEntity = new User({ id: userId, startTime, endTime, timezone: 0 });
+            UserStateService(userId, state, userEntity);
+        });
+    });
+
+    await bot.launch();
+
+}, 10)
 
 /*setTimeout(async () => {
     const DB = getModels();

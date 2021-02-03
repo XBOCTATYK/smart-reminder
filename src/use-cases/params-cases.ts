@@ -7,7 +7,9 @@ export class ParamsCases {
         this.paramsRepository = paramsRepository;
     }
 
-    getList() {
-        this.paramsRepository.get();
+    async getList() {
+        const result = await this.paramsRepository.get();
+
+        return [ ...result ];
     }
 }

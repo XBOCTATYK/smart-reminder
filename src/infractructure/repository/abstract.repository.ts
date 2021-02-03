@@ -10,6 +10,10 @@ export class AbstractRepository<DTO extends IConsistent> {
     modifiers = {};
     includedModels: [];
 
+    constructor(model: any) {
+        this.model = model;
+    }
+
     protected checkDTO(thisDTO: DTO): void {
         const consistence = thisDTO.checkConsistence();
 

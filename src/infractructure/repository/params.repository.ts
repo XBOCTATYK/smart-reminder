@@ -6,8 +6,12 @@ export interface IParamsRepository extends IRepository<ParamsDTO>{
     withKey(key: string): IParamsRepository;
 }
 
-export class ParamsRepository extends AbstractRepository<ParamsDTO> {
+export class ParamsRepository extends AbstractRepository<ParamsDTO> implements IParamsRepository {
     modifiers = {};
+
+    constructor(model: any) {
+        super(model);
+    }
 
     withKey(key: string) {
         this.modifiers[key] = key;

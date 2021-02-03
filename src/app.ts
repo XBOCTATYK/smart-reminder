@@ -39,6 +39,8 @@ import { TASK_TIME_PHRASES } from 'Constants/phrases/taskTime';
 import { ANSWERS } from 'Constants/answers';
 import { Time } from 'Utils/date-services/extended-date';
 import { User } from 'Domain/entities/User';
+import { ParamsCases } from 'Src/use-cases/params-cases';
+import { ParamsRepository } from 'Repository/params.repository';
 
 const logger = pino();
 
@@ -46,7 +48,9 @@ setTimeout( async () => {
     const DB = getModels();
 
     logger.info('Getting config from base!');
-    const Params = await DB.model(USER_PARAMS_ENTITY_KEY).findAll();
+    const paramsInteractor = new ParamsCases(new ParamsRepository(DB.model(USER_PARAMS_ENTITY_KEY)));
+    const Params = await paramsInteractor.getList();
+
     const SETTINGS = {
         TOKEN: ''
     };

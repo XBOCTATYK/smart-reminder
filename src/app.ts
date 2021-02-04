@@ -41,6 +41,12 @@ import { Time } from 'Utils/date-services/extended-date';
 import { User } from 'Domain/entities/User';
 import { ParamsCases } from 'Src/use-cases/params-cases';
 import { ParamsRepository } from 'Repository/params.repository';
+import { UserCases } from 'Src/use-cases/user/user-cases';
+import { BanListCases } from 'Src/use-cases/ban-list/ban-list-cases';
+import { UserRepository } from 'Repository/user.repository';
+import { TaskCases } from 'Src/use-cases/task/task-cases';
+import { NotifyRepository } from 'Repository/notify.repository';
+import { TaskRepository } from 'Repository/task.repository';
 
 const logger = pino();
 
@@ -61,6 +67,19 @@ setTimeout( async () => {
 
     logger.info('Config accepted! %o', SETTINGS);
 
+    const banListInteractor = new BanListCases();
+    const userRepository = new UserRepository(DB.model(USER_ENTITY_KEY));
+    const userIntersector = new UserCases(
+        userRepository,
+        banListInteractor,
+    );
+    const notificationRepository = new NotifyRepository(DB.model(NOTIFICATION_ENTITY_KEY), DB.model(TASK_ENTITY_KEY));
+    const taskRepository = new TaskRepository(TASK_ENTITY_KEY)
+    const taskIntersector = new TaskCases(
+        userRepository,
+
+    );
+
     const bot = new Telegraf(SETTINGS.TOKEN);
 
     bot.command('start', (ctx) => {
@@ -76,6 +95,29 @@ setTimeout( async () => {
     });
 
     await bot.launch();
+
+    bot.on('text', async (ctx) => {
+        const userId = ctx?.message?.from?.id;
+        const UserState = UserStateService(userId);
+        const currentState = UserState.state();
+
+
+    });
+
+    bot.command('list', async (ctx) => {
+        const userId = ctx?.message?.from?.id;
+
+        const listString = await showTaskList(userId, logger);
+        const [ message ] = listString;
+
+        if (message === '') {
+            await ctx.reply('У вас нет ни одной запланированной задачи.');
+            return;
+        }
+
+        await ctx.reply(...listString);
+
+    });
 
 }, 10)
 

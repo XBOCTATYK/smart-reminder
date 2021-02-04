@@ -1,4 +1,9 @@
-import { IRepository, ITaskRepository } from 'Repository/repository.interface';
+import {
+    INotificationsRepository,
+    IRepository,
+    ITaskRepository,
+    IUserRepository
+} from 'Repository/repository.interface';
 import { UserDTO } from 'DTO/UserDTO';
 import { NotificationsDTO } from 'DTO/NotificationsDTO';
 import { User } from 'Domain/entities/User';
@@ -9,10 +14,22 @@ import { IUserCases } from '../user/user-cases.interface';
 import { ITaskCases } from './task-cases.interface';
 
 export class TaskCases implements ITaskCases {
-    userRepository: IRepository<UserDTO>;
-    notificationRepository: IRepository<NotificationsDTO>;
+    userRepository: IUserRepository;
+    notificationRepository: INotificationsRepository;
     taskRepository: ITaskRepository;
     userCases: IUserCases;
+
+    constructor(
+        userRepository: IUserRepository,
+        notificationRepository: INotificationsRepository,
+        taskRepository: ITaskRepository,
+        userCases: IUserCases,
+    ) {
+        this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
+        this.taskRepository = taskRepository;
+        this.userCases = userCases;
+    }
 
     async storeTask(user: User): Promise<boolean> {
         const { tasks } = user;

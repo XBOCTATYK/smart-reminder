@@ -47,6 +47,7 @@ import { UserRepository } from 'Repository/user.repository';
 import { TaskCases } from 'Src/use-cases/task/task-cases';
 import { NotifyRepository } from 'Repository/notify.repository';
 import { TaskRepository } from 'Repository/task.repository';
+import { NotificationsCases } from 'Src/use-cases/notifications/notifications-cases';
 
 const logger = pino();
 
@@ -74,10 +75,17 @@ setTimeout( async () => {
         banListInteractor,
     );
     const notificationRepository = new NotifyRepository(DB.model(NOTIFICATION_ENTITY_KEY), DB.model(TASK_ENTITY_KEY));
-    const taskRepository = new TaskRepository(TASK_ENTITY_KEY)
+    const taskRepository = new TaskRepository(DB.model(TASK_ENTITY_KEY));
     const taskIntersector = new TaskCases(
         userRepository,
-
+        notificationRepository,
+        taskRepository,
+        userIntersector,
+    );
+    const notificationIntersector = new NotificationsCases(
+        userRepository,
+        taskRepository,
+        notificationRepository,
     );
 
     const bot = new Telegraf(SETTINGS.TOKEN);
@@ -94,7 +102,7 @@ setTimeout( async () => {
         });
     });
 
-    await bot.launch();
+
 
     bot.on('text', async (ctx) => {
         const userId = ctx?.message?.from?.id;
@@ -107,7 +115,8 @@ setTimeout( async () => {
     bot.command('list', async (ctx) => {
         const userId = ctx?.message?.from?.id;
 
-        const listString = await showTaskList(userId, logger);
+        const taskList = await taskIntersector.getTaskList(userId);
+        const listString = await showTaskList(taskList, logger);
         const [ message ] = listString;
 
         if (message === '') {
@@ -119,6 +128,8 @@ setTimeout( async () => {
 
     });
 
+
+    await bot.launch();
 }, 10)
 
 /*setTimeout(async () => {

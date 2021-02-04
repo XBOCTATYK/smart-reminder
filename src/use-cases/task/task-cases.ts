@@ -65,6 +65,7 @@ export class TaskCases implements ITaskCases {
 
     async getTaskList(userId: number): Promise<TaskDTO[]> {
         const user = this.userCases.checkUser(userId);
+        console.log('this')
         return this.taskRepository
             .forUser(userId)
             .actual()

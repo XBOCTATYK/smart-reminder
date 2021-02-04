@@ -6,10 +6,19 @@ import { UserDTO } from 'DTO/UserDTO';
 
 import { BanListCases } from '../ban-list/ban-list-cases';
 import { IUserCases } from './user-cases.interface';
+import { IUserRepository } from 'Repository/repository.interface';
 
 export class UserCases implements IUserCases {
-    userRepository: UserRepository;
+    userRepository: IUserRepository;
     banListInteractor: BanListCases;
+
+    constructor(
+        userRepository: IUserRepository,
+        banListInteractor: BanListCases,
+    ) {
+        this.userRepository = userRepository;
+        this.banListInteractor = banListInteractor;
+    }
 
     protected async getActiveUser(userId: number) {
         const userEntity = new User(userId);

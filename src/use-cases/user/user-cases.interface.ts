@@ -1,10 +1,10 @@
 import { UserDTO } from 'DTO/UserDTO';
-import { UserRepository } from 'Repository/user.repository';
 
 import { IDataInteractor } from '../data-interactor.interface';
+import { IUserRepository } from 'Repository/repository.interface';
 
 export interface IUserCases extends IDataInteractor {
-    userRepository: UserRepository;
+    userRepository: IUserRepository;
 
     addUser(userInfo: UserDTO): Promise<boolean>;
     stop(userId: number): Promise<boolean>;

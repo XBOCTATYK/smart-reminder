@@ -32,8 +32,9 @@ export interface ITaskRepository extends IRepository<TaskDTO>, ITimeCharacter<IT
 }
 
 export interface IUserRepository extends IRepository<UserDTO> {
-    active(): IUserRepository
-    inactive(): IUserRepository
+    active(): IUserRepository;
+    inactive(): IUserRepository;
+    withId(id: number): IUserRepository;
 }
 
 export interface INotificationsRepository extends IRepository<NotificationsDTO>, ITimeCharacter<INotificationsRepository>, IActual<INotificationsRepository> {

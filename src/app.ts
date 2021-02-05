@@ -116,7 +116,7 @@ setTimeout( async () => {
         const userId = ctx?.message?.from?.id;
 
         const taskList = await taskIntersector.getTaskList(userId);
-        const listString = await showTaskList(taskList, logger);
+        const listString = await showTaskList(taskList);
         const [ message ] = listString;
 
         if (message === '') {

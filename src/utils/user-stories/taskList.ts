@@ -1,4 +1,3 @@
-import { TaskListService } from '../../services/Task';
 import { taskListMenu } from 'Src/messages/taskListMenu';
 
 export async function showTaskList(taskList): Promise<[string, any]> {

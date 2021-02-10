@@ -61,13 +61,13 @@ export class Task {
         return this.done;
     }
 
-    increaseNotificationsCount() {
-        this.notificationsNeed += 1;
+    increaseNotificationsCount(amount = 1) {
+        this.notificationsNeed += amount;
         return this;
     }
 
-    decreaseNotificationCount() {
-        this.notificationsNeed -= 1;
+    decreaseNotificationCount(amount = 1) {
+        this.notificationsNeed -= amount;
         return this;
     }
 

@@ -5,6 +5,8 @@ import { TaskDTO } from 'DTO/TaskDTO';
 import { RepositoryError } from 'Domain/errors';
 import { TASK_DISPERSION_TIME } from 'Constants/time';
 
+import { ModelResult } from 'Types/models';
+
 export class TaskRepository implements ITaskRepository {
     model: any; //typeof Model;
 
@@ -22,7 +24,7 @@ export class TaskRepository implements ITaskRepository {
         this.model = db;
     }
 
-    protected ejectData(modelResult) {
+    protected ejectData(modelResult: ModelResult<TaskDTO>): TaskDTO | null {
         const data = modelResult?.dataValues;
 
         return data ? new TaskDTO(data) : null;
@@ -84,7 +86,7 @@ export class TaskRepository implements ITaskRepository {
     }
 
 
-    async get() {
+    async get(): Promise<TaskDTO[]> {
         const taskList = await this.model.findAll({ where: this.modifiers });
         return taskList.map(task => this.ejectData(task));
     }
@@ -101,7 +103,7 @@ export class TaskRepository implements ITaskRepository {
         }
     }
 
-    protected checkDTO(taskDTO: TaskDTO) {
+    protected checkDTO(taskDTO: TaskDTO): void {
         const consistence = taskDTO.checkConsistence();
 
         if (!consistence) {
@@ -109,7 +111,7 @@ export class TaskRepository implements ITaskRepository {
         }
     }
 
-    async save(task: TaskDTO) {
+    async save(task: TaskDTO): Promise<boolean> {
         await this.model.update(
             this.mapDTO(task),
             { where: this.modifiers }
@@ -118,7 +120,19 @@ export class TaskRepository implements ITaskRepository {
         return true;
     }
 
-    async create(task: TaskDTO) {
+    async create(task: TaskDTO | TaskDTO[]): Promise<boolean> {
+        if (Array.isArray(task)) {
+            const mappedEntities = task.map((task) => {
+                this.checkDTO(task);
+
+                return { id: task.id, ...this.mapDTO(task) }
+            })
+
+            await this.model.bulkCreate(mappedEntities);
+
+            return true;
+        }
+
         this.checkDTO(task);
         await this.model.create({
             id: task.id,
@@ -128,7 +142,7 @@ export class TaskRepository implements ITaskRepository {
         return true;
     }
 
-    async remove() {
+    async remove(): Promise<boolean> {
         this.model.destroy({ where: this.modifiers })
 
         return true;

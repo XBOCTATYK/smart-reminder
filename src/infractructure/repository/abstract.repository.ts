@@ -2,13 +2,15 @@ import { RepositoryError } from 'Domain/errors';
 import { IConsistent } from 'Src/infractructure/interfaces/main';
 import { AbstractDTO } from 'DTO/AbstractDTO';
 import { ModelResult } from 'Types/models';
+import { IRepository } from 'Repository/repository.interface';
+import { Shape } from 'Types/shape';
 
-export class AbstractRepository<DTO extends IConsistent> {
-    name = 'Abstract';
+export class AbstractRepository<DTO extends IConsistent> implements IRepository<DTO>{
+    private name = 'Abstract';
     model = undefined;
 
-    modifiers = {};
-    includedModels: [];
+    protected modifiers = {};
+    protected includedModels = [];
 
     constructor(model: any) {
         this.model = model;
@@ -28,12 +30,12 @@ export class AbstractRepository<DTO extends IConsistent> {
         return data ? new AbstractDTO(data) : null;
     }
 
-    async get() {
+    async get(): Promise<DTO[]> {
         const itemList = await this.model.findAll({ where: this.modifiers, include: this.includedModels });
         return itemList.map(task => this.ejectData(task));
     }
 
-    protected mapDTO(thisDTO: DTO) {
+    protected mapDTO(thisDTO: DTO): Shape<any> {
         return { ...thisDTO }
     }
 
@@ -43,7 +45,19 @@ export class AbstractRepository<DTO extends IConsistent> {
         return true;
     }
 
-    async create(thisDTO: DTO) {
+    async create(thisDTO: DTO): Promise<boolean> {
+        if (Array.isArray(thisDTO)) {
+            const mappedEntities = thisDTO.map((DTO) => {
+                this.checkDTO(DTO);
+
+                return { ...this.mapDTO(DTO) }
+            })
+
+            await this.model.bulkCreate(mappedEntities);
+
+            return true;
+        }
+
         this.checkDTO(thisDTO);
         await this.model.create({
             ...this.mapDTO(thisDTO)

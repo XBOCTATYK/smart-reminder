@@ -1,16 +1,20 @@
 import { Op } from 'sequelize';
 
 import { INotificationsRepository } from 'Repository/repository.interface';
-import { TaskDTO } from 'DTO/TaskDTO';
 import { NotificationsDTO } from 'DTO/NotificationsDTO';
 import { RepositoryError } from 'Domain/errors';
 import { TASK_DISPERSION_TIME } from 'Constants/time';
+import { AbstractRepository } from 'Repository/abstract.repository';
+import { ModelResult } from 'Types/models';
+import { Shape } from 'Types/shape';
 
-export class NotifyRepository implements INotificationsRepository {
+export class NotifyRepository extends AbstractRepository<NotificationsDTO> implements INotificationsRepository {
     model: any;
-    taskModel: any;
+    private taskModel: any;
 
     constructor(db, taskModel) {
+        super(db);
+
         this.model = db;
         this.taskModel = taskModel;
     }
@@ -23,16 +27,16 @@ export class NotifyRepository implements INotificationsRepository {
         answer: undefined
     };
 
-    protected includedModels = []
+    protected includedModels = [];
 
     protected saveData = {
         user_id: undefined
     }
 
-    protected ejectData(modelResult) {
+    protected ejectData(modelResult: ModelResult): NotificationsDTO {
         const data = modelResult?.dataValues;
 
-        return data ? new TaskDTO(data) : null;
+        return data ? new NotificationsDTO(data) : null;
     }
 
     forUser(userId: string): INotificationsRepository {
@@ -101,8 +105,9 @@ export class NotifyRepository implements INotificationsRepository {
         return this;
     }
 
-    private mapDTO(notificationsDTO: NotificationsDTO) {
+    protected mapDTO(notificationsDTO: NotificationsDTO): Shape<any> {
         return {
+            id: notificationsDTO.id,
             date: notificationsDTO.date,
             answer: notificationsDTO.answer,
             ['task_id']: notificationsDTO.Task.id,
@@ -110,7 +115,7 @@ export class NotifyRepository implements INotificationsRepository {
         }
     }
 
-    protected checkDTO(notificationsDTO: NotificationsDTO) {
+    protected checkDTO(notificationsDTO: NotificationsDTO): void {
         const consistence = notificationsDTO.checkConsistence();
 
         if (!consistence) {
@@ -118,28 +123,13 @@ export class NotifyRepository implements INotificationsRepository {
         }
     }
 
-    async get() {
-        const taskList = await this.model.findAll({ where: this.modifiers, include: this.includedModels });
-        return taskList.map(task => this.ejectData(task));
-    }
-
-    async save(notification: NotificationsDTO) {
+    async save(notification: NotificationsDTO): Promise<boolean> {
         await this.model.update(this.mapDTO(notification), { where: this.modifiers })
 
         return true;
     }
 
-    async create(notification: NotificationsDTO) {
-        this.checkDTO(notification);
-        await this.model.create({
-            id: notification.id,
-            ...this.mapDTO(notification)
-        })
-
-        return true;
-    }
-
-    async remove() {
+    async remove(): Promise<boolean> {
         this.model.destroy({ where: this.modifiers })
 
         return true;

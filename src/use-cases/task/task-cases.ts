@@ -1,6 +1,5 @@
 import {
     INotificationsRepository,
-    IRepository,
     ITaskRepository,
     IUserRepository
 } from 'Repository/repository.interface';
@@ -34,11 +33,22 @@ export class TaskCases implements ITaskCases {
     async storeTask(user: User): Promise<boolean> {
         const { tasks } = user;
 
-        const taskDTOs = tasks.map((task) => {
-            return new TaskDTO({ ...task, user: new UserDTO({ ...user }) });
+        const taskDataCollection = tasks.map((task) => {
+            const taskDTO = new TaskDTO({ ...task, user: new UserDTO({ ...user }) });
+            const notificationDTO = new NotificationsDTO({ ...task.nextNotification, Task: taskDTO })
+            return {
+                taskDTO,
+                notificationDTO
+            };
         })
 
-        await this.taskRepository.forUser(user.id).create(taskDTOs);
+        await this.taskRepository.forUser(user.id).create(taskDataCollection.map((data) => data.taskDTO));
+
+        await Promise.all(
+            taskDataCollection.map(({ notificationDTO, taskDTO }) => {
+                return this.notificationRepository.forTask(taskDTO.id).create(notificationDTO)
+            })
+        )
 
         return true;
     }

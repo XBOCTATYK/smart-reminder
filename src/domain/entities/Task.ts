@@ -62,20 +62,30 @@ export class Task {
     }
 
     increaseNotificationsCount(amount = 1) {
+        if (amount < 0) throw new BusinessError(BUSINESS_ERROR.INCREASE_NOTIFICATION_NOT_POSITIVE);
+
         this.notificationsNeed += amount;
         return this;
     }
 
     decreaseNotificationCount(amount = 1) {
+        if (amount < 0) throw new BusinessError(BUSINESS_ERROR.DECREASE_NOTIFICATION_NOT_POSITIVE);
+
         this.notificationsNeed -= amount;
+
+        if (this.notificationsNeed < 1) {
+            this.notificationsNeed = 1;
+        }
+
         return this;
     }
 
-    doneNotifications() {
-        this.notificationsDone += 1;
+    doneNotifications(amount = 1) {
+        this.notificationsDone += amount;
 
         if (this.notificationsDone >= this.notificationsNeed) {
             this.done = true;
+            this.notificationsDone = this.notificationsNeed;
         }
 
         return this;

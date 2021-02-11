@@ -26,6 +26,10 @@ export function getUserModel(sequelize: Sequelize, models?: OrmModelCollection, 
             type: DataTypes.INTEGER,
             defaultValue: 100,
         },
+        timezone: {
+            type: DataTypes.INTEGER,
+            defaultValue: 3
+        },
         active: {
             type: DataTypes.BOOLEAN,
             defaultValue: true

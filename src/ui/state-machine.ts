@@ -1,3 +1,5 @@
+import { IUIState } from 'Src/ui/ui-interfaces';
+
 export const STATES = {
     PENDING_TASK: 'PENDING_TASK', // state for bot waiting a new task
     START: 'START', // user is not subscribed
@@ -14,7 +16,7 @@ export const STATES = {
     UNSUBSCRIBED: 'UNSUBSCRIBED', // the user has disabled any notifications
 } as const;
 
-const TELEGRAM_UI_STATE_MACHINE = {
+export const TELEGRAM_UI_STATE_MACHINE = {
     [STATES.START]: {
         next: [
             STATES.FROM_TIME,
@@ -77,5 +79,22 @@ const TELEGRAM_UI_STATE_MACHINE = {
         actions: {
             [STATES.PENDING_TASK]: () => undefined,
         }
+    }
+}
+
+export class TelegramStateMachine {
+    stateMachine;
+    state;
+
+    constructor(stateMachine) {
+        this.stateMachine = stateMachine;
+    }
+
+    init(state: IUIState) {
+        this.state = state;
+    }
+
+    next(state: IUIState) {
+
     }
 }

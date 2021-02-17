@@ -85,6 +85,7 @@ export const TELEGRAM_UI_STATE_MACHINE = {
 export class TelegramStateMachine {
     stateMachine;
     state;
+    prevState;
 
     constructor(stateMachine) {
         this.stateMachine = stateMachine;

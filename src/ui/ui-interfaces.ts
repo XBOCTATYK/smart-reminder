@@ -2,6 +2,7 @@ import { Shape } from 'Types/shape';
 
 // raw case of interface
 export interface IUIState {
+    name: string;
     controls(): Shape<any>;
     onEnter(): string;
     onLeave(): string;

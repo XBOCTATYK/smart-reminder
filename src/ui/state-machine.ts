@@ -84,18 +84,55 @@ export const TELEGRAM_UI_STATE_MACHINE = {
 
 export class TelegramStateMachine {
     stateMachine;
+    defaultState;
     state;
     prevState;
 
-    constructor(stateMachine) {
+    constructor(stateMachine, defaultState: IUIState) {
         this.stateMachine = stateMachine;
+        this.defaultState = defaultState;
     }
 
     init(state: IUIState) {
         this.state = state;
+        this.state.onEnter();
+
+        return this;
     }
 
     next(state: IUIState) {
+        const hasNextState = this.stateMachine[this.state.name].next.includes(state.name);
 
+        if (hasNextState) {
+            this.state.onLeave();
+            this.state = state;
+            this.state.onEnter();
+        } else {
+            throw new Error('You attempt to enter to not allowed step')
+        }
+
+        return this;
+    }
+
+    prev() {
+        this.state.onLeave();
+        this.state = this.prevState;
+        this.state.onEnter();
+
+        return this;
+    }
+
+    default() {
+        this.state.onLeave();
+        this.state = this.defaultState;
+        this.state.onEnter();
+
+        return this;
+    }
+
+    interact(context) {
+        this.state.interact(context);
+
+        return this;
     }
 }

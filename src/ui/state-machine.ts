@@ -1,5 +1,6 @@
 import { IUIState } from 'Src/ui/ui-interfaces';
-import { IStateMachine } from 'Src/ui/state-machine.interface';
+import { IStateMachine, IStateMap } from 'Src/ui/state-machine.interface';
+import { PendingTaskState } from 'Src/ui/states/pending-task.state';
 
 export const STATES = {
     PENDING_TASK: 'PENDING_TASK', // state for bot waiting a new task
@@ -16,6 +17,8 @@ export const STATES = {
     DONE: 'DONE',
     UNSUBSCRIBED: 'UNSUBSCRIBED', // the user has disabled any notifications
 } as const;
+
+export type StateType = keyof typeof STATES;
 
 export const TELEGRAM_UI_STATE_MACHINE = {
     [STATES.START]: {
@@ -81,15 +84,16 @@ export const TELEGRAM_UI_STATE_MACHINE = {
             [STATES.PENDING_TASK]: () => undefined,
         }
     }
-}
+} as IStateMap;
 
 export class TelegramStateMachine implements IStateMachine {
     stateMachine;
     defaultState;
     state;
     prevState;
+    interactResult;
 
-    constructor(stateMachine, defaultState: IUIState) {
+    constructor(stateMachine: IStateMap, defaultState: IUIState) {
         this.stateMachine = stateMachine;
         this.defaultState = defaultState;
     }
@@ -105,6 +109,7 @@ export class TelegramStateMachine implements IStateMachine {
         const hasNextState = this.stateMachine[this.state.name].next.includes(state.name);
 
         if (hasNextState) {
+            this.prevState = this.state;
             this.state.onLeave();
             this.state = state;
             this.state.onEnter();
@@ -131,9 +136,54 @@ export class TelegramStateMachine implements IStateMachine {
         return this;
     }
 
-    interact(context) {
-        this.state.interact(context);
+    interact<RES = any, RET = any>(fn: (result: RES) => RET) {
+        this.interactResult = this.state.interact();
+        fn(this.interactResult);
 
         return this;
+    }
+}
+
+export class TelegramStateMachineStrings {
+    stateMachineClass;
+    state;
+    prevState;
+    defaultState;
+
+    private getStateByName(name: StateType) {
+        switch (name) {
+            case STATES.PENDING_TASK:
+                return new PendingTaskState(name)
+        }
+    }
+
+    constructor(stateMachine: IStateMap, defaultState: StateType) {
+        this.stateMachineClass = new TelegramStateMachine(stateMachine, this.getStateByName(defaultState));
+        this.defaultState = defaultState;
+    }
+
+    init(state: StateType) {
+        this.stateMachineClass.init(this.getStateByName(state))
+
+        return this;
+    }
+
+    next(state: StateType) {
+        this.stateMachineClass.next(this.getStateByName(state));
+        this.state = state;
+
+        return this;
+    }
+
+    prev() {
+        this.stateMachineClass.prev();
+        this.state = this.prevState;
+
+        return this;
+    }
+
+    default() {
+        this.stateMachineClass.default();
+        this.state = this.defaultState;
     }
 }

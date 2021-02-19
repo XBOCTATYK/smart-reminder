@@ -1,4 +1,5 @@
 import { IUIState } from 'Src/ui/ui-interfaces';
+import { IStateMachine } from 'Src/ui/state-machine.interface';
 
 export const STATES = {
     PENDING_TASK: 'PENDING_TASK', // state for bot waiting a new task
@@ -82,7 +83,7 @@ export const TELEGRAM_UI_STATE_MACHINE = {
     }
 }
 
-export class TelegramStateMachine {
+export class TelegramStateMachine implements IStateMachine {
     stateMachine;
     defaultState;
     state;

@@ -6,9 +6,9 @@ export interface IStateMachine {
     state: IUIState;
     prevState: IUIState;
 
-    init(state: IUIState): IUIState;
-    next(state: IUIState): IUIState;
-    prev(): IUIState;
-    default(): IUIState;
-    interact(): IUIState;
+    init(state: IUIState): IStateMachine;
+    next(state: IUIState): IStateMachine;
+    prev(): IStateMachine;
+    default(): IStateMachine;
+    interact(context): IStateMachine;
 }

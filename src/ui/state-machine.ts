@@ -136,11 +136,8 @@ export class TelegramStateMachine implements IStateMachine {
         return this;
     }
 
-    interact<RES = any, RET = any>(fn: (result: RES) => RET) {
-        this.interactResult = this.state.interact();
-        fn(this.interactResult);
-
-        return this;
+    interact<CTX = any>(ctx: CTX) {
+        return this.interactResult = this.state.interact(ctx);
     }
 }
 

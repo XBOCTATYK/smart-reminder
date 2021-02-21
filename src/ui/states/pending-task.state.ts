@@ -2,12 +2,11 @@ import { IUIState } from '../ui-interfaces';
 
 import { Shape } from 'Types/shape';
 
-export class PendingTaskState<CTX = any> implements IUIState {
+export class PendingTaskState<CTX> implements IUIState {
     name;
     context;
 
-    constructor(name: string, context?: CTX) {
-        this.name = name;
+    constructor(context?: CTX) {
         this.context = context;
     }
     controls(): Shape<any> {
@@ -19,6 +18,7 @@ export class PendingTaskState<CTX = any> implements IUIState {
     }
 
     onEnter(): string {
+        this.context.reply('Воспользуйтесь панелью управления, чтобы добавить задачу')
         return '';
     }
 

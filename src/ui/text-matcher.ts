@@ -17,6 +17,7 @@ const DEFAULT_MATCHERS = {
 interface IMatchedData<DATA> {
     matchers: Shape<MatcherItem[]>;
     convertedData: DATA;
+    matched: boolean;
 
     data(): DATA;
     toString(): string;
@@ -26,18 +27,26 @@ export function MatcherFactory(matchers: Shape<MatcherItem[]>) {
     return class MatchedDataFromText<DATA = unknown> implements IMatchedData<DATA> {
         matchers: Shape<MatcherItem[]>;
         convertedData: DATA;
+        matched: boolean;
         constructor(uiState: IUIState, text: string) {
             this.matchers = matchers;
 
-            const matchersListForUIState = this.matchers[uiState.name];
+            const matchersListForUIState = this.matchers[uiState.name] || [];
             const matcherForUIState = matchersListForUIState.find( matcher => matcher.match(text))
 
             if (matcherForUIState) {
-                this.convertedData = matcherForUIState.convert<DATA>(text)
+                this.matched = true;
+                this.convertedData = matcherForUIState.convert<DATA>(text);
+            } else {
+                this.matched = false;
             }
         }
 
         data() {
+            if (!this.matched) {
+                return undefined;
+            }
+
             return this.convertedData;
         }
 

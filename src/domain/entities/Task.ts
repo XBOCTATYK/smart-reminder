@@ -7,6 +7,7 @@ import { getNextNotifyTime } from 'Utils/calculateTime';
 export class Task {
     user?: User;
     date: Date;
+    name: string;
     nextNotification: Notification;
     notificationsNeed: number;
     notificationsDone: number;
@@ -26,6 +27,7 @@ export class Task {
         }
 
         this.date = taskData.date;
+        this.name = taskData.name;
     }
 
     private createNotification() {
@@ -89,6 +91,16 @@ export class Task {
         }
 
         return this;
+    }
+
+    toSerializable() {
+        return {
+            data: this.date.toString(),
+            name: this.name,
+            nextNotification: this.nextNotification.toSerializable(),
+            notificationsNeed: this.notificationsNeed,
+            notificationsDone: this.notificationsDone,
+        }
     }
 }
 

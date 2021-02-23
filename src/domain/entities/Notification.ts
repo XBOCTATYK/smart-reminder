@@ -33,4 +33,12 @@ export class Notification {
         this.answer = answer;
         this.setDone();
     }
+
+    toSerializable() {
+        return {
+            time: this.time.format('HH:mm'),
+            done: this.done,
+            answer: this.answer,
+        }
+    }
 }

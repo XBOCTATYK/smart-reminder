@@ -44,4 +44,15 @@ export class User {
     }
 
     isBanned: boolean;
+
+    toSerializable() {
+        return {
+            id: this.id,
+            tasks: this.tasks.map(task => task.toSerializable()),
+            startTime: this.startTime.toString(),
+            endTime: this.endTime.toString(),
+            timezone: this.timezone,
+            active: this.active,
+        }
+    }
 }

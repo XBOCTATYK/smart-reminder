@@ -15,8 +15,8 @@ export interface IActual<Repository> {
     notActual(): Repository
 }
 
-export interface IRepository<T> {
-    model: typeof Model;
+export interface IRepository<T, REPO> {
+    model: REPO;
 
     get(): Promise<T[]>;
     save(T): Promise<boolean>;
@@ -24,20 +24,20 @@ export interface IRepository<T> {
     remove(): Promise<boolean>;
 }
 
-export interface ITaskRepository extends IRepository<TaskDTO>, ITimeCharacter<ITaskRepository> {
+export interface ITaskRepository extends IRepository<TaskDTO, typeof Model>, ITimeCharacter<ITaskRepository> {
     actual(): ITaskRepository
     forUser(userId: number): ITaskRepository;
     done(): ITaskRepository;
     withId(taskId: string): ITaskRepository;
 }
 
-export interface IUserRepository extends IRepository<UserDTO> {
+export interface IUserRepository extends IRepository<UserDTO, typeof Model> {
     active(): IUserRepository;
     inactive(): IUserRepository;
     withId(id: number): IUserRepository;
 }
 
-export interface INotificationsRepository extends IRepository<NotificationsDTO>, ITimeCharacter<INotificationsRepository>, IActual<INotificationsRepository> {
+export interface INotificationsRepository extends IRepository<NotificationsDTO, typeof Model>, ITimeCharacter<INotificationsRepository>, IActual<INotificationsRepository> {
     withId(notifyId: string): INotificationsRepository;
     forTask(taskId: string): INotificationsRepository;
     forUser(userId: string): INotificationsRepository;

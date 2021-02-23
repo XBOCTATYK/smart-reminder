@@ -183,4 +183,8 @@ export class TelegramStateMachineStrings {
         this.stateMachineClass.default();
         this.state = this.defaultState;
     }
+
+    interact<CTX = any>(ctx: CTX) {
+        this.stateMachineClass.interact(ctx);
+    }
 }

@@ -49,6 +49,7 @@ import { NotifyRepository } from 'Repository/notify.repository';
 import { TaskRepository } from 'Repository/task.repository';
 import { NotificationsCases } from 'Src/use-cases/notifications/notifications-cases';
 import { TELEGRAM_UI_STATE_MACHINE, TelegramStateMachine } from 'Src/ui/state-machine';
+import { PendingTaskState } from 'Src/ui/states/pending-task.state';
 
 const logger = pino();
 
@@ -89,7 +90,7 @@ setTimeout( async () => {
         notificationRepository,
     );
 
-    const StateMachine = new TelegramStateMachine(TELEGRAM_UI_STATE_MACHINE);
+    const StateMachine = new TelegramStateMachine(TELEGRAM_UI_STATE_MACHINE, new PendingTaskState());
 
     const bot = new Telegraf(SETTINGS.TOKEN);
 

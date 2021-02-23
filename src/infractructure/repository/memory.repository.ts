@@ -18,6 +18,8 @@ export class MemoryRepository<T extends { id: string }> implements IRepository<T
 
     withId(id: string | string[]) {
         this.modifiers.id = id;
+
+        return this;
     }
 
     get(): Promise<T[]> {

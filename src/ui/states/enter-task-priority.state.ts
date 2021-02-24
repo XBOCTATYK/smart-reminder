@@ -14,6 +14,7 @@ export class EnterTaskPriorityState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('Какой приоритет у задачи?');
         return '';
     }
 

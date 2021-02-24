@@ -14,6 +14,7 @@ export class EnterTaskDateState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('Введите дату задачи');
         return '';
     }
 

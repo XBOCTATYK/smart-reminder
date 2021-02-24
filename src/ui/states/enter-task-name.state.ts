@@ -14,6 +14,7 @@ export class EnterTaskNameState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('Что нужно сделать?');
         return '';
     }
 

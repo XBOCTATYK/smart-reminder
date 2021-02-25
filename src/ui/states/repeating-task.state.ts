@@ -14,6 +14,7 @@ export class RepeatingTaskState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('Повторы задачи.');
         return '';
     }
 

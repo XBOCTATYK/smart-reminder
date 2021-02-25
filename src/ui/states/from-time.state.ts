@@ -14,6 +14,7 @@ export class FromTimeState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('В какое время начинать делать напоминания?');
         return '';
     }
 

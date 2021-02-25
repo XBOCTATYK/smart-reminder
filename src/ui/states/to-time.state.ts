@@ -14,6 +14,7 @@ export class ToTimeState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('В какое время прекращать давать напоминания?');
         return '';
     }
 

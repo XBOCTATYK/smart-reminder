@@ -14,6 +14,7 @@ export class PostponeTaskState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('Задача успешно создана!');
         return '';
     }
 

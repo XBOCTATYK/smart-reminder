@@ -14,6 +14,7 @@ export class UnsubscribedState implements IUIState {
     }
 
     onEnter(): string {
+        this.context.telegram.sendMessage('Вы больше не получаете напоминания! Их можно включить кнопкой "Включить напоминания"')
         return '';
     }
 

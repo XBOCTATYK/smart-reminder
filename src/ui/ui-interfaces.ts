@@ -4,10 +4,11 @@ import { Shape } from 'Types/shape';
 export interface IUIState<CTX = any> {
     name: string;
     context: CTX;
-    controls(): Shape<any>;
     onEnter(): string;
     onLeave(): string;
     interact(): string;
+    onError(err: Error): any;
+    onCallback(): any;
 }
 
 // action sends to state

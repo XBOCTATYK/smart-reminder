@@ -1,5 +1,0 @@
-class TaskLogic {
-    command(userId) {
-        
-    }
-}

@@ -78,13 +78,13 @@ setTimeout( async () => {
     );
     const notificationRepository = new NotifyRepository(DB.model(NOTIFICATION_ENTITY_KEY), DB.model(TASK_ENTITY_KEY));
     const taskRepository = new TaskRepository(DB.model(TASK_ENTITY_KEY));
-    const taskIntersector = new TaskCases(
+    const taskInteractor = new TaskCases(
         userRepository,
         notificationRepository,
         taskRepository,
         userIntersector,
     );
-    const notificationIntersector = new NotificationsCases(
+    const notificationInteractor = new NotificationsCases(
         userRepository,
         taskRepository,
         notificationRepository,
@@ -119,7 +119,7 @@ setTimeout( async () => {
     bot.command('list', async (ctx) => {
         const userId = ctx?.message?.from?.id;
 
-        const taskList = await taskIntersector.getTaskList(userId);
+        const taskList = await taskInteractor.getTaskList(userId);
         const listString = await showTaskList(taskList);
         const [ message ] = listString;
 

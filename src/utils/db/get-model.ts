@@ -14,7 +14,7 @@ import {
     USUAL_EVENTS_ENTITY_KEY
 } from 'Constants/enitityNames';
 
-export function getModels() {
+export function getModel() {
     return new ORMConnection(process.env.DATABASE_URL, [
         { init: getUserModel, key: USER_ENTITY_KEY },
         { init: getTasksModel, key: TASK_ENTITY_KEY },

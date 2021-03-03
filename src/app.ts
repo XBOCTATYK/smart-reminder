@@ -1,43 +1,17 @@
 import { Telegraf } from 'telegraf';
-import format from 'date-fns/format';
-import { addDays, addHours, addMinutes } from 'date-fns';
 import pino from 'pino';
 
 import { STATES } from 'Constants/states';
-import { remindControls } from 'Src/messages/remind';
-import { createNewTask } from 'Utils/createNewTask';
-import { DATE_FNS_OPTIONS, DATE_FORMAT, TIME_FORMAT } from 'Constants/formats';
-import { dateControls, priorityControls } from 'Src/messages/taskCreating';
 
 import { UserStateService } from 'Services/User';
-import { notificationCallback } from 'Src/callbacks/notificationCallback';
-import { creatingTaskCallback } from 'Src/callbacks/creatingTaskCallback';
-import { getDateNow } from 'Utils/dates';
-import { getModels } from 'Utils/db/getModels';
-import { NextNotification } from 'Services/Notification';
+import { getModel } from 'Utils/db/get-model';
 import {
     NOTIFICATION_ENTITY_KEY,
     TASK_ENTITY_KEY,
     USER_ENTITY_KEY,
     USER_PARAMS_ENTITY_KEY,
-    USUAL_EVENTS_ENTITY_KEY
 } from 'Constants/enitityNames';
-import { relocateDoneTasks } from 'Utils/relocateDoneTasks';
-import { updateNotifies } from 'Utils/updateNotifies';
-import { MainMenu } from 'Src/messages/MainMenu';
 import { showTaskList } from 'Utils/user-stories/taskList';
-import { taskSelectCallback } from 'Src/callbacks/taskSelectCallback';
-import { taskUnderAction } from 'Src/callbacks/taskUnderActionCallback';
-import { postponeTaskCallback } from 'Src/callbacks/postponeTaskCallback';
-import { postponeControls } from 'Src/messages/postponeControls';
-import { TEXT_COMMANDS } from 'Constants/textCommands';
-import { randomElement } from 'Utils/randomElement';
-import { NOTIFY_PHRASES } from 'Constants/phrases/notification';
-import { CREATION_TASK_PHRASES } from 'Constants/phrases/creationTask';
-import { TASK_CREATION_ERROR_PHRASES } from 'Constants/phrases/taskCreationError';
-import { TASK_TIME_PHRASES } from 'Constants/phrases/taskTime';
-import { ANSWERS } from 'Constants/answers';
-import { Time } from 'Utils/date-services/extended-date';
 import { User } from 'Domain/entities/User';
 import { ParamsCases } from 'Src/use-cases/params-cases';
 import { ParamsRepository } from 'Repository/params.repository';
@@ -54,7 +28,7 @@ import { PendingTaskState } from 'Src/ui/states/pending-task.state';
 const logger = pino();
 
 setTimeout( async () => {
-    const DB = getModels();
+    const DB = getModel();
 
     logger.info('Getting config from base!');
     const paramsInteractor = new ParamsCases(new ParamsRepository(DB.model(USER_PARAMS_ENTITY_KEY)));
@@ -90,7 +64,7 @@ setTimeout( async () => {
         notificationRepository,
     );
 
-    const StateMachine = new TelegramStateMachine(TELEGRAM_UI_STATE_MACHINE, new PendingTaskState());
+    const StateMachine = new TelegramStateMachine(TELEGRAM_UI_STATE_MACHINE, new PendingTaskState<any>());
 
     const bot = new Telegraf(SETTINGS.TOKEN);
 

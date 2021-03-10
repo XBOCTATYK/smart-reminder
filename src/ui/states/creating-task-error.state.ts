@@ -9,8 +9,8 @@ export class CreatingTaskErrorState implements IUIState {
         return undefined;
     }
 
-    interact(): string {
-        return '';
+    interact(): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
     onEnter(): string {
@@ -19,6 +19,12 @@ export class CreatingTaskErrorState implements IUIState {
 
     onLeave(): string {
         return '';
+    }
+
+    onCallback(): any {
+    }
+
+    onError(err: Error): any {
     }
 
 }

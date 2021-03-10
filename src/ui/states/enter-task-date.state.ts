@@ -9,8 +9,8 @@ export class EnterTaskDateState implements IUIState {
         return undefined;
     }
 
-    interact(): string {
-        return '';
+    interact(): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
     onEnter(): string {
@@ -20,6 +20,12 @@ export class EnterTaskDateState implements IUIState {
 
     onLeave(): string {
         return '';
+    }
+
+    onCallback(): any {
+    }
+
+    onError(err: Error): any {
     }
 
 }

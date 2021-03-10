@@ -6,7 +6,7 @@ export interface IUIState<CTX = any> {
     context: CTX;
     onEnter(): string;
     onLeave(): string;
-    interact(): string;
+    interact(input: string): Promise<boolean>;
     onError(err: Error): any;
     onCallback(): any;
 }

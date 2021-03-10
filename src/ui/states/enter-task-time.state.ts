@@ -15,8 +15,8 @@ export class EnterTaskTimeState implements IUIState {
         return undefined;
     }
 
-    interact(): string {
-        return '';
+    interact(input: string): Promise<boolean> {
+        return this.context.saveTaskTime(input);
     }
 
     onEnter(): string {

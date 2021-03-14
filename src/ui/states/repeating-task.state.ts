@@ -22,7 +22,7 @@ export class RepeatingTaskState implements IUIState {
     }
 
     onEnter(): string {
-        this.context.telegram.sendMessage('Повторы задачи.');
+        this.context.telegram.sendMessage('Запланируйте повторы задач.');
         return '';
     }
 

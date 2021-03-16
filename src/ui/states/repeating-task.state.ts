@@ -6,6 +6,7 @@ import { TASK_CREATING_ACTION } from '../../constants/callback-actions';
 const templateMessage = `${TASK_CREATING_ACTION}`;
 
 export class RepeatingTaskState implements IUIState {
+    id: number;
     context: any;
     name: string;
 
@@ -22,7 +23,7 @@ export class RepeatingTaskState implements IUIState {
     }
 
     onEnter(): string {
-        this.context.telegram.sendMessage('Запланируйте повторы задач.');
+        this.context.telegram.sendMessage(this.id,'Запланируйте повторы задач.', this.controls());
         return '';
     }
 

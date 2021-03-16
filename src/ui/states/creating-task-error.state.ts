@@ -21,9 +21,6 @@ export class CreatingTaskErrorState implements IUIState {
         return '';
     }
 
-    onCallback(): any {
-    }
-
     onError(err: Error): any {
     }
 

@@ -8,7 +8,6 @@ export interface IUIState<CTX = any> {
     onLeave(): string;
     interact(input: string): Promise<boolean>;
     onError(err: Error): any;
-    onCallback(): any;
 }
 
 // action sends to state

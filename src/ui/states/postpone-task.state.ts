@@ -36,9 +36,4 @@ export class PostponeTaskState implements IUIState {
     onError(err: Error): any {
 
     }
-
-    onCallback(): any {
-
-    }
-
 }

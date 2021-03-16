@@ -31,10 +31,6 @@ export class RepeatingTaskState implements IUIState {
         return '';
     }
 
-    onCallback(): any {
-    }
-
     onError(err: Error): any {
     }
-
 }

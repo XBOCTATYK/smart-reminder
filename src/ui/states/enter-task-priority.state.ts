@@ -38,8 +38,4 @@ export class EnterTaskPriorityState implements IUIState {
 
     }
 
-    onCallback(): any {
-
-    }
-
 }

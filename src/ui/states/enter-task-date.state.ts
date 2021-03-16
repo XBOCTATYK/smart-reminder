@@ -31,9 +31,6 @@ export class EnterTaskDateState implements IUIState {
         return '';
     }
 
-    onCallback(): any {
-    }
-
     onError(err: Error): any {
     }
 

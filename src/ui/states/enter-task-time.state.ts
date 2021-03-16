@@ -32,9 +32,4 @@ export class EnterTaskTimeState implements IUIState {
         const errorHandler = (ERRORS[err.message] || emptyFunc);
         errorHandler(this.context);
     }
-
-    onCallback(): void {
-        return undefined;
-    }
-
 }

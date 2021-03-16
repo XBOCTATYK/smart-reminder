@@ -12,8 +12,8 @@ export class PendingTaskState<CTX> implements IUIState {
         return undefined;
     }
 
-    interact(): string {
-        return '';
+    interact(): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
     onEnter(): string {
@@ -26,10 +26,6 @@ export class PendingTaskState<CTX> implements IUIState {
     }
 
     onError(err: Error): any {
-        return undefined;
-    }
-
-    onCallback(): any {
         return undefined;
     }
 

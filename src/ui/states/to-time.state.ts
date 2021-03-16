@@ -22,10 +22,6 @@ export class ToTimeState implements IUIState {
         return '';
     }
 
-    onCallback(): any {
-    }
-
     onError(err: Error): any {
     }
-
 }

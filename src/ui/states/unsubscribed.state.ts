@@ -22,10 +22,6 @@ export class UnsubscribedState implements IUIState {
         return '';
     }
 
-    onCallback(): any {
-    }
-
     onError(err: Error): any {
     }
-
 }

@@ -22,9 +22,6 @@ export class EnterTaskNameState implements IUIState {
         return '';
     }
 
-    onCallback(): any {
-    }
-
     onError(err: Error): any {
     }
 

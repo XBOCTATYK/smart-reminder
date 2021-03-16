@@ -21,10 +21,6 @@ export class StartState implements IUIState{
         return '';
     }
 
-    onCallback(): any {
-    }
-
     onError(err: Error): any {
     }
-
 }

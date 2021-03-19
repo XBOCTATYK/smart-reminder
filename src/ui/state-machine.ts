@@ -69,19 +69,19 @@ export const TELEGRAM_UI_STATE_MACHINE = {
     [STATES.ENTER_TASK_DATE]: {
         next: [
             STATES.ENTER_TASK_TIME,
+            STATES.POSTPONE_TASK,
             STATES.PENDING_TASK,
         ],
         actions: {
-            [STATES.ENTER_TASK_TIME]: () => undefined,
             [STATES.PENDING_TASK]: () => undefined,
         }
     },
     [STATES.ENTER_TASK_TIME]: {
         next: [
-            STATES.PENDING_TASK,
+            STATES.ENTER_TASK_DATE,
         ],
         actions: {
-            [STATES.PENDING_TASK]: () => undefined,
+            [STATES.ENTER_TASK_DATE]: () => undefined,
         }
     }
 } as IStateMap;

@@ -28,17 +28,24 @@ const matcherFunctions = [
         transformer: () => ExtendedDate.of(new Date).addDays(4).startOfDay().get()
     },
     {
-        matcher: (text: string) => !!text.match(/через ([\d]{1,2}) ?(день|дня|дней|деньков|денечков|дн$|д$|)+/)[2],
+        matcher: (text: string) => !!text.match(/через ([\d]{1,2}) ?(день|дня|дней|деньков|денечков|дн$|д$)+/)[2],
         transformer: (text: string) => {
             const [ , days ] = text.match(/через ([\d]+) ?(день|дня|дней|деньков|денечков|дн$|д$|)+/);
             return ExtendedDate.of(new Date).addDays(parseInt(days)).startOfDay().get()
         }
     },
     {
-        matcher: (text: string) => !!text.match(/через ([\d]{1,2}) ?(час|часа|часов|часика|часиков|часик|чс$|ч$|)+/)[2],
+        matcher: (text: string) => !!text.match(/через ([\d]{1,2}) ?(час|часа|часов|часика|часиков|часик|чс$|ч$)+/)[2],
         transformer: (text: string) => {
             const [ , hours ] = text.match(/через ([\d]+) ?(час|часа|часов|часика|часиков|часик|чс$|ч$|)+/);
             return ExtendedDate.of(new Date).addHours(parseInt(hours)).startOfDay().get()
+        }
+    },
+    {
+        matcher: (text: string) => !!text.match(/через ([\d]{1,2}) ?(минуты|минуток|минут|мин$|мн$|м$)+/)[2],
+        transformer: (text: string) => {
+            const [ , minutes ] = text.match(/через ([\d]+) ?(час|часа|часов|часика|часиков|часик|чс$|ч$)+/);
+            return ExtendedDate.of(new Date).addMinutes(parseInt(minutes)).startOfDay().get()
         }
     }
 ];

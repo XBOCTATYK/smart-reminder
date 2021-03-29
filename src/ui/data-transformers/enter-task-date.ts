@@ -44,7 +44,7 @@ const matcherFunctions = [
     {
         matcher: (text: string) => !!text.match(/через ([\d]{1,2}) ?(минуты|минуток|минут|мин$|мн$|м$)+/)[2],
         transformer: (text: string) => {
-            const [ , minutes ] = text.match(/через ([\d]+) ?(час|часа|часов|часика|часиков|часик|чс$|ч$)+/);
+            const [ , minutes ] = text.match(/через ([\d]+) ?(минуты|минуток|минут|мин$|мн$|м$)+/);
             return ExtendedDate.of(new Date).addMinutes(parseInt(minutes)).startOfDay().get()
         }
     }

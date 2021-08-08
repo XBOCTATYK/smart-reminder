@@ -9,3 +9,7 @@ export interface IConsistent {
 export interface IWithId<T> {
     withId: (id: string) => T;
 }
+
+export interface IHavingUnicId<T = string> {
+    id?: T;
+}

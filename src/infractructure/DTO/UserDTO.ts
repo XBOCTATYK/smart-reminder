@@ -5,9 +5,9 @@ import { SkipNullableSetter } from 'Decorators/methods/skipNullableSetter';
 import { NumberType } from 'Decorators/validators/NumberType';
 import { DTO_ERROR } from 'Constants/errors';
 
-import { ICheckRequired } from 'Src/infractructure/interfaces/main';
+import { ICheckRequired, IHavingUnicId } from 'Src/infractructure/interfaces/main';
 
-interface IUserDTO {
+export interface IUserDTO {
     id: number;
     startTime?: Date;
     endTime?: Date;
@@ -16,7 +16,7 @@ interface IUserDTO {
     active: boolean;
 }
 
-export class UserDTO implements IUserDTO, ICheckRequired {
+export class UserDTO implements IUserDTO, ICheckRequired, IHavingUnicId<number> {
     @Required id: number;
     @Required @DateType startTime: Date;
     @Required @DateType endTime: Date;

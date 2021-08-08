@@ -7,3 +7,7 @@ export const dayCountReg = '([\\d]+)'
 export const hourCountReg = '([\\d]+)'
 export const minuteCountReg = '([\\d]+)'
 export const secondCountReg = '([\\d]+)'
+
+type Flatten<Type> = Type extends { name: infer Item } ? Item : Type;
+
+const t: Flatten<{ name: number }> = 2;

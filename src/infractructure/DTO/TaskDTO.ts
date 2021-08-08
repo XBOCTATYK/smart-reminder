@@ -11,8 +11,9 @@ import { NotificationsDTO } from 'DTO/NotificationsDTO';
 import { DTO_ERROR } from 'Constants/errors';
 
 import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
+import { getIdDefault } from 'DTO/helpers/getIdDefault';
 
-interface ITaskDTO {
+export interface ITaskDTO {
     id?: string;
     name?: string;
     date?: Date;
@@ -26,7 +27,7 @@ interface ITaskDTO {
     done: boolean;
 }
 
-@GeneratedId
+@GeneratedId(getIdDefault<TaskDTO>())
 export class TaskDTO implements ITaskDTO, ICheckRequired, IConsistent {
     @Required id: string;
     @Required name: string;

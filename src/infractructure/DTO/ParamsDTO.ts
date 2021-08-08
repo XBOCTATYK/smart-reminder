@@ -1,12 +1,18 @@
-import { SkipNullableSetter } from '../decorators/methods/skipNullableSetter';
-import { IConsistent } from '../interfaces/main';
+import { SkipNullableSetter } from 'Decorators/methods/skipNullableSetter';
 
-export class ParamsDTO implements IConsistent {
+import { IConsistent, IHavingUnicId } from '../interfaces/main';
+
+export interface IParamsDTO {
+    key: string;
+    value: string;
+}
+
+export class ParamsDTO implements IConsistent, IHavingUnicId {
     id: string;
     key: string;
     value: string;
 
-    constructor({ key, value }) {
+    constructor({ key, value }: IParamsDTO) {
         this.setKey(key);
         this.setValue(value);
     }

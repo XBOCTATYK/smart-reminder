@@ -71,6 +71,11 @@ export class NotifyRepository extends AbstractRepository<NotificationsDTO> imple
         return this;
     }
 
+    withTaskId(id: string): INotificationsRepository {
+        this.modifiers.task_id = id;
+        return this;
+    }
+
     inThisTime(): INotificationsRepository {
         this.modifiers.date = {
             [Op.between]: [new Date(Date.now() - TASK_DISPERSION_TIME), new Date()],

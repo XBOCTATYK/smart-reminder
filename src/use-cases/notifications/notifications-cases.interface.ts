@@ -1,5 +1,5 @@
-import { IUserRepository } from '../../infractructure/repository/repository.interface';
-import { NotificationsDTO } from '../../infractructure/DTO/NotificationsDTO';
+import { IUserRepository } from 'Repository/repository.interface';
+import { NotificationsDTO } from 'DTO/NotificationsDTO';
 import { Answer } from 'Constants/answers';
 import { IDataInteractor } from '../data-interactor.interface';
 

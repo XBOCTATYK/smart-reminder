@@ -10,13 +10,12 @@ export type IStateMap = Shape<StateDescription>;
 
 export interface IStateMachine {
     stateMachine: IStateMap;
-    defaultState: IUIState;
+    initState: IUIState;
     state: IUIState;
     prevState: IUIState;
 
-    init(state: IUIState): IStateMachine;
     next(state: IUIState): IStateMachine;
     prev(): IStateMachine;
-    default(): IStateMachine;
+    resetState(): IStateMachine;
     interact(fn: (result: any) => any): IStateMachine;
 }

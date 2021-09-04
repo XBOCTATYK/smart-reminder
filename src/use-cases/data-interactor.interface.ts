@@ -1,5 +1,5 @@
-import { IRepository } from '../infractructure/repository/repository.interface';
+import { IUserRepository } from 'Repository/repository.interface';
 
 export interface IDataInteractor {
-    userRepository: IRepository;
+    userRepository: IUserRepository;
 }

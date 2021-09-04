@@ -32,21 +32,18 @@ setTimeout( async () => {
 
     logger.info('Getting config from base!');
     const paramsInteractor = new ParamsCases(new ParamsRepository(DB.model(USER_PARAMS_ENTITY_KEY)));
-    const Params = await paramsInteractor.getList();
+    const paramsList = await paramsInteractor.getList();
 
-    const SETTINGS = {
-        TOKEN: ''
-    };
-    Params.forEach(item => {
+    const SETTINGS = paramsList.reduce((accumulator, item) => {
         const { key, value } = item;
-        SETTINGS[key] = value;
-    });
+        return { ...accumulator, [key]: value }
+    }, {});
 
     logger.info('Config accepted! %o', SETTINGS);
 
     const banListInteractor = new BanListCases();
     const userRepository = new UserRepository(DB.model(USER_ENTITY_KEY));
-    const userIntersector = new UserCases(
+    const userInteractor = new UserCases(
         userRepository,
         banListInteractor,
     );
@@ -56,7 +53,7 @@ setTimeout( async () => {
         userRepository,
         notificationRepository,
         taskRepository,
-        userIntersector,
+        userInteractor,
     );
     const notificationInteractor = new NotificationsCases(
         userRepository,

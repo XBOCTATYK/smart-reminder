@@ -3,21 +3,23 @@ import { IUIState } from '../ui-interfaces';
 export class PendingTaskState<CTX> implements IUIState {
     id;
     name;
-    context;
+    tgContext;
+    appContext;
 
-    constructor(context?: CTX) {
-        this.context = context;
+    constructor(tgContext?: CTX, appContext?: any ) {
+        this.tgContext = tgContext;
+        this.appContext = appContext;
     }
     controls(): any {
         return undefined;
     }
 
-    interact(): Promise<boolean> {
+    interact(string): Promise<boolean> {
         return Promise.resolve(true);
     }
 
     onEnter(): string {
-        this.context.telegram.sendMessage(this.id, 'Воспользуйтесь панелью управления, чтобы добавить задачу', this.controls())
+        this.tgContext.sendMessage(this.id, 'Воспользуйтесь панелью управления, чтобы добавить задачу', this.controls())
         return '';
     }
 

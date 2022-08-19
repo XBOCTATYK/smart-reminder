@@ -30,7 +30,7 @@ export async function notificationCallback(ctx, DB) {
                 case 'Y':
                     break;
                 case 'N':
-                    await DB.model(TASK_ENTITY_KEY).update({ notificationsNeed: notificationsNeed + 1 }, { where: { id: task.id } });
+                    await DB.model(TASK_ENTITY_KEY).update({ notificationsNeed: Number(notificationsNeed) + 1 }, { where: { id: task.id } });
                     break;
                 case 'D':
                     await DB.model(TASK_ENTITY_KEY).update({ done: true }, { where: { id: task.id } });

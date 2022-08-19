@@ -14,7 +14,7 @@
         "sourceMap": true,
         "noImplicitAny": false,
         "module": "es2020",
-        "target": "es2017",
+        "target": "es2020",
         "jsx": "react",
         "allowJs": true,
         "esModuleInterop": true,
@@ -31,5 +31,5 @@
             "Constants/*": ["src/constants/*"],
             "Utils/*": ["src/utils/*"]
         }
-    }
+    },
 }

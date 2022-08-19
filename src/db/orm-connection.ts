@@ -19,6 +19,12 @@ export class ORMConnection {
             timezone: '+03:00',
             retry: {
                 max: 5,
+            },
+            pool: {
+                max: 10,
+                min: 1,
+                acquire: 10000,
+                idle: 30000
             }
         });
 

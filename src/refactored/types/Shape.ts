@@ -1,0 +1,1 @@
+export type Shape<T extends string = string, K = any> = Record<T, K>

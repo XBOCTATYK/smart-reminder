@@ -18,6 +18,7 @@ module.exports = {
     entry: {
         app: './src/app.ts',
         migrate: './src/migrate.ts',
+        exp: './src/exp.ts'
     },
     module: {
         rules: [

@@ -22,5 +22,5 @@ export interface ConfigLoader extends ResourceLoader {
 }
 
 export interface UserSessionService {
-    getSessionById(userId: number): UserSession
+    getSessionById(userId: number): Promise<UserSession>
 }

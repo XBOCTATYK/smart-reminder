@@ -21,12 +21,12 @@ export class HandlerResult {
     }
 }
 
-export interface HandlerClass {
-    handle<T>(action: Action<T>): Promise<HandlerResult>
+export interface HandlerClass<T> {
+    handle(action: Action<T>): Promise<HandlerResult>
 }
 
 export type HandlerFunction<T> = (action: Action<T>) => Promise<HandlerResult>
 
 export type HandlerGenerator<T> = Generator<Action<T>, Promise<HandlerResult>, Promise<HandlerResult>>
 
-export type Handler<T> = HandlerClass | HandlerFunction<T> | HandlerGenerator<T>
+export type Handler<T> = HandlerClass<T> | HandlerFunction<T> | HandlerGenerator<T>

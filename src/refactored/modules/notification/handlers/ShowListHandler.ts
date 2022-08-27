@@ -1,13 +1,14 @@
 import {Action} from "../../common/interfaces/Action";
+import {HandlerClass, HandlerResult} from "../../common/interfaces/Handler";
 
-export class ShowListHandler {
+export class ShowListHandler implements HandlerClass<string[]> {
     constructor(
 
     ) {
 
     }
 
-    handle(action: Action<undefined>) {
-
+    async handle(action: Action<string[]>): Promise<HandlerResult> {
+        return new HandlerResult.Done()
     }
 }

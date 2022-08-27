@@ -16,8 +16,8 @@ export class TelegramActionProcessor extends EventEmitter implements ActionProce
         this.bot = bot
     }
 
-    async process<T>(action: Action<T>) {
-        return action
+    process<T>(action: Action<T>) {
+
     }
 
 }

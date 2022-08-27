@@ -1,3 +1,5 @@
+import {UserSession} from "../interfaces/UserSession";
+
 export interface Configurable {
     configure(config: Record<string, any>): Configurable
     getConfig(): Record<string, any>
@@ -17,4 +19,8 @@ export interface MessageBunchLoader extends  ResourceLoader{
 
 export interface ConfigLoader extends ResourceLoader {
     load(name?: string): Promise<Record<string, any>>
+}
+
+export interface UserSessionService {
+    getSessionById(userId: number): UserSession
 }

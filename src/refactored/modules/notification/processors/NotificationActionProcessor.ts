@@ -6,8 +6,7 @@ import {ActionSubscribe} from "../../common/utils/decorators/ActionSubscribe";
 @ActionSubscribe()
 export class NotificationActionProcessor extends EventEmitter implements ActionProcessor  {
 
-    async process<T>(action: Action<T>) {
+    process<T>(action: Action<T>) {
 
-        return action
     }
 }

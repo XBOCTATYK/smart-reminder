@@ -7,12 +7,15 @@ export function getUserModel(sequelize: Sequelize, models?: OrmModelCollection, 
         dataValues: any;
     }
 
+    const TABLE_NAME = 'users'
+
     User.init({
         id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
             unique: true,
+            autoIncrement: true,
         },
         time_from: {
             type: DataTypes.STRING,
@@ -29,8 +32,9 @@ export function getUserModel(sequelize: Sequelize, models?: OrmModelCollection, 
 
     }, {
         sequelize,
-        tableName: 'users',
+        tableName: TABLE_NAME,
         modelName: key,
+        indexes: [{name: `${TABLE_NAME}_id_i`, fields: ["id"]}]
     })
 
     return User;

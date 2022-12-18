@@ -1,4 +1,4 @@
-import {ActionProcessor} from "../../common/interfaces/ActionProcessor";
+import {Channel} from "../../common/interfaces/Channel";
 import {Action} from "../../common/interfaces/Action";
 import {ActionSubscribe} from "../../common/utils/decorators/ActionSubscribe";
 import {Telegraf} from "telegraf";
@@ -6,7 +6,7 @@ import {TelegrafContext} from "telegraf/typings/context";
 import {EventEmitter} from "events";
 
 @ActionSubscribe()
-export class TelegramActionProcessor extends EventEmitter implements ActionProcessor {
+export class TelegramActionProcessor extends EventEmitter implements Channel {
     private bot: Telegraf<TelegrafContext>;
 
     constructor(
@@ -16,7 +16,7 @@ export class TelegramActionProcessor extends EventEmitter implements ActionProce
         this.bot = bot
     }
 
-    process<T>(action: Action<T>) {
+    send<T>(action: Action<T>) {
 
     }
 

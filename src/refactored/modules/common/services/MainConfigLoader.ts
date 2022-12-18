@@ -1,5 +1,5 @@
 import {ConfigLoader} from "./interfaces";
-import {merge} from "lodash";
+import merge from "lodash/merge";
 
 export class MainConfigLoader implements ConfigLoader {
     private loaders: Set<ConfigLoader>;

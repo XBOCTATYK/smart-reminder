@@ -14,9 +14,13 @@
     "db:migrate": "cross-env NODE_ENV=production webpack --config ./configs/webpack.config.server.prod.js && cross-env DATABASE_URL=postgres://postgres:gaussne+4@localhost:5432/reminder node ./.build/migrate.js"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "@typescript-eslint/parser": "^4.14.1",
+    "axios": "^0.21.1",
     "date-fns": "^2.14.0",
     "lodash": "^4.17.21",
+    "eslint": "^7.19.0",
+    "eslint-config-google": "^0.14.0",
     "node-cache": "^5.1.2",
     "pg": "^8.3.0",
     "pg-hstore": "^2.3.3",

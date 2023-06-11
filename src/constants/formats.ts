@@ -10,3 +10,8 @@ export const DATE_FNS_OPTIONS = {
     locale: LOCALE,
     startOfWeek: 1,
 }
+
+export type DateFnsOptions = {
+    locale: Locale;
+    startOfWeek: number;
+}

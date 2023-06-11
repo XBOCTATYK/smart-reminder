@@ -1,13 +1,14 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 import { OrmModelCollection } from 'Src/db/orm-connection';
 import { ModelKey } from 'Constants/enitityNames';
+import { getUserModel } from 'Models/User';
 
 export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, key?: ModelKey) {
     class Tasks extends Model {
         dataValues: any;
     }
 
-    const UserModel = models?.User;
+    const UserModel = getUserModel(sequelize);
 
     Tasks.init({
         id: {
@@ -27,15 +28,7 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
             type: DataTypes.STRING,
             allowNull: false,
         },
-        time: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
         date: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        startTime: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -46,6 +39,11 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
         priority: {
             type: DataTypes.INTEGER,
             defaultValue: 5,
+            allowNull: false
+        },
+        type: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1,
             allowNull: false
         },
         notificationsNeed: {
@@ -66,6 +64,10 @@ export function getTasksModel(sequelize: Sequelize, models: OrmModelCollection, 
         sequelize,
         tableName: key.toLowerCase(),
         modelName: key
+    })
+
+    Tasks.belongsTo(UserModel, {
+        foreignKey: 'user_id'
     })
 
     return Tasks;

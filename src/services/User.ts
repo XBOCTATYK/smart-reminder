@@ -1,7 +1,6 @@
 import { Store } from './store';
 import { STATES } from 'Constants/states';
 import { UserStateType } from 'Types/state';
-import { model } from 'Utils/decorators/model';
 import { getUserModel } from 'Models/User';
 import { USER_ENTITY_KEY } from 'Constants/enitityNames';
 
@@ -76,7 +75,6 @@ export class UserService {
     private valueProp = {};
     private isChanged = false;
 
-    @model(USER_ENTITY_KEY)
     private Model: ReturnType<typeof getUserModel>;
 
     static async create(userId) {

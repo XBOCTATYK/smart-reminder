@@ -1,22 +1,21 @@
 import {Telegraf} from "telegraf";
 import {TelegrafContext} from "telegraf/typings/context";
-import {STATES} from "../constants/states";
-import {UserService, UserStateService} from "../../../../services/User";
 import {UserDefaultsConfig} from "../../common/configs/UserDefaultsConfig";
-import {UserStateType} from "../../../../types/state";
-import {UserState} from "./User";
+import {Channel} from "../../common/interfaces/Channel";
 
 export class StartService {
     bot: Telegraf<TelegrafContext>
     private config: UserDefaultsConfig;
+    private channel: Channel;
 
     constructor(
         bot: Telegraf<TelegrafContext>,
-        userStateService: (id: number | string, state?: UserStateType, data?: Record<string, any>) => UserState,
+        channel: Channel,
         config: UserDefaultsConfig
 ) {
         this.bot = bot;
         this.config = config;
+        this.channel = channel;
 
         this.init()
     }
@@ -24,12 +23,11 @@ export class StartService {
     private init() {
         this.bot.command('start', (ctx) => {
             const userId = ctx.message.from.id;
-            let state = STATES.FROM_TIME;
-            let fromTime = this.config.notifications.from;
-            let toTime = this.config.notifications.to;
+            const fromTime = this.config.notifications.from;
+            const toTime = this.config.notifications.to;
 
             ctx.reply('С какого времени вам нужно начинать напоминать?').then(() => {
-                UserStateService(userId, state, { fromTime, toTime });
+                this.channel.send({ type: 'USER_START', payload: { userId, fromTime, toTime } })
             });
         });
     }

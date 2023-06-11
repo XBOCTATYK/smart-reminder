@@ -4,7 +4,7 @@ import * as path from "path";
 import {Decoder} from "../interfaces/Decoder";
 import {Logger} from "pino"
 
-class FileConfigLoader implements ConfigLoader {
+export class FileConfigLoader implements ConfigLoader {
     private decoder: Decoder;
     private readonly name: string;
     private logger: Logger;
@@ -15,7 +15,7 @@ class FileConfigLoader implements ConfigLoader {
         this.name = name
     }
 
-    async load(filename?: string) {
+    async load(filename?: string): Promise<Record<string, any>> {
         const fileFullPath = path.resolve(process.cwd(), '/config', filename ?? this.name)
 
         return fs.readFile(fileFullPath, 'utf-8')

@@ -6,7 +6,7 @@ import {TelegrafContext} from "telegraf/typings/context";
 import {EventEmitter} from "events";
 
 @ActionSubscribe()
-export class TelegramActionProcessor extends EventEmitter implements Channel {
+export class TelegramChannel extends EventEmitter implements Channel {
     private bot: Telegraf<TelegrafContext>;
 
     constructor(
@@ -17,7 +17,7 @@ export class TelegramActionProcessor extends EventEmitter implements Channel {
     }
 
     send<T>(action: Action<T>) {
-
+        this.emit(action.type, action.payload)
     }
 
 }

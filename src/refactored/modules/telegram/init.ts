@@ -1,12 +1,13 @@
 import {BotConfig} from "./config/BotConfig";
 import {Channel} from "../common/interfaces/Channel";
-import {TelegramActionProcessor} from "./processors/TelegramActionProcessor";
+import {TelegramChannel} from "./processors/TelegramChannel";
 import {Telegraf} from "telegraf";
 import {StartService} from "./services/StartService";
 import {UserDefaultsConfig} from "../common/configs/UserDefaultsConfig";
-import {UserService, UserStateService} from "./services/User";
+import {UserStateService} from "./services/UserState";
+import {Action} from "../common/interfaces/Action";
 
-type TelegramModuleConfig = BotConfig & UserDefaultsConfig
+export type TelegramModuleConfig = BotConfig & UserDefaultsConfig
 
 const TELEGRAM_MODULE_SERVICES = {
     USER_STATE: 'USER_STATE',
@@ -19,8 +20,9 @@ const CHANNELS = {
 
 export default class TelegramModule {
     private readonly config: TelegramModuleConfig;
-    private services: Record<any, any>;
-    private channels: Record<any, Channel>;
+    private services: Record<string, any>;
+    private channels: Record<string, Channel>;
+    private actionTypes: Action<Record<string, any>>[];
 
     constructor(imports: any[], config: TelegramModuleConfig) {
         this.config = config;
@@ -30,21 +32,23 @@ export default class TelegramModule {
 
     init() {
         const bot = new Telegraf(this.config.apiKey)
+        const telegramChannel = new TelegramChannel(bot)
 
         this.services = {
             [TELEGRAM_MODULE_SERVICES.USER_STATE]: UserStateService,
-            [TELEGRAM_MODULE_SERVICES.BOT_START]: new StartService(bot, UserStateService, this.config)
+            [TELEGRAM_MODULE_SERVICES.BOT_START]: new StartService(bot, telegramChannel, this.config)
         };
 
         this.channels = {
-            [CHANNELS.USER_INTERACTION]: new TelegramActionProcessor(bot)
+            [CHANNELS.USER_INTERACTION]: telegramChannel
         }
     }
 
     export() {
         return {
             services: this.services,
-            channels: this.channels
+            channels: this.channels,
+            actionTypes: this.actionTypes
         }
     }
 }

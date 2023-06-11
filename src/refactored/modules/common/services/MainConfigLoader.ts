@@ -8,7 +8,7 @@ export class MainConfigLoader implements ConfigLoader {
         this.loaders = loaders
     }
 
-    async load() {
+    async load(): Promise<Record<string, any>> {
         return Promise.all([
             ...Array.from(this.loaders.values()).map(i => i.load())
         ]).then(configs =>

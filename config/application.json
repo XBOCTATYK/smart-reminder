@@ -1,0 +1,10 @@
+{
+  "timezone": "+03:00",
+  "db": {
+    "connect": "postgres://postgres:gaussne+4@localhost:5432/reminder",
+    "pool": {
+      "min": 1,
+      "max": 10
+    }
+  }
+}

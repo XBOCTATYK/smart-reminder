@@ -6,7 +6,7 @@ export const ANSWERS = {
     WAITING: 'O',
     YES: 'Y',
     NO: 'N',
-    RELOCATED: 'R',
+    RESCHEDULED: 'R',
     SKIP: 'C'
 } as const;
 

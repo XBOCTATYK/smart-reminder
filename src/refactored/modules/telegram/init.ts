@@ -6,6 +6,7 @@ import {StartService} from "./services/StartService";
 import {UserDefaultsConfig} from "../common/configs/UserDefaultsConfig";
 import {UserStateService} from "./services/UserState";
 import {Action} from "../common/interfaces/Action";
+import {PetModule, ModuleExports} from "../interfaces/PetModule";
 
 export type TelegramModuleConfig = BotConfig & UserDefaultsConfig
 
@@ -18,7 +19,7 @@ const CHANNELS = {
     USER_INTERACTION: 'USER_INTERACTION'
 }
 
-export default class TelegramModule {
+export default class TelegramModule implements PetModule {
     private readonly config: TelegramModuleConfig;
     private services: Record<string, any>;
     private channels: Record<string, Channel>;
@@ -30,7 +31,7 @@ export default class TelegramModule {
         this.init();
     }
 
-    init() {
+    init(): TelegramModule {
         const bot = new Telegraf(this.config.apiKey)
         const telegramChannel = new TelegramChannel(bot)
 
@@ -42,9 +43,11 @@ export default class TelegramModule {
         this.channels = {
             [CHANNELS.USER_INTERACTION]: telegramChannel
         }
+
+        return this;
     }
 
-    export() {
+    export(): ModuleExports {
         return {
             services: this.services,
             channels: this.channels,

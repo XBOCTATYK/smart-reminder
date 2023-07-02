@@ -16,14 +16,16 @@ export class FileConfigLoader implements ConfigLoader {
     }
 
     async load(filename?: string): Promise<Record<string, any>> {
-        const fileFullPath = path.resolve(process.cwd(), '/config', filename ?? this.name)
+        const fileFullPath = path.resolve(process.cwd(), 'config', filename ?? this.name)
 
+        console.log(fileFullPath)
         return fs.readFile(fileFullPath, 'utf-8')
             .then(configFile => this.decoder.decode<Record<string, any>>(configFile))
             .then(res => {
                 this.logger.info(`Successfully got config ${this.name}`);
                 return res
             })
+            .catch(console.log)
             .catch(err => this.logger.error(`Cannot get config ${this.name}. This requested config won't be merged!`, err))
             .then(res => typeof res === "undefined" ? ({}) : res)
     }

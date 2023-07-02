@@ -1,5 +1,0 @@
-{
-  "db": {
-    "connect": "postgres://postgres:gaussne+4@localhost:5432/reminder"
-  }
-}

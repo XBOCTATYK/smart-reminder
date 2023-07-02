@@ -7,8 +7,8 @@
     "clear": "rm -rf ./.build",
     "build:server:prod": "cross-env NODE_ENV=production webpack --config ./configs/webpack.config.server.prod.js",
     "build:server:prod:watch": "cross-env NODE_ENV=development webpack --watch --config ./configs/webpack.config.server.prod.js",
-    "start:server:nodemon": "cross-env NODE_ENV=development JWT_SECRET_KEY=secret DATABASE_URL=postgres://postgres:***@localhost:5432/reminder nodemon ./.build/exp.js --watch ./.build/exp.js",
-    "start:server:node": "cross-env NODE_ENV=development JWT_SECRET_KEY=secret DATABASE_URL=postgres://postgres:***@localhost:5432/reminder node ./.build/exp.js",
+    "start:server:nodemon": "cross-env NODE_ENV=development JWT_SECRET_KEY=secret DATABASE_URL=postgres://postgres:gaussne+4@localhost:5432/reminder nodemon ./.build/new.js --watch ./.build/new.js",
+    "start:server:node": "cross-env NODE_ENV=development JWT_SECRET_KEY=secret DATABASE_URL=postgres://postgres:gaussne+4@localhost:5432/reminder node ./.build/exp.js",
     "start:server": "npm-run-all --parallel build:server:prod:watch start:server:nodemon",
     "start:server:prod": "npm-run-all --parallel build:server:prod:watch start:server:node",
     "db:migrate": "cross-env NODE_ENV=production webpack --config ./configs/webpack.config.server.prod.js && cross-env DATABASE_URL=postgres://postgres:gaussne+4@localhost:5432/reminder node ./.build/migrate.js"

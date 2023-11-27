@@ -6,9 +6,10 @@ import { DTO } from 'Decorators/validators/DTO';
 import { SkipNullableSetter } from 'Decorators/methods/skipNullableSetter';
 import { TaskDTO } from 'DTO/TaskDTO';
 
-import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
+import { ICheckRequired, IConsistent, IHavingUnicId } from 'Src/infractructure/interfaces/main';
+import { getIdDefault } from './helpers/getIdDefault';
 
-interface IUsualDTO {
+export interface IUsualDTO {
     id?: string;
     task_id?: string;
     lastTaskDate?: Date;
@@ -20,8 +21,8 @@ interface IUsualDTO {
     done?: boolean;
 }
 
-@GeneratedId
-export class UsualDTO implements IUsualDTO, IConsistent, ICheckRequired {
+@GeneratedId(getIdDefault<IUsualDTO>())
+export class UsualDTO implements IUsualDTO, IConsistent, ICheckRequired, IHavingUnicId {
     @Required id: string;
     @Required task_id: string;
     @DTO Task: TaskDTO;
@@ -42,7 +43,7 @@ export class UsualDTO implements IUsualDTO, IConsistent, ICheckRequired {
         this.setMinutes(data.minutes);
         this.setDone(data.done);
         this.setTaskId(data.task_id);
-    }k
+    }
 
     @SkipNullableSetter
     setTaskId(id?: string) {

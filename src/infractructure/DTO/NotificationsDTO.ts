@@ -10,6 +10,7 @@ import { DTO_ERROR } from 'Constants/errors';
 import { DTOError } from 'Domain/errors';
 
 import { ICheckRequired, IConsistent } from 'Src/infractructure/interfaces/main';
+import { getIdDefault } from 'DTO/helpers/getIdDefault';
 
 interface INotificationsDTO {
     id?: string;
@@ -21,7 +22,7 @@ interface INotificationsDTO {
 
 const ANSWERS_CASES = Object.keys(ANSWERS);
 
-@GeneratedId
+@GeneratedId(getIdDefault<NotificationsDTO>())
 export class NotificationsDTO implements INotificationsDTO, IConsistent, ICheckRequired {
     @Required id: string;
     @Required @DateType date: Date;

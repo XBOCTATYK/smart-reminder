@@ -17,6 +17,8 @@ export class TaskCases implements ITaskCases {
     notificationRepository: INotificationsRepository;
     taskRepository: ITaskRepository;
     userCases: IUserCases;
+    portIn;
+    portOut;
 
     constructor(
         userRepository: IUserRepository,
@@ -74,7 +76,7 @@ export class TaskCases implements ITaskCases {
     }
 
     async getTaskList(userId: number): Promise<TaskDTO[]> {
-        const user = this.userCases.checkUser(userId);
+        await this.userCases.checkUser(userId);
 
         return this.taskRepository
             .forUser(userId)

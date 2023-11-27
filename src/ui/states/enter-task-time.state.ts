@@ -15,8 +15,8 @@ export class EnterTaskTimeState implements IUIState {
         return undefined;
     }
 
-    interact(): string {
-        return '';
+    interact(input: string): Promise<boolean> {
+        return this.context.saveTaskTime(input);
     }
 
     onEnter(): string {
@@ -32,9 +32,4 @@ export class EnterTaskTimeState implements IUIState {
         const errorHandler = (ERRORS[err.message] || emptyFunc);
         errorHandler(this.context);
     }
-
-    onCallback(): void {
-        return undefined;
-    }
-
 }

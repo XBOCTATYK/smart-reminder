@@ -9,8 +9,8 @@ export class ToTimeState implements IUIState {
         return undefined;
     }
 
-    interact(): string {
-        return '';
+    interact(): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
     onEnter(): string {
@@ -22,4 +22,6 @@ export class ToTimeState implements IUIState {
         return '';
     }
 
+    onError(err: Error): any {
+    }
 }

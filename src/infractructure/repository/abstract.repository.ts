@@ -1,3 +1,4 @@
+import { Model } from 'sequelize';
 import { RepositoryError } from 'Domain/errors';
 import { IConsistent } from 'Src/infractructure/interfaces/main';
 import { AbstractDTO } from 'DTO/AbstractDTO';
@@ -5,14 +6,14 @@ import { ModelResult } from 'Types/models';
 import { IRepository } from 'Repository/repository.interface';
 import { Shape } from 'Types/shape';
 
-export class AbstractRepository<DTO extends IConsistent> implements IRepository<DTO>{
+export class AbstractRepository<DTO extends IConsistent> implements IRepository<DTO, typeof Model>{
     private name = 'Abstract';
     model = undefined;
 
     protected modifiers = {};
     protected includedModels = [];
 
-    constructor(model: any) {
+    constructor(model: typeof Model) {
         this.model = model;
     }
 

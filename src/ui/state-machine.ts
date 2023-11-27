@@ -69,40 +69,35 @@ export const TELEGRAM_UI_STATE_MACHINE = {
     [STATES.ENTER_TASK_DATE]: {
         next: [
             STATES.ENTER_TASK_TIME,
+            STATES.POSTPONE_TASK,
             STATES.PENDING_TASK,
         ],
         actions: {
-            [STATES.ENTER_TASK_TIME]: () => undefined,
             [STATES.PENDING_TASK]: () => undefined,
         }
     },
     [STATES.ENTER_TASK_TIME]: {
         next: [
-            STATES.PENDING_TASK,
+            STATES.ENTER_TASK_DATE,
         ],
         actions: {
-            [STATES.PENDING_TASK]: () => undefined,
+            [STATES.ENTER_TASK_DATE]: () => undefined,
         }
     }
 } as IStateMap;
 
 export class TelegramStateMachine implements IStateMachine {
     stateMachine;
-    defaultState;
+    initState;
     state;
     prevState;
     interactResult;
+    userContext;
 
-    constructor(stateMachine: IStateMap, defaultState: IUIState) {
+    constructor(stateMachine: IStateMap, userContext, initState: IUIState) {
         this.stateMachine = stateMachine;
-        this.defaultState = defaultState;
-    }
-
-    init(state: IUIState) {
-        this.state = state;
-        this.state.onEnter();
-
-        return this;
+        this.initState = initState;
+        this.state = initState;
     }
 
     next(state: IUIState) {
@@ -128,9 +123,9 @@ export class TelegramStateMachine implements IStateMachine {
         return this;
     }
 
-    default() {
+    resetState() {
         this.state.onLeave();
-        this.state = this.defaultState;
+        this.state = this.initState;
         this.state.onEnter();
 
         return this;
@@ -139,52 +134,8 @@ export class TelegramStateMachine implements IStateMachine {
     interact<CTX = any>(ctx: CTX) {
         return this.interactResult = this.state.interact(ctx);
     }
-}
 
-export class TelegramStateMachineStrings {
-    stateMachineClass;
-    state;
-    prevState;
-    defaultState;
+    private crateState(name) {
 
-    private getStateByName(name: StateType) {
-        switch (name) {
-            case STATES.PENDING_TASK:
-                return new PendingTaskState(name)
-        }
-    }
-
-    constructor(stateMachine: IStateMap, defaultState: StateType) {
-        this.stateMachineClass = new TelegramStateMachine(stateMachine, this.getStateByName(defaultState));
-        this.defaultState = defaultState;
-    }
-
-    init(state: StateType) {
-        this.stateMachineClass.init(this.getStateByName(state))
-
-        return this;
-    }
-
-    next(state: StateType) {
-        this.stateMachineClass.next(this.getStateByName(state));
-        this.state = state;
-
-        return this;
-    }
-
-    prev() {
-        this.stateMachineClass.prev();
-        this.state = this.prevState;
-
-        return this;
-    }
-
-    default() {
-        this.stateMachineClass.default();
-        this.state = this.defaultState;
-    }
-
-    interact<CTX = any>(ctx: CTX) {
-        this.stateMachineClass.interact(ctx);
     }
 }

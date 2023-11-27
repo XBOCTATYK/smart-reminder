@@ -1,8 +1,9 @@
+import { Model } from 'sequelize';
 import { AbstractRepository } from './abstract.repository';
-import { ParamsDTO } from '../DTO/ParamsDTO';
+import { ParamsDTO } from 'DTO/ParamsDTO';
 import { IRepository } from './repository.interface';
 
-export interface IParamsRepository extends IRepository<ParamsDTO>{
+export interface IParamsRepository extends IRepository<ParamsDTO, typeof Model>{
     withKey(key: string): IParamsRepository;
 }
 

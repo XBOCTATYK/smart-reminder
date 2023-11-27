@@ -9,8 +9,8 @@ export class UnsubscribedState implements IUIState {
         return undefined;
     }
 
-    interact(): string {
-        return '';
+    interact(): Promise<boolean> {
+        return Promise.resolve(true);
     }
 
     onEnter(): string {
@@ -22,4 +22,6 @@ export class UnsubscribedState implements IUIState {
         return '';
     }
 
+    onError(err: Error): any {
+    }
 }
